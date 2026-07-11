@@ -1,0 +1,57 @@
+- title: The Millennial Fair
+  rosterChanges:
+    - pin: Chrono
+    - pin: Marle
+- title: The Queen Returns
+  rosterChanges:
+    - remove: Marle
+- title: A Vanished Princess
+  rosterChanges:
+    - pin: Lucca
+- title: Homecoming
+- title: The Trial
+- title: Beyond the Ruins
+  rosterChanges:
+    - pin: Marle
+- title: The Factory Ruins
+  rosterChanges:
+    - pin: Robo
+    - unpin: Lucca
+    - unpin: Marle
+- title: The End of Time
+- title: The Village of Magic
+  rosterChanges:
+    - unpin: Robo
+- title: The Hero Appears
+- title: Tata and the Frog
+- title: The Rare Red Rock
+- title: Footsteps! Follow!
+  rosterChanges:
+    - pin: Ayla
+- title: The Masamune!
+  rosterChanges:
+    - add: Frog
+- title: Magus's Castle
+- title: Forward to the Past
+- title: Unnatural Selection?
+- title: The Magic Kingdom
+  rosterChanges:
+    - unpin: Ayla
+- title: Break the Seal!
+- title: The Guru on Mt. Woe
+- title: What Lies Beyond?
+- title: Lavos Beckons
+- title: The New King
+  rosterChanges:
+    - remove: Chrono
+- title: The Time Egg
+- title: The Fated Hour
+  sideQuests:
+    - The Sunstone
+    - The End of Ozzie
+    - Giving Cyrus Rest
+    - Fiona's Forest
+    - Robo's Origins
+    - The Rainbow Shell
+    - The Black Omen
+- title: The Final Battle
