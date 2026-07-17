@@ -15,7 +15,34 @@ import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.yaml.parser
 
-final case class ChronoTriggerDefinition(randomFlags: List[String], chapters: List[Chapter])
+final case class ChronoTriggerDefinition(
+    randomFlags: List[String],
+    chapters: List[Chapter],
+    secretTripleTechs: List[SecretTripleTech]
+)
+
+final case class SecretTripleTech(name: String, characters: (String, String, String), rockColor: String)
+
+object SecretTripleTech:
+  given Decoder[SecretTripleTech] = deriveDecoder[SecretTripleTech]
+
+sealed trait TripleTechDesignation
+
+object TripleTechDesignation:
+  final case class Secret(tech: SecretTripleTech) extends TripleTechDesignation
+
+  case object Base extends TripleTechDesignation
+
+  def forParty(
+      selectedParty: List[String],
+      secretTripleTechs: List[SecretTripleTech]
+  ): Option[TripleTechDesignation] =
+    secretTripleTechs
+      .find: tech =>
+        selectedParty.size == 3 && tech.characters.toList.toSet == selectedParty.toSet
+      .map(Secret.apply)
+      .orElse:
+        Option.when(selectedParty.contains("Chrono") && !selectedParty.contains("Magus"))(Base)
 
 /**
   * @param rosterChanges
@@ -103,7 +130,11 @@ object SideQuest:
 object ChronoTriggerDefinition:
   given Decoder[ChronoTriggerDefinition] = deriveDecoder[ChronoTriggerDefinition]
 
-final case class ChronoTriggerQuestData(flags: Map[String, Boolean], chapterStates: List[ChapterState])
+final case class ChronoTriggerQuestData(
+    flags: Map[String, Boolean],
+    chapterStates: List[ChapterState],
+    secretTripleTechs: List[SecretTripleTech]
+)
 
 object ChronoTriggerQuestData:
   private val yamlPath =
@@ -212,7 +243,7 @@ object ChronoTriggerQuestData:
             case Some(sideQuests) =>
               selectSideQuests(sideQuests, roster)
                 .map(ChapterState(chapter, roster, rosterAfterCompletion, List.empty, _))
-      .map(ChronoTriggerQuestData(flags, _))
+      .map(ChronoTriggerQuestData(flags, _, definition.secretTripleTechs))
 
   private[chronotrigger] def simulate(definition: ChronoTriggerDefinition): Rng[ChronoTriggerQuestData] =
     chooseFlags(definition.randomFlags).flatMap(simulate(definition, _))

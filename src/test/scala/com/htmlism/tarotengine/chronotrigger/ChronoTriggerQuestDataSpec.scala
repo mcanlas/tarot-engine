@@ -11,7 +11,7 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
     Some(FlagCondition(NonEmptyMap.one(flag, value)))
 
   private def definition(chapters: Chapter*): ChronoTriggerDefinition =
-    ChronoTriggerDefinition(List.empty, chapters.toList)
+    ChronoTriggerDefinition(List.empty, chapters.toList, List.empty)
 
   private def chapter(title: String, changes: RosterChange*): Chapter =
     Chapter(
@@ -156,3 +156,27 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
     forEach(result.chapterStates): chapterState =>
       expect(chapterState.roster.available.isEmpty)
+
+  test("a matching secret party receives its rock designation regardless of order"):
+    val tech = SecretTripleTech("Omega Flare", ("Lucca", "Robo", "Magus"), "Blue")
+
+    expect.same(
+      Some(TripleTechDesignation.Secret(tech)),
+      TripleTechDesignation.forParty(List("Magus", "Lucca", "Robo"), List(tech))
+    )
+
+  test("a party with Chrono and without Magus receives the base triple tech designation"):
+    val designation = TripleTechDesignation.forParty(
+      List("Chrono", "Marle", "Lucca"),
+      List.empty
+    )
+
+    expect.same(Some(TripleTechDesignation.Base), designation)
+
+  test("a non-secret party containing both Chrono and Magus has no triple tech"):
+    val designation = TripleTechDesignation.forParty(
+      List("Chrono", "Magus", "Marle"),
+      List.empty
+    )
+
+    expect.same(None, designation)

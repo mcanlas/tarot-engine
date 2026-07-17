@@ -1,6 +1,37 @@
 randomFlags:
   - fight-magus
   - save-chrono
+secretTripleTechs:
+  - name: Eternal Darkness
+    characters:
+      - Marle
+      - Lucca
+      - Magus
+    rockColor: Black
+  - name: Mastermune
+    characters:
+      - Frog
+      - Marle
+      - Robo
+    rockColor: Gold
+  - name: Omega Flare
+    characters:
+      - Lucca
+      - Robo
+      - Magus
+    rockColor: Blue
+  - name: Poyozo Dance
+    characters:
+      - Marle
+      - Lucca
+      - Ayla
+    rockColor: White
+  - name: Spin Strike
+    characters:
+      - Frog
+      - Robo
+      - Ayla
+    rockColor: Silver
 # rosterChanges apply on entry and determine the roster used during that chapter.
 # completionChanges apply after the chapter and carry into the next chapter.
 chapters:
