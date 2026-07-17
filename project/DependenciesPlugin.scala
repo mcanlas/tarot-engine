@@ -41,6 +41,14 @@ object DependenciesPlugin extends AutoPlugin {
         p.settings(
           libraryDependencies += "org.slf4j" % "slf4j-simple" % Versions.slf4jSimple
         )
+
+      def withTesting: Project =
+        p.settings(
+          libraryDependencies ++= Seq(
+            "org.typelevel" %% "weaver-cats"       % Versions.weaver % Test,
+            "org.typelevel" %% "weaver-scalacheck" % Versions.weaver % Test
+          )
+        )
     }
   }
 }

@@ -5,6 +5,7 @@ lazy val root =
     .withJson
     .withYaml
     .withLogging
+    .withTesting
     .enablePlugins(JavaAppPackaging, DockerPlugin)
     .settings(
       Compile / mainClass := Some("com.htmlism.tarotengine.web.TarotEngineServiceApp"),

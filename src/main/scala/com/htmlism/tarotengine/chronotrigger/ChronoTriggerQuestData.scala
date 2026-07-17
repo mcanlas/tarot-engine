@@ -8,6 +8,7 @@ import scala.util.Random
 
 import cats.data.NonEmptyList
 import cats.effect.IO
+import cats.syntax.traverse.*
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.yaml.parser
@@ -93,22 +94,24 @@ object ChronoTriggerQuestData:
 
     chapters.zip(rosters)
 
-  private def selectParty(roster: Roster, random: Random): List[String] =
+  private def selectParty(roster: Roster): Rng[List[String]] =
     val openSlots = (3 - roster.pinned.size).max(0)
 
-    roster.pinned ++ random.shuffle(roster.available).take(openSlots)
+    Rng
+      .shuffle(roster.available)
+      .map(roster.pinned ++ _.take(openSlots))
 
-  private def simulate(chapters: List[Chapter], random: Random): ChronoTriggerQuestData =
-    val chapterStates = rosterStates(chapters).map:
-      case (chapter, roster) =>
-        ChapterState(chapter, roster, selectParty(roster, random))
-
-    ChronoTriggerQuestData(chapterStates)
+  private[chronotrigger] def simulate(chapters: List[Chapter]): Rng[ChronoTriggerQuestData] =
+    rosterStates(chapters)
+      .traverse:
+        case (chapter, roster) =>
+          selectParty(roster).map(ChapterState(chapter, roster, _))
+      .map(ChronoTriggerQuestData.apply)
 
   val build: IO[ChronoTriggerQuestData] =
     for
       yaml      <- IO.blocking(Files.readString(yamlPath, StandardCharsets.UTF_8))
       chapters  <- IO.fromEither(parser.parse(yaml).flatMap(_.as[List[Chapter]]))
       random    <- IO(Random())
-      questData <- IO(simulate(chapters, random))
+      questData <- IO(simulate(chapters).runA(random).value)
     yield questData
