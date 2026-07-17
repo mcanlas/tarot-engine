@@ -3,16 +3,24 @@ package com.htmlism.tarotengine.chronotrigger
 import scala.util.Random
 
 import cats.data.NonEmptyList
+import cats.data.NonEmptyMap
 import weaver.*
 
 object ChronoTriggerQuestDataSpec extends FunSuite:
+  private def when(flag: String, value: Boolean): Option[FlagCondition] =
+    Some(FlagCondition(NonEmptyMap.one(flag, value)))
+
+  private def definition(chapters: Chapter*): ChronoTriggerDefinition =
+    ChronoTriggerDefinition(List.empty, chapters.toList)
+
   private def chapter(title: String, changes: RosterChange*): Chapter =
     Chapter(
       title,
       bosses            = None,
       partyRestrictions = None,
       sideQuests        = None,
-      rosterChanges     = NonEmptyList.fromList(changes.toList)
+      rosterChanges     = NonEmptyList.fromList(changes.toList),
+      completionChanges = None
     )
 
   test("simulate selects at most three party members and always includes pinned members"):
@@ -28,7 +36,7 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
       chapter("The Queen Returns")
     )
 
-    val result = ChronoTriggerQuestData.simulate(chapters).runA(Random(123)).value
+    val result = ChronoTriggerQuestData.simulate(definition(chapters*)).runA(Random(123)).value
 
     expect(result.chapterStates.forall(_.selectedParty.size <= 3)) &&
     expect:
@@ -52,14 +60,78 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
         bosses            = None,
         partyRestrictions = None,
         sideQuests        = Some(sideQuests),
-        rosterChanges     = None
+        rosterChanges     = None,
+        completionChanges = None
       )
     )
 
-    val result          = ChronoTriggerQuestData.simulate(chapters).runA(Random(123)).value
+    val result          = ChronoTriggerQuestData.simulate(definition(chapters*)).runA(Random(123)).value
     val sideQuestStates = result.chapterStates.flatMap(_.sideQuestStates)
 
     expect.same(sideQuests.toList.sorted, sideQuestStates.map(_.title).sorted) &&
     expect(sideQuests.toList != sideQuestStates.map(_.title)) &&
     expect(sideQuestStates.forall(_.selectedParty.size <= 3)) &&
     expect(sideQuestStates.forall(_.selectedParty.contains("Crono")))
+
+  test("simulate applies chapter completion changes whose flag conditions match"):
+    val chapters = List(
+      chapter("The Millennial Fair", RosterChange.Pin("Chrono")),
+      Chapter(
+        "The New King",
+        bosses            = None,
+        partyRestrictions = None,
+        sideQuests        = None,
+        rosterChanges     = Some(NonEmptyList.one(RosterChange.Remove("Chrono"))),
+        completionChanges = Some(
+          NonEmptyList.one(RosterChange.Add("Magus", when("fight-magus", false)))
+        )
+      ),
+      Chapter(
+        "The Time Egg",
+        bosses            = None,
+        partyRestrictions = None,
+        sideQuests        = None,
+        rosterChanges     = None,
+        completionChanges = Some(
+          NonEmptyList.one(RosterChange.Add("Chrono", when("save-chrono", true)))
+        )
+      ),
+      chapter("The Fated Hour")
+    )
+    val flags  = Map("fight-magus" -> false, "save-chrono" -> true)
+    val result = ChronoTriggerQuestData.simulate(definition(chapters*), flags).runA(Random(123)).value
+
+    expect.same(flags, result.flags) &&
+    expect.same(List.empty, result.chapterStates(1).roster.available) &&
+    expect.same(List("Magus"), result.chapterStates(1).rosterAfterCompletion.available) &&
+    expect.same(List("Magus"), result.chapterStates(2).roster.available) &&
+    expect.same(List("Magus", "Chrono"), result.chapterStates(2).rosterAfterCompletion.available) &&
+    expect.same(List("Magus", "Chrono"), result.chapterStates(3).roster.available)
+
+  test("simulate skips chapter completion changes whose flag conditions do not match"):
+    val chapters = List(
+      Chapter(
+        "The New King",
+        bosses            = None,
+        partyRestrictions = None,
+        sideQuests        = None,
+        rosterChanges     = None,
+        completionChanges = Some(
+          NonEmptyList.one(RosterChange.Add("Magus", when("fight-magus", false)))
+        )
+      ),
+      Chapter(
+        "The Time Egg",
+        bosses            = None,
+        partyRestrictions = None,
+        sideQuests        = None,
+        rosterChanges     = None,
+        completionChanges = Some(
+          NonEmptyList.one(RosterChange.Add("Chrono", when("save-chrono", true)))
+        )
+      )
+    )
+    val flags  = Map("fight-magus" -> true, "save-chrono" -> false)
+    val result = ChronoTriggerQuestData.simulate(definition(chapters*), flags).runA(Random(123)).value
+
+    expect(result.chapterStates.forall(_.roster.available.isEmpty))

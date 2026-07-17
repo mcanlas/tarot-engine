@@ -5,6 +5,11 @@ import scala.util.Random
 import weaver.*
 
 object RngSpec extends FunSuite:
+  test("nextBoolean is deterministic for a given seed"):
+    val control = Random(123)
+
+    expect.same(control.nextBoolean(), Rng.nextBoolean.runA(Random(123)).value)
+
   test("shuffle is deterministic for a given seed"):
     val values = List("Crono", "Marle", "Lucca", "Frog", "Robo")
 

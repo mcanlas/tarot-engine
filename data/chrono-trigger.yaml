@@ -1,3 +1,9 @@
+randomFlags:
+  - fight-magus
+  - save-chrono
+# rosterChanges apply on entry and determine the roster used during that chapter.
+# completionChanges apply after the chapter and carry into the next chapter.
+chapters:
 - title: The Millennial Fair
   rosterChanges:
     - pin: Chrono
@@ -44,8 +50,15 @@
 - title: The New King
   rosterChanges:
     - remove: Chrono
+  completionChanges:
     - add: Magus
+      when:
+        fight-magus: false
 - title: The Time Egg
+  completionChanges:
+    - add: Chrono
+      when:
+        save-chrono: true
 - title: The Fated Hour
   sideQuests:
     - The Sunstone

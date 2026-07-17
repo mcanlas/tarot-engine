@@ -228,6 +228,14 @@ object TarotEngineRoutesHtml:
       ),
       body(
         h1("Chrono Trigger"),
+        p(
+          questData
+            .flags
+            .toList
+            .sortBy(_._1)
+            .map: (name, value) =>
+              span(cls := "flag")(s"$name: $value ")
+        ),
         p(s"Loaded ${questData.chapterStates.size} chapters"),
         tag("main")(
           questData.chapterStates.map(chronoTriggerChapter)

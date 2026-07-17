@@ -10,11 +10,11 @@ import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.scalatags.*
 import org.http4s.server.middleware.Logger
 
-import com.htmlism.tarotengine.chronotrigger.Chapter
+import com.htmlism.tarotengine.chronotrigger.ChronoTriggerDefinition
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
 
 object TarotEngineServiceApp extends ResourceApp.Forever:
-  private def routes(chapters: List[Chapter]) =
+  private def routes(definition: ChronoTriggerDefinition) =
     HttpRoutes.of[IO]:
       case GET -> Root =>
         Ok(TarotEngineRoutesHtml.index)
@@ -25,7 +25,7 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
       case GET -> Root / "chrono-trigger" =>
         for
           random    <- IO(Random())
-          questData <- ChronoTriggerQuestData.build(chapters, random)
+          questData <- ChronoTriggerQuestData.build(definition, random)
           response  <- Ok(TarotEngineRoutesHtml.chronoTrigger(questData))
         yield response
 
@@ -34,11 +34,11 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
       _ <- Resource
         .eval(IO.println("Starting tarot-engine service..."))
 
-      chapters <- Resource
+      definition <- Resource
         .eval(ChronoTriggerQuestData.load)
 
       _ <- Resource
-        .eval(IO.println(s"Loaded ${chapters.size} Chrono Trigger chapters"))
+        .eval(IO.println(s"Loaded ${definition.chapters.size} Chrono Trigger chapters"))
 
       _ <- EmberServerBuilder
         .default[IO]
@@ -46,7 +46,7 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
         .withPort(port"8083")
         .withHttpApp(
           Logger.httpApp(logHeaders = true, logBody = false)(
-            routes(chapters).orNotFound
+            routes(definition).orNotFound
           )
         )
         .build
