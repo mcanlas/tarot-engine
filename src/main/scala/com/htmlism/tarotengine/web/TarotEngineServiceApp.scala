@@ -8,8 +8,10 @@ import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.scalatags.*
 import org.http4s.server.middleware.Logger
 
+import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
+
 object TarotEngineServiceApp extends ResourceApp.Forever:
-  private def routes =
+  private def routes(questData: ChronoTriggerQuestData) =
     HttpRoutes.of[IO]:
       case GET -> Root =>
         Ok(TarotEngineRoutesHtml.index)
@@ -18,12 +20,18 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
         Ok("Final Fantasy VI stub")
 
       case GET -> Root / "chrono-trigger" =>
-        Ok("Chrono Trigger stub")
+        Ok(TarotEngineRoutesHtml.chronoTrigger(questData))
 
   def run(args: List[String]): Resource[IO, Unit] =
     for
       _ <- Resource
         .eval(IO.println("Starting tarot-engine service..."))
+
+      questData <- Resource
+        .eval(ChronoTriggerQuestData.build)
+
+      _ <- Resource
+        .eval(IO.println(s"Loaded ${questData.chapterStates.size} Chrono Trigger chapters"))
 
       _ <- EmberServerBuilder
         .default[IO]
@@ -31,7 +39,7 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
         .withPort(port"8083")
         .withHttpApp(
           Logger.httpApp(logHeaders = true, logBody = false)(
-            routes.orNotFound
+            routes(questData).orNotFound
           )
         )
         .build

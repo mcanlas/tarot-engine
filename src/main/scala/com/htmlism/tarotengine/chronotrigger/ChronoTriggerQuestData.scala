@@ -1,4 +1,4 @@
-package com.htmlism.tarotengine
+package com.htmlism.tarotengine.chronotrigger
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -8,7 +8,6 @@ import scala.util.Random
 
 import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.effect.IOApp
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.yaml.parser
@@ -22,6 +21,8 @@ final case class Chapter(
 )
 
 final case class Roster(pinned: List[String], available: List[String])
+
+final case class ChapterState(chapter: Chapter, roster: Roster, selectedParty: List[String])
 
 sealed trait RosterChange
 
@@ -45,12 +46,14 @@ object RosterChange:
 object Chapter:
   given Decoder[Chapter] = deriveDecoder[Chapter]
 
-object ChronoTriggerYamlApp extends IOApp.Simple:
-  private val initialRoster =
-    Roster(pinned = List.empty, available = List.empty)
+final case class ChronoTriggerQuestData(chapterStates: List[ChapterState])
 
+object ChronoTriggerQuestData:
   private val yamlPath =
     Path.of("data", "chrono-trigger.yaml")
+
+  private val initialRoster =
+    Roster(pinned = List.empty, available = List.empty)
 
   private def applyChange(roster: Roster, change: RosterChange): Roster =
     change match
@@ -90,34 +93,22 @@ object ChronoTriggerYamlApp extends IOApp.Simple:
 
     chapters.zip(rosters)
 
-  private def displayRoster(chapter: Chapter, roster: Roster): String =
-    val pinned    = roster.pinned.mkString(", ")
-    val available = roster.available.mkString(", ")
-
-    s"${chapter.title}: pinned=[$pinned], available=[$available]"
-
   private def selectParty(roster: Roster, random: Random): List[String] =
     val openSlots = (3 - roster.pinned.size).max(0)
 
     roster.pinned ++ random.shuffle(roster.available).take(openSlots)
 
-  private def printRosterStates(chapters: List[Chapter], random: Random): IO[Unit] =
-    val lines = rosterStates(chapters).flatMap:
+  private def simulate(chapters: List[Chapter], random: Random): ChronoTriggerQuestData =
+    val chapterStates = rosterStates(chapters).map:
       case (chapter, roster) =>
-        val party = selectParty(roster, random).mkString(", ")
+        ChapterState(chapter, roster, selectParty(roster, random))
 
-        List(
-          displayRoster(chapter, roster),
-          s"selected party=[$party]"
-        )
+    ChronoTriggerQuestData(chapterStates)
 
-    IO.println(lines.mkString("\n"))
-
-  val run: IO[Unit] =
+  val build: IO[ChronoTriggerQuestData] =
     for
-      yaml     <- IO.blocking(Files.readString(yamlPath, StandardCharsets.UTF_8))
-      chapters <- IO.fromEither(parser.parse(yaml).flatMap(_.as[List[Chapter]]))
-      random   <- IO(Random())
-      _        <- IO.println(s"Loaded ${chapters.size} Chrono Trigger chapters")
-      _        <- printRosterStates(chapters, random)
-    yield ()
+      yaml      <- IO.blocking(Files.readString(yamlPath, StandardCharsets.UTF_8))
+      chapters  <- IO.fromEither(parser.parse(yaml).flatMap(_.as[List[Chapter]]))
+      random    <- IO(Random())
+      questData <- IO(simulate(chapters, random))
+    yield questData
