@@ -236,7 +236,6 @@ object TarotEngineRoutesHtml:
             .map: (name, value) =>
               span(cls := "flag")(s"$name: $value ")
         ),
-        p(s"Loaded ${questData.chapterStates.size} chapters"),
         tag("main")(
           questData.chapterStates.map(chronoTriggerChapter)
         )
