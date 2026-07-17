@@ -44,6 +44,7 @@
 - title: The New King
   rosterChanges:
     - remove: Chrono
+    - add: Magus
 - title: The Time Egg
 - title: The Fated Hour
   sideQuests:
