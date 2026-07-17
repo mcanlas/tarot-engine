@@ -97,7 +97,7 @@ object TarotEngineRoutesHtml:
       |  color: #7f1d1d;
       |}
       |.frog-forest {
-      |  background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 55%, #86efac 100%);
+      |  background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 55%, #4ade80 100%);
       |  border-color: #4ade80;
       |  color: #14532d;
       |}
@@ -112,7 +112,7 @@ object TarotEngineRoutesHtml:
       |  color: #4a3522;
       |}
       |.magus-shadow {
-      |  background: linear-gradient(135deg, #9333ea 0%, #6b21a8 55%, #312e81 100%);
+      |  background: linear-gradient(135deg, #a855f7 0%, #6b21a8 55%, #1e1b4b 100%);
       |  border-color: #c084fc;
       |  color: #faf5ff;
       |}

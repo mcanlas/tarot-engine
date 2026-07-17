@@ -108,10 +108,11 @@ object ChronoTriggerQuestData:
           selectParty(roster).map(ChapterState(chapter, roster, _))
       .map(ChronoTriggerQuestData.apply)
 
-  val build: IO[ChronoTriggerQuestData] =
+  val load: IO[List[Chapter]] =
     for
-      yaml      <- IO.blocking(Files.readString(yamlPath, StandardCharsets.UTF_8))
-      chapters  <- IO.fromEither(parser.parse(yaml).flatMap(_.as[List[Chapter]]))
-      random    <- IO(Random())
-      questData <- IO(simulate(chapters).runA(random).value)
-    yield questData
+      yaml     <- IO.blocking(Files.readString(yamlPath, StandardCharsets.UTF_8))
+      chapters <- IO.fromEither(parser.parse(yaml).flatMap(_.as[List[Chapter]]))
+    yield chapters
+
+  def build(chapters: List[Chapter], random: Random): IO[ChronoTriggerQuestData] =
+    IO(simulate(chapters).runA(random).value)
