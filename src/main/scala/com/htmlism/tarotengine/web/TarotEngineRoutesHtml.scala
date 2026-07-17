@@ -5,6 +5,8 @@ import scalatags.Text.all.*
 
 import com.htmlism.tarotengine.chronotrigger.ChapterState
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
+import com.htmlism.tarotengine.chronotrigger.Roster
+import com.htmlism.tarotengine.chronotrigger.SideQuestState
 
 object TarotEngineRoutesHtml:
   private val chronoTriggerStyles =
@@ -20,6 +22,10 @@ object TarotEngineRoutesHtml:
       |section {
       |  padding: 1rem 0;
       |  border-top: 1px solid #dbe3ef;
+      |}
+      |
+      |.side-quest {
+      |  margin-left: 1rem;
       |}
       |
       |.roster-table {
@@ -157,13 +163,13 @@ object TarotEngineRoutesHtml:
         characters.map(characterPill)
       )
 
-  private def partyProgression(chapterState: ChapterState): Text.TypedTag[String] =
-    val pinned   = chapterState.roster.pinned
-    val selected = chapterState.selectedParty.filterNot(pinned.contains)
+  private def partyProgression(roster: Roster, selectedParty: List[String]): Text.TypedTag[String] =
+    val pinned   = roster.pinned
+    val selected = selectedParty.filterNot(pinned.contains)
 
     if pinned.isEmpty then
       div(cls := "party-line")(
-        characterList(chapterState.selectedParty)
+        characterList(selectedParty)
       )
     else if selected.isEmpty then
       div(cls := "party-line")(
@@ -176,9 +182,9 @@ object TarotEngineRoutesHtml:
         characterList(selected)
       )
 
-  private def partyTable(chapterState: ChapterState): Text.TypedTag[String] =
+  private def partyTable(roster: Roster, selectedParty: List[String]): Text.TypedTag[String] =
     val partyHeading =
-      if chapterState.selectedParty.size > chapterState.roster.pinned.size then "Selected Party"
+      if selectedParty.size > roster.pinned.size then "Selected Party"
       else "Party"
 
     table(cls := "roster-table")(
@@ -191,19 +197,26 @@ object TarotEngineRoutesHtml:
       tbody(
         tr(
           td(
-            partyProgression(chapterState)
+            partyProgression(roster, selectedParty)
           ),
           td(cls := "available-party")(
-            characterList(chapterState.roster.available)
+            characterList(roster.available)
           )
         )
       )
     )
 
+  private def sideQuest(sideQuestState: SideQuestState): Text.TypedTag[String] =
+    div(cls := "side-quest")(
+      h3(sideQuestState.title),
+      partyTable(sideQuestState.roster, sideQuestState.selectedParty)
+    )
+
   private def chronoTriggerChapter(chapterState: ChapterState): Text.TypedTag[String] =
     tag("section")(
       h2(chapterState.chapter.title),
-      partyTable(chapterState)
+      if chapterState.sideQuestStates.isEmpty then partyTable(chapterState.roster, chapterState.selectedParty)
+      else chapterState.sideQuestStates.map(sideQuest)
     )
 
   def chronoTrigger(questData: ChronoTriggerQuestData): Text.TypedTag[String] =

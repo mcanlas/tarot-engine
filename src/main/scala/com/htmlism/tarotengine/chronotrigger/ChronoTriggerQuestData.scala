@@ -23,7 +23,14 @@ final case class Chapter(
 
 final case class Roster(pinned: List[String], available: List[String])
 
-final case class ChapterState(chapter: Chapter, roster: Roster, selectedParty: List[String])
+final case class SideQuestState(title: String, roster: Roster, selectedParty: List[String])
+
+final case class ChapterState(
+    chapter: Chapter,
+    roster: Roster,
+    selectedParty: List[String],
+    sideQuestStates: List[SideQuestState]
+)
 
 sealed trait RosterChange
 
@@ -101,11 +108,24 @@ object ChronoTriggerQuestData:
       .shuffle(roster.available)
       .map(roster.pinned ++ _.take(openSlots))
 
+  private def selectSideQuests(sideQuests: NonEmptyList[String], roster: Roster): Rng[List[SideQuestState]] =
+    Rng
+      .shuffle(sideQuests.toList)
+      .flatMap:
+        _.traverse: title =>
+          selectParty(roster).map(SideQuestState(title, roster, _))
+
   private[chronotrigger] def simulate(chapters: List[Chapter]): Rng[ChronoTriggerQuestData] =
     rosterStates(chapters)
       .traverse:
         case (chapter, roster) =>
-          selectParty(roster).map(ChapterState(chapter, roster, _))
+          chapter.sideQuests match
+            case None =>
+              selectParty(roster).map(ChapterState(chapter, roster, _, List.empty))
+
+            case Some(sideQuests) =>
+              selectSideQuests(sideQuests, roster)
+                .map(ChapterState(chapter, roster, List.empty, _))
       .map(ChronoTriggerQuestData.apply)
 
   val load: IO[List[Chapter]] =
