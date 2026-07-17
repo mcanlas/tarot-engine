@@ -38,16 +38,19 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
     val result = ChronoTriggerQuestData.simulate(definition(chapters*)).runA(Random(123)).value
 
-    expect(result.chapterStates.forall(_.selectedParty.size <= 3)) &&
-    expect:
-      result
-        .chapterStates
-        .forall: chapterState =>
-          chapterState.roster.pinned.forall(chapterState.selectedParty.contains)
+    forEach(result.chapterStates): chapterState =>
+      expect(chapterState.selectedParty.size <= 3) &&
+        forEach(chapterState.roster.pinned): char =>
+          exists(chapterState.selectedParty): selected =>
+            expect.same(char, selected)
 
   test("simulate shuffles side quests and selects a party for each one"):
-    val sideQuests = NonEmptyList.of("The Sunstone", "The End of Ozzie", "Robo's Origins")
-    val chapters   = List(
+    val sideQuests = NonEmptyList.of(
+      SideQuest("The Sunstone", None),
+      SideQuest("The End of Ozzie", Some("Robo")),
+      SideQuest("Robo's Origins", None)
+    )
+    val chapters = List(
       chapter(
         "The Millennial Fair",
         RosterChange.Pin("Crono"),
@@ -68,18 +71,27 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
     val result          = ChronoTriggerQuestData.simulate(definition(chapters*)).runA(Random(123)).value
     val sideQuestStates = result.chapterStates.flatMap(_.sideQuestStates)
-    val robosOrigins    =
-      sideQuestStates.find(_.title == "Robo's Origins")
-    val nonRobosOrigins =
-      sideQuestStates.filterNot(_.title == "Robo's Origins")
+    val otherSideQuests = sideQuestStates.filterNot(_.title == "The End of Ozzie")
+    val validParties    = forEach(sideQuestStates): sideQuestState =>
+      expect(sideQuestState.selectedParty.size <= 3) &&
+        exists(sideQuestState.selectedParty): selected =>
+          expect.same("Crono", selected)
+    val roboRequired = exists(sideQuestStates): sideQuestState =>
+      val roboPinned = exists(sideQuestState.roster.pinned): pinned =>
+        expect.same("Robo", pinned)
+      val roboSelected = exists(sideQuestState.selectedParty): selected =>
+        expect.same("Robo", selected)
 
-    expect.same(sideQuests.toList.sorted, sideQuestStates.map(_.title).sorted) &&
-    expect(sideQuests.toList != sideQuestStates.map(_.title)) &&
-    expect(sideQuestStates.forall(_.selectedParty.size <= 3)) &&
-    expect(sideQuestStates.forall(_.selectedParty.contains("Crono"))) &&
-    expect(robosOrigins.exists(_.roster.pinned.contains("Robo"))) &&
-    expect(robosOrigins.exists(_.selectedParty.contains("Robo"))) &&
-    expect(nonRobosOrigins.forall(!_.roster.pinned.contains("Robo")))
+      expect.same("The End of Ozzie", sideQuestState.title) && roboPinned && roboSelected
+    val roboNotRequiredElsewhere = forEach(otherSideQuests): sideQuestState =>
+      forEach(sideQuestState.roster.pinned): pinned =>
+        expect(pinned != "Robo")
+
+    expect.same(sideQuests.toList.map(_.title).sorted, sideQuestStates.map(_.title).sorted) &&
+    expect(sideQuests.toList.map(_.title) != sideQuestStates.map(_.title)) &&
+    validParties &&
+    roboRequired &&
+    roboNotRequiredElsewhere
 
   test("simulate applies chapter completion changes whose flag conditions match"):
     val chapters = List(
@@ -142,4 +154,5 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
     val flags  = Map("fight-magus" -> true, "save-chrono" -> false)
     val result = ChronoTriggerQuestData.simulate(definition(chapters*), flags).runA(Random(123)).value
 
-    expect(result.chapterStates.forall(_.roster.available.isEmpty))
+    forEach(result.chapterStates): chapterState =>
+      expect(chapterState.roster.available.isEmpty)

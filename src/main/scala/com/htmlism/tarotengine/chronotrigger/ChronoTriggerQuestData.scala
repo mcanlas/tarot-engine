@@ -27,10 +27,12 @@ final case class Chapter(
     title: String,
     bosses: Option[NonEmptyList[String]],
     partyRestrictions: Option[NonEmptyList[String]],
-    sideQuests: Option[NonEmptyList[String]],
+    sideQuests: Option[NonEmptyList[SideQuest]],
     rosterChanges: Option[NonEmptyList[RosterChange]],
     completionChanges: Option[NonEmptyList[RosterChange]]
 )
+
+final case class SideQuest(title: String, required: Option[String])
 
 final case class Roster(pinned: List[String], available: List[String])
 
@@ -95,6 +97,9 @@ object RosterChange:
 object Chapter:
   given Decoder[Chapter] = deriveDecoder[Chapter]
 
+object SideQuest:
+  given Decoder[SideQuest] = deriveDecoder[SideQuest]
+
 object ChronoTriggerDefinition:
   given Decoder[ChronoTriggerDefinition] = deriveDecoder[ChronoTriggerDefinition]
 
@@ -103,9 +108,6 @@ final case class ChronoTriggerQuestData(flags: Map[String, Boolean], chapterStat
 object ChronoTriggerQuestData:
   private val yamlPath =
     Path.of("data", "chrono-trigger.yaml")
-
-  private val robosOriginsTitle =
-    "Robo's Origins"
 
   private val initialRoster =
     Roster(pinned = List.empty, available = List.empty)
@@ -119,13 +121,16 @@ object ChronoTriggerQuestData:
           .forall:
             case (name, expected) => flags.get(name).contains(expected)
 
+  private def pin(roster: Roster, char: String): Roster =
+    roster.copy(
+      pinned    = (roster.pinned :+ char).distinct,
+      available = roster.available.filterNot(_ == char)
+    )
+
   private def applyChange(roster: Roster, change: RosterChange): Roster =
     change match
       case RosterChange.Pin(char, _) =>
-        roster.copy(
-          pinned    = (roster.pinned :+ char).distinct,
-          available = roster.available.filterNot(_ == char)
-        )
+        pin(roster, char)
 
       case RosterChange.Unpin(char, _) =>
         roster.copy(
@@ -171,16 +176,20 @@ object ChronoTriggerQuestData:
       .shuffle(roster.available)
       .map(roster.pinned ++ _.take(openSlots))
 
-  private def selectSideQuests(sideQuests: NonEmptyList[String], roster: Roster): Rng[List[SideQuestState]] =
+  private def selectSideQuests(
+      sideQuests: NonEmptyList[SideQuest],
+      roster: Roster
+  ): Rng[List[SideQuestState]] =
     Rng
       .shuffle(sideQuests.toList)
       .flatMap:
-        _.traverse: title =>
-          val sideQuestRoster =
-            if title == robosOriginsTitle then applyChange(roster, RosterChange.Pin("Robo"))
-            else roster
+        _.traverse: sideQuest =>
+          val sideQuestRoster = sideQuest
+            .required
+            .fold(roster): char =>
+              pin(roster, char)
 
-          selectParty(sideQuestRoster).map(SideQuestState(title, sideQuestRoster, _))
+          selectParty(sideQuestRoster).map(SideQuestState(sideQuest.title, sideQuestRoster, _))
 
   private def chooseFlags(names: List[String]): Rng[Map[String, Boolean]] =
     names

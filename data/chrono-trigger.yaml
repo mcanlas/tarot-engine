@@ -61,11 +61,12 @@ chapters:
         save-chrono: true
 - title: The Fated Hour
   sideQuests:
-    - The Sunstone
-    - The End of Ozzie
-    - Giving Cyrus Rest
-    - Fiona's Forest
-    - Robo's Origins
-    - The Rainbow Shell
-    - The Black Omen
+    - title: The Sunstone
+    - title: The End of Ozzie
+    - title: Giving Cyrus Rest
+    - title: Fiona's Forest
+    - title: Robo's Origins
+      required: Robo
+    - title: The Rainbow Shell
+    - title: The Black Omen
 - title: The Final Battle
