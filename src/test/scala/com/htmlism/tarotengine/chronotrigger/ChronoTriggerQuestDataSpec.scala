@@ -46,14 +46,15 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
           chapterState.roster.pinned.forall(chapterState.selectedParty.contains)
 
   test("simulate shuffles side quests and selects a party for each one"):
-    val sideQuests = NonEmptyList.of("The Sunstone", "The End of Ozzie", "Giving Cyrus Rest")
+    val sideQuests = NonEmptyList.of("The Sunstone", "The End of Ozzie", "Robo's Origins")
     val chapters   = List(
       chapter(
         "The Millennial Fair",
         RosterChange.Pin("Crono"),
         RosterChange.Add("Marle"),
         RosterChange.Add("Lucca"),
-        RosterChange.Add("Frog")
+        RosterChange.Add("Frog"),
+        RosterChange.Add("Robo")
       ),
       Chapter(
         "The Fated Hour",
@@ -67,11 +68,18 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
     val result          = ChronoTriggerQuestData.simulate(definition(chapters*)).runA(Random(123)).value
     val sideQuestStates = result.chapterStates.flatMap(_.sideQuestStates)
+    val robosOrigins    =
+      sideQuestStates.find(_.title == "Robo's Origins")
+    val nonRobosOrigins =
+      sideQuestStates.filterNot(_.title == "Robo's Origins")
 
     expect.same(sideQuests.toList.sorted, sideQuestStates.map(_.title).sorted) &&
     expect(sideQuests.toList != sideQuestStates.map(_.title)) &&
     expect(sideQuestStates.forall(_.selectedParty.size <= 3)) &&
-    expect(sideQuestStates.forall(_.selectedParty.contains("Crono")))
+    expect(sideQuestStates.forall(_.selectedParty.contains("Crono"))) &&
+    expect(robosOrigins.exists(_.roster.pinned.contains("Robo"))) &&
+    expect(robosOrigins.exists(_.selectedParty.contains("Robo"))) &&
+    expect(nonRobosOrigins.forall(!_.roster.pinned.contains("Robo")))
 
   test("simulate applies chapter completion changes whose flag conditions match"):
     val chapters = List(

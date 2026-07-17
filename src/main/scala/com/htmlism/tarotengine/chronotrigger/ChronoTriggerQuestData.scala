@@ -104,6 +104,9 @@ object ChronoTriggerQuestData:
   private val yamlPath =
     Path.of("data", "chrono-trigger.yaml")
 
+  private val robosOriginsTitle =
+    "Robo's Origins"
+
   private val initialRoster =
     Roster(pinned = List.empty, available = List.empty)
 
@@ -173,7 +176,11 @@ object ChronoTriggerQuestData:
       .shuffle(sideQuests.toList)
       .flatMap:
         _.traverse: title =>
-          selectParty(roster).map(SideQuestState(title, roster, _))
+          val sideQuestRoster =
+            if title == robosOriginsTitle then applyChange(roster, RosterChange.Pin("Robo"))
+            else roster
+
+          selectParty(sideQuestRoster).map(SideQuestState(title, sideQuestRoster, _))
 
   private def chooseFlags(names: List[String]): Rng[Map[String, Boolean]] =
     names

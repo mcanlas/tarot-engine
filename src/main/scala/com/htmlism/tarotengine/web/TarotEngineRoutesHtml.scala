@@ -12,6 +12,8 @@ object TarotEngineRoutesHtml:
   private val chronoTriggerStyles =
     """
       |body {
+      |  --party-column-width: 22rem;
+      |  --side-quest-indent: 1rem;
       |  max-width: 72rem;
       |  margin: 0 auto;
       |  padding: 2rem;
@@ -25,13 +27,46 @@ object TarotEngineRoutesHtml:
       |}
       |
       |.side-quest {
-      |  margin-left: 1rem;
+      |  margin-left: var(--side-quest-indent);
+      |}
+      |
+      |.flag-list {
+      |  display: flex;
+      |  flex-wrap: wrap;
+      |  gap: 0.5rem;
+      |  padding-top: 0.5rem;
+      |  margin: 0 0 1rem;
+      |}
+      |
+      |.flag-pill {
+      |  display: inline-flex;
+      |  align-items: center;
+      |  padding: 0.25rem 0.75rem;
+      |  border: 1px solid;
+      |  border-radius: 999px;
+      |  font-size: 0.85rem;
+      |  font-weight: 700;
+      |  line-height: 1.4;
+      |  letter-spacing: 0.01em;
+      |  box-shadow: inset 0 1px 0 #ffffffa6, 0 1px 3px #17203326;
+      |}
+      |
+      |.flag-active {
+      |  background: linear-gradient(135deg, #475569 0%, #1e293b 52%, #020617 100%);
+      |  border-color: #0f172a;
+      |  color: #ffffff;
+      |  box-shadow: inset 0 1px 0 #ffffff59, 0 2px 5px #0206174d;
+      |}
+      |
+      |.flag-inactive {
+      |  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 52%, #e2e8f0 100%);
+      |  border-color: #cbd5e1;
+      |  color: #94a3b8;
+      |  box-shadow: inset 0 1px 0 #ffffff, 0 1px 3px #64748b26;
       |}
       |
       |.roster-table {
-      |  width: 100%;
       |  border-collapse: collapse;
-      |  table-layout: fixed;
       |}
       |
       |.roster-table th {
@@ -43,14 +78,19 @@ object TarotEngineRoutesHtml:
       |  text-transform: uppercase;
       |}
       |
-      |.roster-table th:first-child,
-      |.roster-table td:first-child {
-      |  width: 62%;
-      |}
-      |
       |.roster-table td {
       |  padding-right: 1rem;
       |  vertical-align: top;
+      |}
+      |
+      |.roster-table th:first-child,
+      |.roster-table td:first-child {
+      |  width: var(--party-column-width);
+      |}
+      |
+      |.side-quest .roster-table th:first-child,
+      |.side-quest .roster-table td:first-child {
+      |  width: calc(var(--party-column-width) - var(--side-quest-indent));
       |}
       |
       |.party-line {
@@ -212,11 +252,40 @@ object TarotEngineRoutesHtml:
       partyTable(sideQuestState.roster, sideQuestState.selectedParty)
     )
 
-  private def chronoTriggerChapter(chapterState: ChapterState): Text.TypedTag[String] =
+  private def chapterFlagPills(
+      chapterState: ChapterState,
+      flags: Map[String, Boolean]
+  ): List[Text.TypedTag[String]] =
+    val relevantFlagNames =
+      List(chapterState.chapter.rosterChanges, chapterState.chapter.completionChanges)
+        .flatMap(_.toList)
+        .flatMap(_.toList)
+        .flatMap(_.when.toList.flatMap(_.values.toSortedMap.keys))
+        .distinct
+        .sorted
+
+    relevantFlagNames.flatMap: name =>
+      flags
+        .get(name)
+        .map: value =>
+          val stateClass =
+            if value then "flag-pill flag-active"
+            else "flag-pill flag-inactive"
+
+          span(cls := stateClass)(s"$name: $value")
+
+  private def chronoTriggerChapter(
+      chapterState: ChapterState,
+      flags: Map[String, Boolean]
+  ): Text.TypedTag[String] =
+    val chapterFlags = chapterFlagPills(chapterState, flags)
+
     tag("section")(
       h2(chapterState.chapter.title),
       if chapterState.sideQuestStates.isEmpty then partyTable(chapterState.roster, chapterState.selectedParty)
-      else chapterState.sideQuestStates.map(sideQuest)
+      else chapterState.sideQuestStates.map(sideQuest),
+      if chapterFlags.isEmpty then frag()
+      else div(cls := "flag-list")(chapterFlags)
     )
 
   def chronoTrigger(questData: ChronoTriggerQuestData): Text.TypedTag[String] =
@@ -228,16 +297,20 @@ object TarotEngineRoutesHtml:
       ),
       body(
         h1("Chrono Trigger"),
-        p(
+        div(cls := "flag-list")(
           questData
             .flags
             .toList
             .sortBy(_._1)
             .map: (name, value) =>
-              span(cls := "flag")(s"$name: $value ")
+              val stateClass =
+                if value then "flag-pill flag-active"
+                else "flag-pill flag-inactive"
+
+              span(cls := stateClass)(s"$name: $value")
         ),
         tag("main")(
-          questData.chapterStates.map(chronoTriggerChapter)
+          questData.chapterStates.map(chronoTriggerChapter(_, questData.flags))
         )
       )
     )
