@@ -36,3 +36,26 @@ export function generateParties(partySize, partyStyle) {
   appendParty([], 0);
   return parties;
 }
+
+export function filterPartiesByRequiredJobs(parties, requiredJobIndexes) {
+  const requiredJobCounts = new Map();
+
+  requiredJobIndexes.forEach((jobIndex) => {
+    if (
+      !Number.isInteger(jobIndex) ||
+      jobIndex < 0 ||
+      jobIndex >= jobClasses.length
+    ) {
+      throw new RangeError("Required jobs must reference a valid job class");
+    }
+
+    requiredJobCounts.set(jobIndex, (requiredJobCounts.get(jobIndex) ?? 0) + 1);
+  });
+
+  return parties.filter((party) =>
+    [...requiredJobCounts.entries()].every(
+      ([jobIndex, requiredCount]) =>
+        party.filter((member) => member === jobIndex).length >= requiredCount,
+    ),
+  );
+}

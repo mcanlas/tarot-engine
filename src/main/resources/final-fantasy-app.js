@@ -1,4 +1,5 @@
 import {
+  filterPartiesByRequiredJobs,
   generateParties,
   jobClasses,
 } from "/final-fantasy-core.js";
@@ -11,10 +12,14 @@ function renderParties() {
   const formValues = new FormData(partyControls);
   const selectedPartySize = Number.parseInt(formValues.get("party-size"), 10);
   const partyStyle = formValues.get("party-style");
+  const requiredJobs = formValues
+    .getAll("has-job")
+    .flatMap((jobIndex) => (jobIndex === "" ? [] : [Number.parseInt(jobIndex, 10)]));
   const parties = generateParties(selectedPartySize, partyStyle);
+  const filteredParties = filterPartiesByRequiredJobs(parties, requiredJobs);
   const rows = document.createDocumentFragment();
 
-  parties.forEach((party, index) => {
+  filteredParties.forEach((party, index) => {
     const row = document.createElement("tr");
     row.setAttribute("aria-label", `Party ${index + 1}`);
 
@@ -33,8 +38,8 @@ function renderParties() {
 
   partyCount.textContent =
     partyStyle === "unique-parties"
-      ? `${parties.length} unique ${selectedPartySize}-member parties`
-      : `${parties.length} ${selectedPartySize}-member formations`;
+      ? `${filteredParties.length} unique ${selectedPartySize}-member parties`
+      : `${filteredParties.length} ${selectedPartySize}-member formations`;
   partyRows.replaceChildren(rows);
 }
 

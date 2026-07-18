@@ -11,8 +11,6 @@ body {
   top: 2rem;
   right: 0;
   z-index: 10;
-  display: grid;
-  gap: 0.5rem;
   min-width: 11rem;
   padding: 1rem 1.25rem;
   border: 1px solid #cbd5e1;
@@ -22,21 +20,27 @@ body {
   box-shadow: 0 0.5rem 1.5rem #17203326;
 }
 
-.party-controls > label,
-.party-controls legend {
+.control-group {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.control-group + .control-group {
+  margin-top: 1.85rem;
+}
+
+.control-label {
   color: #475569;
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.08em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
-.party-style-options {
+.control-stack {
   display: grid;
   gap: 0.35rem;
-  margin: 0.5rem 0 0;
-  padding: 0;
-  border: 0;
 }
 
 .radio-option {

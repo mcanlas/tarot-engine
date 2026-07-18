@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  filterPartiesByRequiredJobs,
   generateParties,
   jobClasses,
 } from "../../main/resources/final-fantasy-core.js";
@@ -77,4 +78,24 @@ test("rejects unsupported party sizes", () => {
 
 test("rejects unsupported party styles", () => {
   assert.throws(() => generateParties(4, "something-else"), RangeError);
+});
+
+test("has filters apply additively", () => {
+  const allParties = generateParties(4, "all-formations");
+  const atLeastOneWhite = filterPartiesByRequiredJobs(allParties, [4]);
+  const atLeastTwoWhite = filterPartiesByRequiredJobs(allParties, [4, 4]);
+
+  assert(atLeastOneWhite.length > atLeastTwoWhite.length);
+  assert(
+    atLeastTwoWhite.every(
+      (party) => party.filter((member) => member === 4).length >= 2,
+    ),
+  );
+});
+
+test("empty has filters keep every party", () => {
+  const allParties = generateParties(3, "all-formations");
+  const filtered = filterPartiesByRequiredJobs(allParties, []);
+
+  assert.equal(filtered.length, allParties.length);
 });
