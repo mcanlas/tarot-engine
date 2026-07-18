@@ -13,23 +13,12 @@ object FinalFantasyPage:
       ),
       body(
         h1("Final Fantasy"),
-        p("A plain JavaScript landing page."),
-        tag("section")(
-          h2("Job Classes"),
-          div(cls := "job-list")(
-            span(cls := "job-pill job-warrior")("Warrior"),
-            span(cls := "job-pill job-thief")("Thief"),
-            span(cls := "job-pill job-black-belt")("Black Belt"),
-            span(cls := "job-pill job-red-mage")("Red Mage"),
-            span(cls := "job-pill job-white-mage")("White Mage"),
-            span(cls := "job-pill job-black-mage")("Black Mage")
+        p(id := "party-count", attr("aria-live") := "polite")("Generating parties..."),
+        tag("main")(
+          table(cls := "party-table")(
+            tbody(id := "party-combinations")
           )
         ),
-        p(
-          "Selected game: ",
-          strong(id := "selected-game")("Final Fantasy I")
-        ),
-        button(id := "next-game", tpe := "button")("Next game"),
         script(tpe := "module", src := "/final-fantasy-app.js")
       )
     )

@@ -1,12 +1,29 @@
-import { initialModel, update } from "/final-fantasy-core.js";
+import {
+  generatePartyCombinations,
+  jobClasses,
+} from "/final-fantasy-core.js";
 
-const games = ["Final Fantasy I", "Final Fantasy IV", "Final Fantasy VI"];
-const selectedGame = document.querySelector("#selected-game");
-const nextGame = document.querySelector("#next-game");
+const partyCount = document.querySelector("#party-count");
+const partyRows = document.querySelector("#party-combinations");
+const parties = generatePartyCombinations();
+const rows = document.createDocumentFragment();
 
-let model = initialModel;
+parties.forEach((party, index) => {
+  const row = document.createElement("tr");
+  row.setAttribute("aria-label", `Party ${index + 1}`);
 
-nextGame.addEventListener("click", () => {
-  model = update(model, { type: "next-game" }, games.length);
-  selectedGame.textContent = games[model.selectedIndex];
+  party.forEach((jobIndex) => {
+    const job = jobClasses[jobIndex];
+    const cell = document.createElement("td");
+    const pill = document.createElement("span");
+    pill.className = `job-pill ${job.cssClass}`;
+    pill.textContent = job.name;
+    cell.append(pill);
+    row.append(cell);
+  });
+
+  rows.append(row);
 });
+
+partyCount.textContent = `${parties.length} unique parties`;
+partyRows.replaceChildren(rows);

@@ -6,25 +6,27 @@ body {
   color: #172033;
 }
 
-section {
-  padding: 1rem 0;
-  border-top: 1px solid #dbe3ef;
+.party-table {
+  border-collapse: separate;
+  border-spacing: 0.4rem 0.5rem;
 }
 
-.job-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.party-table td {
+  padding: 0;
 }
 
 .job-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 8rem;
   padding: 0.25rem 0.75rem;
   border: 1px solid;
   border-radius: 999px;
+  box-sizing: border-box;
   font-weight: 700;
   line-height: 1.4;
+  text-align: center;
   box-shadow: inset 0 1px 0 #ffffffa6, 0 1px 3px #17203326;
 }
 

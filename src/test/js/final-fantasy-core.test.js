@@ -2,20 +2,34 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  initialModel,
-  update,
+  generatePartyCombinations,
+  jobClasses,
 } from "../../main/resources/final-fantasy-core.js";
 
-test("next-game advances and wraps the selected game", () => {
-  const second = update(initialModel, { type: "next-game" }, 2);
-  const wrapped = update(second, { type: "next-game" }, 2);
+const parties = generatePartyCombinations();
+const asDigits = (party) => party.map((jobIndex) => jobIndex + 1).join("");
 
-  assert.deepEqual(second, { selectedIndex: 1 });
-  assert.deepEqual(wrapped, { selectedIndex: 0 });
+test("generates the combinations in nondecreasing order", () => {
+  assert.deepEqual(parties.slice(0, 8).map(asDigits), [
+    "1111",
+    "1112",
+    "1113",
+    "1114",
+    "1115",
+    "1116",
+    "1122",
+    "1123",
+  ]);
+  assert.equal(asDigits(parties.at(-1)), "6666");
 });
 
-test("unknown events leave the model unchanged", () => {
-  const next = update(initialModel, { type: "unknown" }, 3);
+test("generates all 126 unique four-job parties", () => {
+  assert.equal(jobClasses.length, 6);
+  assert.equal(parties.length, 126);
+  assert.equal(new Set(parties.map(asDigits)).size, parties.length);
 
-  assert.equal(next, initialModel);
+  for (const party of parties) {
+    assert.equal(party.length, 4);
+    assert.deepEqual(party, party.toSorted((a, b) => a - b));
+  }
 });
