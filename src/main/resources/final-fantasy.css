@@ -1,0 +1,67 @@
+body {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  color: #172033;
+}
+
+section {
+  padding: 1rem 0;
+  border-top: 1px solid #dbe3ef;
+}
+
+.job-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.job-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid;
+  border-radius: 999px;
+  font-weight: 700;
+  line-height: 1.4;
+  box-shadow: inset 0 1px 0 #ffffffa6, 0 1px 3px #17203326;
+}
+
+.job-warrior {
+  background: linear-gradient(135deg, #ffffff 0%, #fee2e2 40%, #f87171 73%, #b91c1c 100%);
+  border-color: #b91c1c;
+  color: #450a0a;
+}
+
+.job-thief {
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 30%, #38bdf8 68%, #1e40af 100%);
+  border-color: #0284c7;
+  color: #082f49;
+}
+
+.job-black-belt {
+  background: linear-gradient(135deg, #fff7ed 0%, #fdba74 52%, #f97316 100%);
+  border-color: #ea580c;
+  color: #7c2d12;
+}
+
+.job-red-mage {
+  background: linear-gradient(135deg, #ef4444 0%, #be123c 52%, #7f1d1d 100%);
+  border-color: #881337;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 #ffffff59, 0 2px 5px #7f1d1d4d;
+}
+
+.job-white-mage {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 58%, #fecdd3 100%);
+  border-color: #e11d48;
+  color: #881337;
+}
+
+.job-black-mage {
+  background: linear-gradient(135deg, #60a5fa 0%, #312e81 52%, #111827 100%);
+  border-color: #3b82f6;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 #ffffff59, 0 2px 5px #1118274d;
+}

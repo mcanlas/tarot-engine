@@ -51,7 +51,7 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     expect(!html.contains("rock-tech-name")) &&
     expect(sectionHtml.indexOf("</table>") < sectionHtml.indexOf("rock-designation")) &&
     expect(html.contains("secret-triple-tech-grid")) &&
-    expect(html.contains("href=\"/app.css\"")) &&
+    expect(html.contains("href=\"/chrono-trigger.css\"")) &&
     expect(html.contains("secret-triple-tech-party"))
 
   test("base triple tech parties render a non-rock designation"):

@@ -11,16 +11,16 @@ import com.htmlism.tarotengine.chronotrigger.SideQuestState
 import com.htmlism.tarotengine.chronotrigger.TripleTechDesignation
 
 object TarotEngineRoutesHtml:
-  private def commonHead(pageTitle: String) =
+  private def commonHead(pageTitle: String, stylesheet: Option[String]) =
     head(
       tag("title")(pageTitle),
       meta(name := "viewport", content := "width=device-width, initial-scale=1"),
-      link(rel  := "stylesheet", href  := "/app.css")
+      stylesheet.map(path => link(rel := "stylesheet", href := path))
     )
 
   val index: Text.TypedTag[String] =
     html(
-      commonHead("tarot-engine"),
+      commonHead("tarot-engine", None),
       body(
         ul(
           li(
@@ -230,7 +230,7 @@ object TarotEngineRoutesHtml:
 
   def chronoTrigger(questData: ChronoTriggerQuestData): Text.TypedTag[String] =
     html(
-      commonHead("Chrono Trigger"),
+      commonHead("Chrono Trigger", Some("/chrono-trigger.css")),
       body(
         h1("Chrono Trigger"),
         div(cls := "flag-list")(
