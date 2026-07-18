@@ -3,6 +3,7 @@ package com.htmlism.tarotengine.web
 import scala.util.Random
 
 import cats.effect.*
+import cats.syntax.all.*
 import com.comcast.ip4s.*
 import org.http4s.*
 import org.http4s.dsl.io.*
@@ -46,7 +47,10 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
         .withPort(port"8083")
         .withHttpApp(
           Logger.httpApp(logHeaders = true, logBody = false)(
-            routes(definition).orNotFound
+            (
+              StaticFileRoutes.routes <+>
+                routes(definition)
+            ).orNotFound
           )
         )
         .build
