@@ -24,6 +24,9 @@ object TarotEngineRoutesHtml:
       body(
         ul(
           li(
+            a(href := "/final-fantasy")("Final Fantasy")
+          ),
+          li(
             a(href := "/final-fantasy-vi")("Final Fantasy VI")
           ),
           li(

@@ -13,6 +13,7 @@ import org.http4s.server.middleware.Logger
 
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerDefinition
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
+import com.htmlism.tarotengine.finalfantasy.FinalFantasyPage
 
 object TarotEngineServiceApp extends ResourceApp.Forever:
   private def routes(definition: ChronoTriggerDefinition) =
@@ -22,6 +23,9 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
 
       case GET -> Root / "final-fantasy-vi" =>
         Ok("Final Fantasy VI stub")
+
+      case GET -> Root / "final-fantasy" =>
+        Ok(FinalFantasyPage.html)
 
       case GET -> Root / "chrono-trigger" =>
         for

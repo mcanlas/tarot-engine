@@ -1,0 +1,8 @@
+{
+  "name": "tarot-engine-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:js": "node --test src/test/js/*.test.js"
+  }
+}
