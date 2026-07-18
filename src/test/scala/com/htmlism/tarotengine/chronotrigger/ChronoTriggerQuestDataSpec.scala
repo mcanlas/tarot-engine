@@ -173,6 +173,14 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
     expect.same(Some(TripleTechDesignation.Base), designation)
 
+  test("parties smaller than three do not receive a triple tech designation"):
+    val designation = TripleTechDesignation.forParty(
+      List("Chrono", "Marle"),
+      List.empty
+    )
+
+    expect.same(None, designation)
+
   test("a non-secret party containing both Chrono and Magus has no triple tech"):
     val designation = TripleTechDesignation.forParty(
       List("Chrono", "Magus", "Marle"),

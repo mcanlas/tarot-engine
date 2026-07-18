@@ -74,7 +74,12 @@ object TarotEngineRoutesHtml:
       selectedParty: List[String],
       secretTripleTechs: List[SecretTripleTech]
   ): Option[Text.TypedTag[String]] =
-    TripleTechDesignation.forParty(selectedParty, secretTripleTechs) match
+    val designation =
+      TripleTechDesignation.forParty(selectedParty, secretTripleTechs)
+
+    assert(designation.isEmpty || selectedParty.size == 3, "Triple tech badge requires a three-member party")
+
+    designation match
       case None =>
         None
 

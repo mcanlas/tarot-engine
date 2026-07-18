@@ -37,12 +37,15 @@ object TripleTechDesignation:
       selectedParty: List[String],
       secretTripleTechs: List[SecretTripleTech]
   ): Option[TripleTechDesignation] =
-    secretTripleTechs
-      .find: tech =>
-        selectedParty.size == 3 && tech.characters.toList.toSet == selectedParty.toSet
-      .map(Secret.apply)
-      .orElse:
-        Option.when(selectedParty.contains("Chrono") && !selectedParty.contains("Magus"))(Base)
+    Option
+      .when(selectedParty.size == 3):
+        secretTripleTechs
+          .find: tech =>
+            tech.characters.toList.toSet == selectedParty.toSet
+          .map(Secret.apply)
+          .orElse:
+            Option.when(selectedParty.contains("Chrono") && !selectedParty.contains("Magus"))(Base)
+      .flatten
 
 /**
   * @param rosterChanges
