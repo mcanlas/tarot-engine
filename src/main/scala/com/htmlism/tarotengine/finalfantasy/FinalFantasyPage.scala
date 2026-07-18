@@ -14,6 +14,15 @@ object FinalFantasyPage:
       body(
         h1("Final Fantasy"),
         p(id := "party-count", attr("aria-live") := "polite")("Generating parties..."),
+        form(id := "party-controls", cls := "party-controls")(
+          label(attr("for") := "party-size")("Party size"),
+          select(id := "party-size", name := "party-size")(
+            option(value := "4")("4"),
+            option(value := "3")("3"),
+            option(value := "2")("2"),
+            option(value := "1")("1")
+          )
+        ),
         tag("main")(
           table(cls := "party-table")(
             tbody(id := "party-combinations")

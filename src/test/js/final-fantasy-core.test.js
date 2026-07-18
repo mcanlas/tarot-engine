@@ -6,7 +6,7 @@ import {
   jobClasses,
 } from "../../main/resources/final-fantasy-core.js";
 
-const parties = generatePartyCombinations();
+const parties = generatePartyCombinations(4);
 const asDigits = (party) => party.map((jobIndex) => jobIndex + 1).join("");
 
 test("generates the combinations in nondecreasing order", () => {
@@ -32,4 +32,19 @@ test("generates all 126 unique four-job parties", () => {
     assert.equal(party.length, 4);
     assert.deepEqual(party, party.toSorted((a, b) => a - b));
   }
+});
+
+test("generates the expected number of parties for sizes one through four", () => {
+  assert.deepEqual(
+    [1, 2, 3, 4].map((partySize) =>
+      generatePartyCombinations(partySize).length
+    ),
+    [6, 21, 56, 126],
+  );
+});
+
+test("rejects unsupported party sizes", () => {
+  assert.throws(() => generatePartyCombinations(0), RangeError);
+  assert.throws(() => generatePartyCombinations(5), RangeError);
+  assert.throws(() => generatePartyCombinations(2.5), RangeError);
 });

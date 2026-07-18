@@ -7,9 +7,11 @@ export const jobClasses = Object.freeze([
   Object.freeze({ name: "Black Mage", cssClass: "job-black-mage" }),
 ]);
 
-const partySize = 4;
+export function generatePartyCombinations(partySize) {
+  if (!Number.isInteger(partySize) || partySize < 1 || partySize > 4) {
+    throw new RangeError("Party size must be an integer from 1 through 4");
+  }
 
-export function generatePartyCombinations() {
   const parties = [];
 
   function appendParty(party, minimumJobIndex) {
