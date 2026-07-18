@@ -21,6 +21,22 @@ object FinalFantasyPage:
             option(value := "3")("3"),
             option(value := "2")("2"),
             option(value := "1")("1")
+          ),
+          fieldset(cls := "party-style-options")(
+            legend("Party style"),
+            label(cls := "radio-option")(
+              input(
+                tpe             := "radio",
+                name            := "party-style",
+                value           := "unique-parties",
+                attr("checked") := "checked"
+              ),
+              "Unique Parties"
+            ),
+            label(cls := "radio-option")(
+              input(tpe := "radio", name := "party-style", value := "all-formations"),
+              "All Formations"
+            )
           )
         ),
         tag("main")(
