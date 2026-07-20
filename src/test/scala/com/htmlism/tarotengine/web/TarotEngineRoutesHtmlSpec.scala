@@ -11,8 +11,33 @@ import com.htmlism.tarotengine.chronotrigger.FlagCondition
 import com.htmlism.tarotengine.chronotrigger.Roster
 import com.htmlism.tarotengine.chronotrigger.RosterChange
 import com.htmlism.tarotengine.chronotrigger.SecretTripleTech
+import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
 object TarotEngineRoutesHtmlSpec extends FunSuite:
+  test("Final Fantasy VI renders all 14 playable characters as themed pills"):
+    val html       = FinalFantasyVIPage.html.render
+    val characters =
+      List(
+        "Terra",
+        "Locke",
+        "Cyan",
+        "Shadow",
+        "Edgar",
+        "Sabin",
+        "Celes",
+        "Strago",
+        "Relm",
+        "Setzer",
+        "Mog",
+        "Gau",
+        "Gogo",
+        "Umaro"
+      )
+
+    expect(characters.forall(html.contains)) &&
+    expect(html.split("character-pill").length == 15) &&
+    expect(html.contains("href=\"/final-fantasy-vi.css\""))
+
   private val chapter = Chapter(
     "Test Chapter",
     bosses            = None,
