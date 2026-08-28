@@ -1,18 +1,38 @@
 - boss: garland
+  tags: []
 - boss: pirates
+  tags: []
 - boss: piscodemons
+  tags: []
 - boss: astos
+  tags: []
 - boss: vampire
+  tags:
+    - undead
 - boss: lich
+  tags:
+    - undead
 - boss: marilith
+  tags: []
 - boss: evil eye
+  tags: []
 - boss: dragon zombies
+  tags: []
 - boss: kraken
+  tags: []
 - boss: blue dragon
+  tags: []
 - boss: warmech
+  tags: []
 - boss: tiamat
+  tags: []
 - boss: lich (rematch)
+  tags: []
 - boss: marilith (rematch)
+  tags: []
 - boss: kraken (rematch)
+  tags: []
 - boss: tiamat (rematch)
+  tags: []
 - boss: chaos
+  tags: []

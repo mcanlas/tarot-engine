@@ -1,22 +1,22 @@
-# Final Fantasy strategy guide
+# Final Fantasy boss strategy guide
 
-The console app lives in `com.htmlism.tarotengine.finalfantasy.vibe`. It loads its classes, spells, and chronological boss list from the three `data/final-fantasy-*.yaml` catalogs.
+The console app lives in `com.htmlism.tarotengine.finalfantasy.vibe`. It loads its classes, spells, chronological boss list, enemy tags, boss groups, and ordered boss-strategy rules from the `data/final-fantasy-*.yaml` catalogs.
 
 ## Current state
 
 - The boss catalog covers 18 encounters from Garland through Chaos, including explicit `(rematch)` designations for the four past Fiends.
 - Six required promotion records produce 12 catalog jobs: the six starting classes plus Knight, Ninja, Master, Red Wizard, White Wizard, and Black Wizard.
 - Promoting a `PartyMember` preserves learned spells, and every spell validates its `learnableBy` class IDs against the expanded catalog.
-- The spell catalog contains 22 spells. Its later-game strategy vocabulary includes elemental nullification, instant-death protection and revival, party-wide defense and evasion, Flare, and Saber.
-- Rules render deterministically in declaration order across `Opening`, `PartyEdge`, and `Safety` sections. Advice reacts to the party's jobs, capabilities, learned spells, and shared Potions.
+- The spell catalog contains 22 spells. Its later-game boss-strategy vocabulary includes elemental nullification, instant-death protection and revival, party-wide defense and evasion, Flare, and Saber.
+- The 66 rules in `data/final-fantasy-boss-strategy.yaml` render deterministically in YAML order across `Opening`, `PartyEdge`, and `Safety` sections. Advice reacts to the party's jobs, capabilities, learned spells, and shared Potions.
 - Collection-backed query nodes retain their canonical `List`/`Set` constructors and also expose fluent varargs helpers such as `all`, `hasAnySpell`, `namedAny`, and `knowsAny`.
 - Tests load the YAML catalogs, require non-empty advice for every configured boss, verify all promotion mappings, and exercise every added spell-rule family.
 
 ## Roadmap
 
-These ideas are **not implemented**. The current engine renders every matching `StrategyRule` in declaration order.
+These ideas are **not implemented**. The current engine renders every matching `BossStrategyRule` in declaration order.
 
-Rank favors changes that can ship independently and noticeably improve the guide. `Deployment` measures how safely the idea can be introduced in a small iteration; `Contribution` estimates its effect on strategy quality.
+Rank favors changes that can ship independently and noticeably improve the guide. `Deployment` measures how safely the idea can be introduced in a small iteration; `Contribution` estimates its effect on boss-strategy quality.
 
 | Rank | Idea | Deployment | Contribution | Reminder |
 | ---: | --- | :---: | :---: | --- |

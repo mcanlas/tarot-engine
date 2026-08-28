@@ -5,15 +5,15 @@ import weaver.*
 object VibeAppSpec extends SimpleIOSuite:
   import Job.*
 
-  test("every configured boss has baseline strategy coverage"):
+  test("every configured boss has baseline boss strategy coverage"):
     VibeApp
-      .loadBosses
-      .map: bosses =>
+      .loadBossStrategy
+      .map: bossStrategy =>
         val party = Party(List(Warrior, Thief, WhiteMage, BlackMage).map(PartyMember(_)))
 
-        forEach(bosses): definition =>
+        forEach(bossStrategy.bosses): definition =>
           expect(
-            FinalFantasyStrategyGuide
+            bossStrategy
               .guide
               .forPartyAndBoss(party, definition.boss)
               .fragments

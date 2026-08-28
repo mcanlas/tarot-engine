@@ -1,19 +1,7 @@
 package com.htmlism.tarotengine.finalfantasy.vibe
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Path
-
 import cats.effect.IO
 import cats.effect.IOApp
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
-import io.circe.yaml.parser
-
-final case class BossDefinition(boss: String)
-
-object BossDefinition:
-  given Decoder[BossDefinition] = deriveDecoder[BossDefinition]
 
 final case class DemoScenario(title: String, party: Party)
 
@@ -129,16 +117,16 @@ object VibeApp extends IOApp.Simple:
       )
     )
 
-  private[vibe] val loadBosses: IO[List[BossDefinition]] =
-    for
-      yaml <- IO.blocking(
-        Files.readString(Path.of("data", "final-fantasy-bosses.yaml"), StandardCharsets.UTF_8)
-      )
-      bosses <- IO.fromEither(parser.parse(yaml).flatMap(_.as[List[BossDefinition]]))
-    yield bosses
+  private[vibe] val loadBossStrategy: IO[FinalFantasyBossStrategyData] =
+    IO.fromEither(
+      FinalFantasyBossStrategyGuide
+        .load()
+        .left
+        .map(new IllegalStateException(_))
+    )
 
-  private def renderGuide(party: Party, boss: String): String =
-    val guide   = FinalFantasyStrategyGuide.guide.forPartyAndBoss(party, boss)
+  private def renderGuide(bossStrategyGuide: BossStrategyGuide, party: Party, boss: String): String =
+    val guide   = bossStrategyGuide.forPartyAndBoss(party, boss)
     val heading = s"  ${guide.boss.capitalize}"
     val advice  = guide
       .fragments
@@ -147,8 +135,12 @@ object VibeApp extends IOApp.Simple:
 
     s"$heading\n$advice"
 
-  private def renderScenario(scenario: DemoScenario, bosses: List[String]): String =
-    val guides = bosses.map(renderGuide(scenario.party, _)).mkString("\n")
+  private def renderScenario(
+      bossStrategyGuide: BossStrategyGuide,
+      scenario: DemoScenario,
+      bosses: List[String]
+  ): String =
+    val guides = bosses.map(renderGuide(bossStrategyGuide, scenario.party, _)).mkString("\n")
     val items  =
       if scenario.party.inventory.isEmpty then "none"
       else scenario.party.inventory.toList.map(_.label).sorted.mkString(", ")
@@ -157,8 +149,8 @@ object VibeApp extends IOApp.Simple:
 
   val run: IO[Unit] =
     for
-      definitions <- loadBosses
-      demoBosses   = definitions.map(_.boss)
-      output       = demoScenarios.map(renderScenario(_, demoBosses)).mkString("\n\n")
-      _           <- IO.println(s"Ruleset: Final Fantasy Pixel Remaster\n\n$output")
+      bossStrategy <- loadBossStrategy
+      demoBosses    = bossStrategy.bosses.map(_.boss)
+      output        = demoScenarios.map(renderScenario(bossStrategy.guide, _, demoBosses)).mkString("\n\n")
+      _            <- IO.println(s"Ruleset: Final Fantasy Pixel Remaster\n\n$output")
     yield ()

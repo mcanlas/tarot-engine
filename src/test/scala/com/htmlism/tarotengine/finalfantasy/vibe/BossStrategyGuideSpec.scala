@@ -2,7 +2,7 @@ package com.htmlism.tarotengine.finalfantasy.vibe
 
 import weaver.*
 
-object StrategyGuideSpec extends FunSuite:
+object BossStrategyGuideSpec extends FunSuite:
   import Capability.*
   import GuideSection.*
   import Item.*
@@ -12,6 +12,19 @@ object StrategyGuideSpec extends FunSuite:
 
   private def untrained(jobs: Job*): Party =
     Party(jobs.toList.map(PartyMember(_)))
+
+  test("boss-strategy YAML owns all ordered rules and enemy tags"):
+    val loaded = FinalFantasyBossStrategyGuide.load()
+
+    expect(
+      loaded.exists: data =>
+        val tagsByBoss = data.bosses.map(definition => definition.boss -> definition.tags).toMap
+
+        data.ruleCount == 66 &&
+        tagsByBoss.get("vampire").contains(List("undead")) &&
+        tagsByBoss.get("lich").contains(List("undead")) &&
+        tagsByBoss.get("garland").contains(Nil)
+    )
 
   test("Final Fantasy YAML owns class attributes and spell learnability"):
     val loaded = FinalFantasyData.load()
@@ -93,7 +106,7 @@ object StrategyGuideSpec extends FunSuite:
         PartyMember.blackMage(Thunder)
       )
     )
-    val guide = FinalFantasyStrategyGuide.guide.forPartyAndBoss(party, "garland")
+    val guide = FinalFantasyBossStrategyGuide.guide.forPartyAndBoss(party, "garland")
 
     expect.same(
       List(Opening, PartyEdge, Safety),
@@ -112,7 +125,7 @@ object StrategyGuideSpec extends FunSuite:
         PartyMember.blackMage()
       )
     )
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "garland")
       .fragments
@@ -130,7 +143,7 @@ object StrategyGuideSpec extends FunSuite:
       Party(List(PartyMember(Warrior), PartyMember(Thief), PartyMember.whiteMage(), PartyMember.blackMage()))
 
     def conservesMagic(party: Party) =
-      FinalFantasyStrategyGuide
+      FinalFantasyBossStrategyGuide
         .guide
         .forPartyAndBoss(party, "pirates")
         .fragments
@@ -143,7 +156,7 @@ object StrategyGuideSpec extends FunSuite:
     val blackParty = Party(List(PartyMember(Warrior), PartyMember.blackMage(Sleep)))
 
     def mentionsSleep(party: Party) =
-      FinalFantasyStrategyGuide
+      FinalFantasyBossStrategyGuide
         .guide
         .forPartyAndBoss(party, "pirates")
         .fragments
@@ -159,7 +172,7 @@ object StrategyGuideSpec extends FunSuite:
         PartyMember.blackMage(Sleep)
       )
     )
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "pirates")
       .fragments
@@ -189,7 +202,7 @@ object StrategyGuideSpec extends FunSuite:
         PartyMember.blackMage(Temper, Haste)
       )
     )
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "piscodemons")
       .fragments
@@ -206,7 +219,7 @@ object StrategyGuideSpec extends FunSuite:
         PartyMember.blackMage(Slow)
       )
     )
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "astos")
       .fragments
@@ -217,7 +230,7 @@ object StrategyGuideSpec extends FunSuite:
 
   test("Astos advice uses Slow only when nobody learned Silence"):
     val party  = Party(List(PartyMember(Warrior), PartyMember.redMage(Slow)))
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "astos")
       .fragments
@@ -227,7 +240,7 @@ object StrategyGuideSpec extends FunSuite:
 
   test("White Mage supports Protect and Blink"):
     val party  = Party(List(PartyMember.whiteMage(Protect, Blink)))
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "lich")
       .fragments
@@ -240,7 +253,7 @@ object StrategyGuideSpec extends FunSuite:
     val party = Party(List(PartyMember(Warrior), PartyMember.whiteMage(Dia)))
 
     def adviceFor(boss: String) =
-      FinalFantasyStrategyGuide
+      FinalFantasyBossStrategyGuide
         .guide
         .forPartyAndBoss(party, boss)
         .fragments
@@ -259,7 +272,7 @@ object StrategyGuideSpec extends FunSuite:
   test("item templates name all eligible party members and pluralize duplicate jobs"):
     val members = List(PartyMember(Warrior), PartyMember(Warrior), PartyMember.blackMage())
     val party   = Party.withItems(members, Potion)
-    val advice  = FinalFantasyStrategyGuide
+    val advice  = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "garland")
       .fragments
@@ -278,7 +291,7 @@ object StrategyGuideSpec extends FunSuite:
     )
 
     def partyEdges(boss: String) =
-      FinalFantasyStrategyGuide
+      FinalFantasyBossStrategyGuide
         .guide
         .forPartyAndBoss(party, boss)
         .fragments
@@ -297,7 +310,7 @@ object StrategyGuideSpec extends FunSuite:
     val party = Party(
       List(PartyMember(Warrior), PartyMember(Thief), PartyMember.whiteMage(Cure), PartyMember.blackMage(Blizzard))
     )
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "vampire")
       .fragments
@@ -307,7 +320,7 @@ object StrategyGuideSpec extends FunSuite:
 
   test("Lich adds a boss-specific no-healer warning"):
     val party  = untrained(Thief, Thief, Monk, Monk)
-    val advice = FinalFantasyStrategyGuide
+    val advice = FinalFantasyBossStrategyGuide
       .guide
       .forPartyAndBoss(party, "lich")
       .fragments
@@ -326,7 +339,7 @@ object StrategyGuideSpec extends FunSuite:
     )
 
     def adviceFor(boss: String) =
-      FinalFantasyStrategyGuide
+      FinalFantasyBossStrategyGuide
         .guide
         .forPartyAndBoss(party, boss)
         .fragments
@@ -349,7 +362,7 @@ object StrategyGuideSpec extends FunSuite:
     )
 
     def adviceFor(boss: String) =
-      FinalFantasyStrategyGuide
+      FinalFantasyBossStrategyGuide
         .guide
         .forPartyAndBoss(party, boss)
         .fragments
@@ -371,7 +384,7 @@ object StrategyGuideSpec extends FunSuite:
 
   test("the same party and boss always produce the same guide"):
     val party = untrained(Thief, Thief, Monk, Monk)
-    val guide = FinalFantasyStrategyGuide.guide
+    val guide = FinalFantasyBossStrategyGuide.guide
 
     expect.same(
       guide.forPartyAndBoss(party, "pirates"),

@@ -1,0 +1,420 @@
+bossGroups:
+  physical-buff:
+    - marilith
+    - warmech
+    - tiamat
+    - lich (rematch)
+    - marilith (rematch)
+    - kraken (rematch)
+    - tiamat (rematch)
+    - chaos
+  physical-defense:
+    - marilith
+    - kraken
+    - warmech
+    - marilith (rematch)
+    - kraken (rematch)
+    - chaos
+  endurance:
+    - warmech
+    - tiamat
+    - lich (rematch)
+    - marilith (rematch)
+    - kraken (rematch)
+    - tiamat (rematch)
+    - chaos
+  lightning-threat:
+    - blue dragon
+    - tiamat
+    - kraken (rematch)
+    - tiamat (rematch)
+    - chaos
+  fire-threat:
+    - marilith
+    - tiamat
+    - marilith (rematch)
+    - tiamat (rematch)
+    - chaos
+  ice-threat:
+    - lich
+    - tiamat
+    - tiamat (rematch)
+    - chaos
+  instant-death:
+    - astos
+    - evil eye
+    - lich (rematch)
+    - marilith (rematch)
+    - tiamat (rematch)
+  resistant-endgame:
+    - warmech
+    - tiamat
+    - lich (rematch)
+    - marilith (rematch)
+    - kraken (rematch)
+    - tiamat (rematch)
+    - chaos
+
+rules:
+  - boss: garland
+    section: opening
+    when: always
+    advice: "Have {{members:all}} focus on {{boss}}; there are no extra enemies to manage."
+
+  - boss: garland
+    section: party-edge
+    when: { capability: physical-damage, atLeast: 3 }
+    advice: "Have {{members:capability:physical-damage}} lean into basic attacks; setup costs more turns than it saves."
+
+  - boss: garland
+    section: party-edge
+    when: { spellAttribute: elemental }
+    advice: "Have {{members:knows-attribute:elemental}} spend MP on a learned elemental spell instead of making a weak physical attack."
+
+  - boss: garland
+    section: safety
+    when: { spellAttribute: healing }
+    advice: "Keep {{members:capability:healing}} attacking until someone is near half health, then use a learned recovery spell."
+
+  - boss: garland
+    section: safety
+    when:
+      all:
+        - not: { capability: healing }
+        - item: potion
+    advice: "With no recovery spell, {{members:can-use:potion}} can use Potions from shared inventory."
+
+  - boss: garland
+    section: safety
+    when:
+      all:
+        - not: { capability: healing }
+        - not: { item: potion }
+    advice: "You have no in-party healing, so arrive rested and treat this as a damage race."
+
+  - boss: pirates
+    section: opening
+    when: always
+    advice: "Have {{members:all}} remove one Pirate at a time so the enemy side gets fewer attacks each round."
+
+  - boss: pirates
+    section: party-edge
+    when: { spell: sleep }
+    advice: "Have {{members:knows:sleep}} cast Sleep to control the full crowd, then clean up awake targets first."
+
+  - boss: pirates
+    section: party-edge
+    when: { spellAttribute: elemental }
+    advice: "Have {{members:knows-attribute:elemental}} conserve learned elemental magic unless basic attacks fall behind."
+
+  - boss: pirates
+    section: party-edge
+    when: { capability: physical-damage, atLeast: 2 }
+    advice: "Have {{members:capability:physical-damage}} use basic attacks and conserve MP."
+
+  - boss: pirates
+    section: safety
+    when: { capability: healing }
+    advice: "Do not heal preemptively; have {{members:capability:healing}} recover only if focused damage puts someone at risk."
+
+  - boss: pirates
+    section: safety
+    when: { not: { capability: healing } }
+    advice: "Without healing, crowd control and quickly reducing the Pirate count are your defenses."
+
+  - boss: piscodemons
+    section: opening
+    when: always
+    advice: "Have {{members:all}} focus on one Piscodemon at a time; every defeat immediately reduces incoming physical attacks."
+
+  - boss: piscodemons
+    section: party-edge
+    when:
+      all:
+        - spell: temper
+        - capability: physical-damage
+    advice: "Have {{members:knows:temper}} cast Temper on {{members:capability:physical-damage}}; weapon damage is more reliable here than most offensive magic."
+
+  - boss: piscodemons
+    section: party-edge
+    when:
+      all:
+        - spell: haste
+        - capability: physical-damage
+    advice: "Have {{members:knows:haste}} cast Haste on {{members:preferred-physical-attacker}} to shorten the dangerous opening rounds."
+
+  - boss: piscodemons
+    section: party-edge
+    when:
+      all:
+        - spell: thunder
+        - not: { capability: physical-damage }
+    advice: "With no physical attacker, have {{members:knows:thunder}} cast Thunder; avoid the Piscodemons' resistance to Fire and Blizzard."
+
+  - boss: astos
+    section: opening
+    when: always
+    advice: "{{boss}} opens with lethal magic, so disruption or a fast knockout matters more than attrition."
+
+  - boss: astos
+    section: party-edge
+    when: { spell: silence }
+    advice: "Have {{members:knows:silence}} cast Silence immediately; if it lands, Astos loses Death and the rest of his spell list."
+
+  - boss: astos
+    section: party-edge
+    when:
+      all:
+        - spell: temper
+        - capability: physical-damage
+    advice: "Have {{members:knows:temper}} cast Temper on {{members:capability:physical-damage}} to end the fight before Astos gets more spell turns."
+
+  - boss: astos
+    section: party-edge
+    when:
+      all:
+        - spell: haste
+        - capability: physical-damage
+    advice: "Have {{members:knows:haste}} cast Haste on {{members:preferred-physical-attacker}} for the quickest knockout line."
+
+  - boss: astos
+    section: safety
+    when:
+      all:
+        - spell: slow
+        - not: { spell: silence }
+    advice: "Without Silence, have {{members:knows:slow}} try Slow to blunt Astos's physical attacks; it will not prevent Death."
+
+  - boss: vampire
+    section: opening
+    when: always
+    advice: "{{boss}} is a short burst fight: exploit its weaknesses before paralysis creates bad turns."
+
+  - boss: lich
+    section: opening
+    when: always
+    advice: "{{boss}} is the first sustained boss fight here; keep everyone healthy enough to survive its spell sequence."
+
+  - bossTag: undead
+    section: party-edge
+    when: { spell: dia }
+    advice: "{{boss}} is undead; have {{members:knows:dia}} cast Dia for direct anti-undead damage."
+
+  - bossTag: undead
+    section: party-edge
+    when: { spell: fire }
+    advice: "{{boss}} is undead and weak to fire; have {{members:knows:fire}} cast Fire as the default action."
+
+  - boss: lich
+    section: safety
+    when: { spell: protect }
+    advice: "Have {{members:knows:protect}} cast Protect to raise an ally's defense before settling into recovery duty."
+
+  - boss: lich
+    section: safety
+    when: { spell: blink }
+    advice: "Have {{members:knows:blink}} cast Blink for personal evasion, but do not treat it as protection from Lich's spells."
+
+  - boss: lich
+    section: safety
+    when: { capability: healing }
+    advice: "Have {{members:capability:healing}} reserve enough healing for recovery after Lich's party-wide magic."
+
+  - boss: lich
+    section: safety
+    when: { not: { capability: healing } }
+    advice: "With no healer, Lich becomes a strict damage race; arrive fully stocked and commit your strongest attacks."
+
+  - boss: marilith
+    section: opening
+    when: always
+    advice: "Marilith applies sustained physical pressure; establish your defenses before committing everyone to offense."
+
+  - boss: evil eye
+    section: opening
+    when: always
+    advice: "Evil Eye is dangerous because of its disabling magic, so treat the encounter as an immediate damage race."
+
+  - boss: dragon zombies
+    section: opening
+    when: always
+    advice: "Focus both Dragon Zombies on one target at a time so the second half of the fight has fewer incoming attacks."
+
+  - boss: kraken
+    section: opening
+    when: always
+    advice: "Kraken's physical offense is the immediate threat; stabilize the front line and concentrate damage."
+
+  - boss: blue dragon
+    section: opening
+    when: always
+    advice: "Blue Dragon is a compact burst fight; use reliable single-target damage and preserve enough recovery for the climb ahead."
+
+  - boss: warmech
+    section: opening
+    when: always
+    advice: "Warmech can overwhelm the whole party quickly; open with your strongest defense, recovery, and focused damage."
+
+  - boss: tiamat
+    section: opening
+    when: always
+    advice: "Tiamat resists broad elemental offense, so build the plan around physical damage and sustained recovery."
+
+  - boss: lich (rematch)
+    section: opening
+    when: always
+    advice: "The Lich rematch punishes a depleted party; restore the group quickly and save decisive damage for safe turns."
+
+  - boss: marilith (rematch)
+    section: opening
+    when: always
+    advice: "The Marilith rematch adds late-game lethality to its physical pressure; protect the front line and end it cleanly."
+
+  - boss: kraken (rematch)
+    section: opening
+    when: always
+    advice: "The Kraken rematch is an endurance check; keep recovery ahead of its physical pressure while focusing damage."
+
+  - boss: tiamat (rematch)
+    section: opening
+    when: always
+    advice: "The Tiamat rematch is the last resource check before Chaos; lean on reliable damage and avoid wasteful casting."
+
+  - boss: chaos
+    section: opening
+    when: always
+    advice: "Chaos is a sustained final fight; establish offense and defense early, then keep healing ahead of incoming damage."
+
+  - boss: marilith
+    section: party-edge
+    when: { spell: sleep }
+    advice: "Have {{members:knows:sleep}} try Sleep; unlike most bosses, Marilith can lose turns to it."
+
+  - boss: evil eye
+    section: party-edge
+    when: { capability: physical-damage }
+    advice: "Have {{members:preferred-physical-attacker}} attack immediately rather than spend a turn setting up against Evil Eye."
+
+  - boss: evil eye
+    section: party-edge
+    when:
+      all:
+        - not: { capability: physical-damage }
+        - capability: offensive-magic
+    advice: "With no physical attacker, have {{members:capability:offensive-magic}} spend learned attack magic immediately before Evil Eye can disable the party."
+
+  - boss: dragon zombies
+    section: party-edge
+    when: { spell: dia }
+    advice: "Have {{members:knows:dia}} cast Dia into the undead pair while the rest of the party focuses one target."
+
+  - boss: dragon zombies
+    section: party-edge
+    when: { spell: fire }
+    advice: "Have {{members:knows:fire}} use Fire against the Dragon Zombies instead of basic mage attacks."
+
+  - boss: kraken
+    section: party-edge
+    when: { spell: thunder }
+    advice: "Have {{members:knows:thunder}} exploit Kraken's lightning weakness with Thunder."
+
+  - boss: blue dragon
+    section: party-edge
+    when: { spell: fire }
+    advice: "Have {{members:knows:fire}} exploit Blue Dragon's fire weakness with Fire."
+
+  - boss: tiamat
+    section: party-edge
+    when: { spellAttribute: elemental }
+    advice: "Have {{members:knows-attribute:elemental}} conserve elemental MP against Tiamat's resistances and support the physical plan instead."
+
+  - boss: lich (rematch)
+    section: party-edge
+    when: { spell: fire }
+    advice: "Have {{members:knows:fire}} conserve Fire; the rematch no longer has Lich's original fire weakness."
+
+  - boss: marilith (rematch)
+    section: party-edge
+    when: { spellAttribute: elemental }
+    advice: "Have {{members:knows-attribute:elemental}} save elemental MP; the rematch resists Fire, Blizzard, and Thunder."
+
+  - boss: kraken (rematch)
+    section: party-edge
+    when: { spell: thunder }
+    advice: "Have {{members:knows:thunder}} conserve Thunder; Kraken's lightning weakness is gone in the rematch."
+
+  - bossGroup: physical-buff
+    section: party-edge
+    when:
+      all:
+        - spell: haste
+        - capability: physical-damage
+    advice: "Have {{members:knows:haste}} cast Haste on {{members:preferred-physical-attacker}} for the main damage line against {{boss}}."
+
+  - bossGroup: physical-buff
+    section: party-edge
+    when:
+      all:
+        - spell: temper
+        - capability: physical-damage
+    advice: "Have {{members:knows:temper}} cast Temper on {{members:preferred-physical-attacker}} once Haste or the opening defense is covered."
+
+  - bossGroup: physical-defense
+    section: safety
+    when: { spell: protect }
+    advice: "Have {{members:knows:protect}} use Protect to blunt repeated physical hits from {{boss}}."
+
+  - bossGroup: endurance
+    section: safety
+    when: { capability: healing }
+    advice: "Have {{members:capability:healing}} preserve recovery turns and MP; this fight is too long to treat as a pure damage race."
+
+  - bossGroup: endurance
+    section: safety
+    when: { not: { capability: healing } }
+    advice: "With no recovery magic, have {{members:all}} commit to a short buff-and-burst line; {{boss}} will win a long fight."
+
+  - bossGroup: lightning-threat
+    section: safety
+    when: { spell: nulshock }
+    advice: "Have {{members:knows:nulshock}} cast NulShock before the party is exposed to repeated lightning damage from {{boss}}."
+
+  - bossGroup: fire-threat
+    section: safety
+    when: { spell: nulblaze }
+    advice: "Have {{members:knows:nulblaze}} cast NulBlaze early to halve the party's fire damage."
+
+  - bossGroup: ice-threat
+    section: safety
+    when: { spell: nulfrost }
+    advice: "Have {{members:knows:nulfrost}} cast NulFrost before committing to offense so party-wide ice damage is easier to heal through."
+
+  - bossGroup: instant-death
+    section: safety
+    when: { spell: nuldeath }
+    advice: "Have {{members:knows:nuldeath}} cast NulDeath before {{boss}} gets repeated chances to remove a party member instantly."
+
+  - bossGroup: instant-death
+    section: safety
+    when: { spell: life }
+    advice: "Keep {{members:knows:life}} alive and reserve a Life charge to recover from an instant knockout."
+
+  - bossGroup: physical-defense
+    section: safety
+    when: { spell: protera }
+    advice: "Have {{members:knows:protera}} cast Protera so the whole party can withstand {{boss}}'s repeated physical hits."
+
+  - bossGroup: physical-defense
+    section: safety
+    when: { spell: invisira }
+    advice: "Have {{members:knows:invisira}} cast Invisira to raise the whole party's evasion before the long physical exchange."
+
+  - bossGroup: resistant-endgame
+    section: party-edge
+    when: { spell: flare }
+    advice: "Have {{members:knows:flare}} use Flare as reliable non-elemental offense against {{boss}}."
+
+  - bossGroup: resistant-endgame
+    section: party-edge
+    when: { spell: saber }
+    advice: "Have {{members:knows:saber}} cast Saber on themselves when their best contribution is a self-buffed physical attack."
