@@ -22,7 +22,6 @@ object TarotEngineRoutesHtml:
     html(
       commonHead("tarot-engine", None),
       body(
-        p(id := "typescript-hello", attr("aria-live") := "polite")("Loading TypeScript..."),
         ul(
           li(
             a(href := "/final-fantasy")("Final Fantasy")

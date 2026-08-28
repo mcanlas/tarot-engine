@@ -14,10 +14,9 @@ import com.htmlism.tarotengine.chronotrigger.SecretTripleTech
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
 object TarotEngineRoutesHtmlSpec extends FunSuite:
-  test("index renders the TypeScript proof-of-concept target and module"):
+  test("index loads the TypeScript module"):
     val html = TarotEngineRoutesHtml.index.render
 
-    expect(html.contains("id=\"typescript-hello\"")) &&
     expect(html.contains("src=\"/tarot-engine-app.js\"")) &&
     expect(html.contains("type=\"module\""))
 
