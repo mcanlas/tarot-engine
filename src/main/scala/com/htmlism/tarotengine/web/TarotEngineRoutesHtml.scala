@@ -73,6 +73,7 @@ object TarotEngineRoutesHtml:
             ),
             span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
           ),
+          // ff5 parties
           tag("article")(cls := "app-tile tile-placeholder tile-slot-coral")(
             span(cls := "tile-kicker")("Unknown"),
             span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
@@ -81,6 +82,7 @@ object TarotEngineRoutesHtml:
               span(cls := "tile-description")("Come back later!")
             )
           ),
+          // ff6 parties
           tag("article")(cls := "app-tile tile-placeholder tile-slot-lime")(
             span(cls := "tile-kicker")("Unknown"),
             span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
@@ -89,7 +91,26 @@ object TarotEngineRoutesHtml:
               span(cls := "tile-description")("Come back later!")
             )
           ),
-          tag("article")(cls := "app-tile tile-placeholder tile-slot-cyan")(
+          // fft parties
+          tag("article")(cls := "app-tile tile-placeholder tile-slot-slate")(
+            span(cls := "tile-kicker")("Unknown"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Unknown"),
+              span(cls := "tile-description")("Come back later!")
+            )
+          ),
+          // ffta parties
+          tag("article")(cls := "app-tile tile-placeholder tile-slot-granite")(
+            span(cls := "tile-kicker")("Unknown"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Unknown"),
+              span(cls := "tile-description")("Come back later!")
+            )
+          ),
+          // ffta2 parties
+          tag("article")(cls := "app-tile tile-placeholder tile-slot-copper")(
             span(cls := "tile-kicker")("Unknown"),
             span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
             span(cls := "tile-copy")(

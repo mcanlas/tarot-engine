@@ -21,9 +21,12 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     expect(html.contains("Party Generator")) &&
     expect(html.contains("Character Roster")) &&
     expect(html.contains("Quest Randomizer")) &&
-    expect(html.split("Boss Strategy").length == 3) &&
-    expect(html.split("tile-placeholder").length == 4) &&
-    expect(html.split("Come back later!").length == 4) &&
+    expect(html.split("Dynamic Strategy").length == 3) &&
+    expect(html.split("tile-placeholder").length == 6) &&
+    expect(html.split("Come back later!").length == 6) &&
+    expect(html.contains("tile-slot-slate")) &&
+    expect(html.contains("tile-slot-granite")) &&
+    expect(html.contains("tile-slot-copper")) &&
     expect(html.split("class=\"tile-arrow\"").length == 6) &&
     expect(!html.contains("↗")) &&
     expect(html.contains("href=\"/tarot-engine.css\"")) &&
@@ -32,7 +35,7 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     expect(html.contains("href=\"/chrono-trigger\"")) &&
     expect(html.contains("href=\"/final-fantasy-vibe\"")) &&
     expect(html.contains("href=\"/chrono-trigger-vibe\"")) &&
-    expect(html.split("app-tile ").length == 9) &&
+    expect(html.split("app-tile ").length == 11) &&
     expect(html.contains("src=\"/tarot-engine-app.js\"")) &&
     expect(html.contains("type=\"module\""))
 

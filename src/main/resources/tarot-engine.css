@@ -183,12 +183,26 @@ a.app-tile:focus-visible {
   background: linear-gradient(145deg, #d9f43b 0%, #73dc5b 52%, #18a980 112%);
 }
 
-.tile-slot-cyan {
-  background: linear-gradient(145deg, #19e0dc 0%, #168bd9 52%, #3747b9 112%);
+.tile-slot-slate {
+  color: #202936;
+  background: linear-gradient(145deg, #ffffff 0%, #edf0f4 62%, #8b96a5 112%);
+}
+
+.tile-slot-granite {
+  background: linear-gradient(145deg, #5c6470 0%, #272b31 38%, #050608 112%);
+}
+
+.tile-slot-copper {
+  background: linear-gradient(145deg, #dc9751 0%, #a94f3c 52%, #652847 112%);
 }
 
 .tile-slot-lime .tile-kicker {
   border-color: #17342133;
+  background: #ffffff3d;
+}
+
+.tile-slot-slate .tile-kicker {
+  border-color: #20293633;
   background: #ffffff3d;
 }
 
