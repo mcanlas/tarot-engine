@@ -9,6 +9,7 @@ object TypeScriptCompilationPlugin extends AutoPlugin {
 
   object autoImport {
     val compileTypeScript = taskKey[Seq[File]]("Compile TypeScript into managed resources")
+    val testTypeScript    = taskKey[Unit]("Run TypeScript unit tests")
 
     implicit class TypeScriptCompilationOps(private val project: Project) extends AnyVal {
       def withTypeScriptCompilation: Project =
@@ -43,7 +44,15 @@ object TypeScriptCompilationPlugin extends AutoPlugin {
 
             generatedResources
           },
-          Compile / resourceGenerators += compileTypeScript.taskValue
+          testTypeScript := {
+            val projectRoot = baseDirectory.value
+            val exitCode    = Process(Seq("npm", "run", "test:ts"), projectRoot).!
+
+            if (exitCode != 0)
+              sys.error("TypeScript tests failed")
+          },
+          Compile / resourceGenerators += compileTypeScript.taskValue,
+          Test / test := ((Test / test) dependsOn testTypeScript).value
         )
     }
   }

@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build:ts": "tsc --project tsconfig.json",
-    "test:js": "node --test src/test/js/*.test.js"
+    "test:js": "node --test src/test/js/*.test.js",
+    "test:ts": "node --test src/test/ts/*.test.ts"
   },
   "devDependencies": {
     "typescript": "^7.0.2"
