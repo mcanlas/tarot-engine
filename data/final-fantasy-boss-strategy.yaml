@@ -3,56 +3,56 @@ bossGroups:
     - marilith
     - warmech
     - tiamat
-    - lich (rematch)
-    - marilith (rematch)
-    - kraken (rematch)
-    - tiamat (rematch)
+    - lich-rematch
+    - marilith-rematch
+    - kraken-rematch
+    - tiamat-rematch
     - chaos
   physical-defense:
     - marilith
     - kraken
     - warmech
-    - marilith (rematch)
-    - kraken (rematch)
+    - marilith-rematch
+    - kraken-rematch
     - chaos
   endurance:
     - warmech
     - tiamat
-    - lich (rematch)
-    - marilith (rematch)
-    - kraken (rematch)
-    - tiamat (rematch)
+    - lich-rematch
+    - marilith-rematch
+    - kraken-rematch
+    - tiamat-rematch
     - chaos
   lightning-threat:
-    - blue dragon
+    - blue-dragon
     - tiamat
-    - kraken (rematch)
-    - tiamat (rematch)
+    - kraken-rematch
+    - tiamat-rematch
     - chaos
   fire-threat:
     - marilith
     - tiamat
-    - marilith (rematch)
-    - tiamat (rematch)
+    - marilith-rematch
+    - tiamat-rematch
     - chaos
   ice-threat:
     - lich
     - tiamat
-    - tiamat (rematch)
+    - tiamat-rematch
     - chaos
   instant-death:
     - astos
-    - evil eye
-    - lich (rematch)
-    - marilith (rematch)
-    - tiamat (rematch)
+    - evil-eye
+    - lich-rematch
+    - marilith-rematch
+    - tiamat-rematch
   resistant-endgame:
     - warmech
     - tiamat
-    - lich (rematch)
-    - marilith (rematch)
-    - kraken (rematch)
-    - tiamat (rematch)
+    - lich-rematch
+    - marilith-rematch
+    - kraken-rematch
+    - tiamat-rematch
     - chaos
 
 rules:
@@ -230,12 +230,12 @@ rules:
     when: always
     advice: "Marilith applies sustained physical pressure; establish your defenses before committing everyone to offense."
 
-  - boss: evil eye
+  - boss: evil-eye
     section: opening
     when: always
     advice: "Evil Eye is dangerous because of its disabling magic, so treat the encounter as an immediate damage race."
 
-  - boss: dragon zombies
+  - boss: dragon-zombies
     section: opening
     when: always
     advice: "Focus both Dragon Zombies on one target at a time so the second half of the fight has fewer incoming attacks."
@@ -245,7 +245,7 @@ rules:
     when: always
     advice: "Kraken's physical offense is the immediate threat; stabilize the front line and concentrate damage."
 
-  - boss: blue dragon
+  - boss: blue-dragon
     section: opening
     when: always
     advice: "Blue Dragon is a compact burst fight; use reliable single-target damage and preserve enough recovery for the climb ahead."
@@ -260,22 +260,22 @@ rules:
     when: always
     advice: "Tiamat resists broad elemental offense, so build the plan around physical damage and sustained recovery."
 
-  - boss: lich (rematch)
+  - boss: lich-rematch
     section: opening
     when: always
     advice: "The Lich rematch punishes a depleted party; restore the group quickly and save decisive damage for safe turns."
 
-  - boss: marilith (rematch)
+  - boss: marilith-rematch
     section: opening
     when: always
     advice: "The Marilith rematch adds late-game lethality to its physical pressure; protect the front line and end it cleanly."
 
-  - boss: kraken (rematch)
+  - boss: kraken-rematch
     section: opening
     when: always
     advice: "The Kraken rematch is an endurance check; keep recovery ahead of its physical pressure while focusing damage."
 
-  - boss: tiamat (rematch)
+  - boss: tiamat-rematch
     section: opening
     when: always
     advice: "The Tiamat rematch is the last resource check before Chaos; lean on reliable damage and avoid wasteful casting."
@@ -290,12 +290,12 @@ rules:
     when: { spell: sleep }
     advice: "Have {{members:knows:sleep}} try Sleep; unlike most bosses, Marilith can lose turns to it."
 
-  - boss: evil eye
+  - boss: evil-eye
     section: party-edge
     when: { capability: physical-damage }
     advice: "Have {{members:preferred-physical-attacker}} attack immediately rather than spend a turn setting up against Evil Eye."
 
-  - boss: evil eye
+  - boss: evil-eye
     section: party-edge
     when:
       all:
@@ -303,12 +303,12 @@ rules:
         - capability: offensive-magic
     advice: "With no physical attacker, have {{members:capability:offensive-magic}} spend learned attack magic immediately before Evil Eye can disable the party."
 
-  - boss: dragon zombies
+  - boss: dragon-zombies
     section: party-edge
     when: { spell: dia }
     advice: "Have {{members:knows:dia}} cast Dia into the undead pair while the rest of the party focuses one target."
 
-  - boss: dragon zombies
+  - boss: dragon-zombies
     section: party-edge
     when: { spell: fire }
     advice: "Have {{members:knows:fire}} use Fire against the Dragon Zombies instead of basic mage attacks."
@@ -318,7 +318,7 @@ rules:
     when: { spell: thunder }
     advice: "Have {{members:knows:thunder}} exploit Kraken's lightning weakness with Thunder."
 
-  - boss: blue dragon
+  - boss: blue-dragon
     section: party-edge
     when: { spell: fire }
     advice: "Have {{members:knows:fire}} exploit Blue Dragon's fire weakness with Fire."
@@ -328,17 +328,17 @@ rules:
     when: { spellAttribute: elemental }
     advice: "Have {{members:knows-attribute:elemental}} conserve elemental MP against Tiamat's resistances and support the physical plan instead."
 
-  - boss: lich (rematch)
+  - boss: lich-rematch
     section: party-edge
     when: { spell: fire }
     advice: "Have {{members:knows:fire}} conserve Fire; the rematch no longer has Lich's original fire weakness."
 
-  - boss: marilith (rematch)
+  - boss: marilith-rematch
     section: party-edge
     when: { spellAttribute: elemental }
     advice: "Have {{members:knows-attribute:elemental}} save elemental MP; the rematch resists Fire, Blizzard, and Thunder."
 
-  - boss: kraken (rematch)
+  - boss: kraken-rematch
     section: party-edge
     when: { spell: thunder }
     advice: "Have {{members:knows:thunder}} conserve Thunder; Kraken's lightning weakness is gone in the rematch."

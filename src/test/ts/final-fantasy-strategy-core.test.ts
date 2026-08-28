@@ -39,8 +39,12 @@ test("loads and validates the complete YAML strategy catalog", () => {
   assert.equal(engine.bosses.length, 18)
   assert.equal(engine.ruleCount, 66)
   assert.deepEqual(
-    engine.bosses.filter((boss) => boss.tags.includes("undead")).map((boss) => boss.boss),
+    engine.bosses.filter((boss) => boss.tags.includes("undead")).map((boss) => boss.key),
     ["vampire", "lich"],
+  )
+  assert.deepEqual(
+    engine.bosses.find((boss) => boss.key === "blue-dragon"),
+    { key: "blue-dragon", name: "Blue Dragon", tags: [] },
   )
   assert.equal(
     describeFinalFantasyStrategyCatalog(),
@@ -119,10 +123,11 @@ test("Garland advice follows YAML order and learned capabilities", () => {
     member("thief"),
     member("white-mage", "cure"),
     member("black-mage", "thunder"),
-  ]), "GARLAND")
+  ]), "garland")
 
   assert.equal(trained.boss, "garland")
   assert.deepEqual(trained.fragments.map((fragment) => fragment.section), ["opening", "party-edge", "safety"])
+  assert(trained.fragments[0]?.advice.includes("Garland"))
   assert(trained.fragments.some((fragment) => fragment.advice.includes("Black Mage spend MP")))
   assert(trained.fragments.some((fragment) => fragment.advice.includes("Keep the White Mage attacking")))
 
@@ -200,9 +205,9 @@ test("boss-specific, group, and rematch rules stay distinct", () => {
     member("black-mage", "fire", "thunder", "haste", "temper"),
   ]
 
-  assert(adviceFor("dragon zombies", members).some((line) => line.includes("cast Dia into the undead pair")))
+  assert(adviceFor("dragon-zombies", members).some((line) => line.includes("cast Dia into the undead pair")))
   assert(adviceFor("kraken", members).some((line) => line.includes("lightning weakness")))
-  assert(adviceFor("kraken (rematch)", members).some((line) => line.includes("lightning weakness is gone")))
+  assert(adviceFor("kraken-rematch", members).some((line) => line.includes("lightning weakness is gone")))
   assert(adviceFor("chaos", members).some((line) => line.includes("cast Haste on the Warrior")))
 })
 
@@ -233,9 +238,9 @@ test("every configured boss has deterministic baseline coverage", () => {
   ])
 
   for (const definition of engine.bosses) {
-    const first = engine.guideFor(baseline, definition.boss)
-    const second = engine.guideFor(baseline, definition.boss)
-    assert(first.fragments.length > 0, definition.boss)
+    const first = engine.guideFor(baseline, definition.key)
+    const second = engine.guideFor(baseline, definition.key)
+    assert(first.fragments.length > 0, definition.key)
     assert.deepEqual(first, second)
   }
   assert.deepEqual(engine.guideFor(baseline, "missing boss").fragments, [])

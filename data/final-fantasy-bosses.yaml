@@ -1,38 +1,56 @@
-- boss: garland
+- key: garland
+  name: Garland
   tags: []
-- boss: pirates
+- key: pirates
+  name: Pirates
   tags: []
-- boss: piscodemons
+- key: piscodemons
+  name: Piscodemons
   tags: []
-- boss: astos
+- key: astos
+  name: Astos
   tags: []
-- boss: vampire
+- key: vampire
+  name: Vampire
   tags:
     - undead
-- boss: lich
+- key: lich
+  name: Lich
   tags:
     - undead
-- boss: marilith
+- key: marilith
+  name: Marilith
   tags: []
-- boss: evil eye
+- key: evil-eye
+  name: Evil Eye
   tags: []
-- boss: dragon zombies
+- key: dragon-zombies
+  name: Dragon Zombies
   tags: []
-- boss: kraken
+- key: kraken
+  name: Kraken
   tags: []
-- boss: blue dragon
+- key: blue-dragon
+  name: Blue Dragon
   tags: []
-- boss: warmech
+- key: warmech
+  name: Warmech
   tags: []
-- boss: tiamat
+- key: tiamat
+  name: Tiamat
   tags: []
-- boss: lich (rematch)
+- key: lich-rematch
+  name: Lich (Rematch)
   tags: []
-- boss: marilith (rematch)
+- key: marilith-rematch
+  name: Marilith (Rematch)
   tags: []
-- boss: kraken (rematch)
+- key: kraken-rematch
+  name: Kraken (Rematch)
   tags: []
-- boss: tiamat (rematch)
+- key: tiamat-rematch
+  name: Tiamat (Rematch)
   tags: []
-- boss: chaos
+- key: chaos
+  name: Chaos
   tags: []

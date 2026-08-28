@@ -101,7 +101,8 @@ function decodeBoss(value: unknown, index: number): BossDefinition {
   const record = requireRecord(value, `bosses[${index}]`)
 
   return {
-    boss: requireString(record.boss, `bosses[${index}].boss`),
+    key: requireString(record.key, `bosses[${index}].key`),
+    name: requireString(record.name, `bosses[${index}].name`),
     tags: record.tags === undefined ? [] : requireStringArray(record.tags, `bosses[${index}].tags`),
   }
 }

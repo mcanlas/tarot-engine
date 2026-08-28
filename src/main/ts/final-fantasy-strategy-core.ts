@@ -38,7 +38,8 @@ export interface SpellDefinition {
 }
 
 export interface BossDefinition {
-  boss: string
+  key: string
+  name: string
   tags: string[]
 }
 
@@ -114,7 +115,7 @@ export interface BossGuide {
   fragments: readonly GuideFragment[]
 }
 
-interface BossProfile { name: string; tags: ReadonlySet<EnemyTagId> }
+interface BossProfile { key: string; name: string; tags: ReadonlySet<EnemyTagId> }
 type PartyCondition = (party: Party) => boolean
 type BossCondition = (boss: BossProfile) => boolean
 interface MemberSelector {
@@ -161,10 +162,10 @@ export class FinalFantasyStrategyEngine {
     this.#rules = rules
   }
 
-  guideFor(party: Party, bossName: string): BossGuide {
-    const normalizedName = bossName.toLowerCase()
-    const boss = this.#bossProfiles.get(normalizedName) ?? {
-      name: normalizedName,
+  guideFor(party: Party, bossKey: string): BossGuide {
+    const boss = this.#bossProfiles.get(bossKey) ?? {
+      key: bossKey,
+      name: bossKey,
       tags: new Set<EnemyTagId>(),
     }
     const fragments = this.#rules.flatMap((rule) =>
@@ -173,7 +174,7 @@ export class FinalFantasyStrategyEngine {
         : [],
     )
 
-    return { boss: boss.name, fragments }
+    return { boss: boss.key, fragments }
   }
 }
 
@@ -284,13 +285,15 @@ function buildCatalog(
 }
 
 function buildBossProfiles(definitions: readonly BossDefinition[]): ReadonlyMap<string, BossProfile> {
-  const names = definitions.map((definition) => definition.boss.toLowerCase())
-  rejectDuplicates("boss", names)
+  const keys = definitions.map((definition) => definition.key)
+  rejectDuplicates("boss", keys)
 
   return new Map(definitions.map((definition) => {
-    const name = definition.boss.toLowerCase()
-
-    return [name, { name, tags: new Set(definition.tags.map(requireEnemyTag)) }]
+    return [definition.key, {
+      key: definition.key,
+      name: definition.name,
+      tags: new Set(definition.tags.map(requireEnemyTag)),
+    }]
   }))
 }
 
@@ -323,13 +326,13 @@ function buildBossCondition(
   }
 
   if (definition.boss !== undefined) {
-    const name = definition.boss.toLowerCase()
+    const key = definition.boss
 
-    if (!bossProfiles.has(name)) {
+    if (!bossProfiles.has(key)) {
       throw new Error(`Unknown rule boss: ${definition.boss}`)
     }
 
-    return (boss) => boss.name === name
+    return (boss) => boss.key === key
   }
 
   if (definition.bossGroup !== undefined) {
@@ -339,9 +342,9 @@ function buildBossCondition(
       throw new Error(`Unknown boss group: ${definition.bossGroup}`)
     }
 
-    const normalizedNames = new Set(names.map((name) => name.toLowerCase()))
+    const keys = new Set(names)
 
-    return (boss) => normalizedNames.has(boss.name)
+    return (boss) => keys.has(boss.key)
   }
 
   const tag = requireEnemyTag(definition.bossTag ?? "")
@@ -438,7 +441,7 @@ function parseAdviceToken(token: string, catalog: FinalFantasyCatalog): Exclude<
 
   if (parts.length === 1 && parts[0] === "boss") {
 
-    return (_party, boss) => capitalize(boss.name)
+    return (_party, boss) => boss.name
   }
 
   if (parts[0] !== "members") {
@@ -570,9 +573,8 @@ function validateBossGroups(
   bosses: ReadonlyMap<string, BossProfile>,
 ): void {
   const unknown = Object.entries(groups).flatMap(([group, names]) => names
-    .map((name) => name.toLowerCase())
-    .filter((name) => !bosses.has(name))
-    .map((name) => `${group} -> ${name}`))
+    .filter((key) => !bosses.has(key))
+    .map((key) => `${group} -> ${key}`))
   if (unknown.length > 0) {
     throw new Error(`Boss groups reference unknown bosses: ${unknown.sort().join(", ")}`)
   }
@@ -647,8 +649,4 @@ function requireGuideSection(id: string): GuideSectionId {
   }
 
   return id as GuideSectionId
-}
-function capitalize(value: string): string {
-
-  return value.length === 0 ? value : `${value[0]?.toUpperCase()}${value.slice(1)}`
 }
