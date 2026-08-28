@@ -1,0 +1,207 @@
+- spell: cure
+  name: Cure
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
+- spell: heal
+  name: Heal
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - healing
+
+- spell: dia
+  name: Dia
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - offensive-magic
+    - anti-undead
+
+- spell: fire
+  name: Fire
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- spell: blizzard
+  name: Blizzard
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- spell: thunder
+  name: Thunder
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- spell: sleep
+  name: Sleep
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes: []
+
+- spell: protect
+  name: Protect
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: blink
+  name: Blink
+  learnableBy:
+    - white-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: silence
+  name: Silence
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: temper
+  name: Temper
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes: []
+
+- spell: haste
+  name: Haste
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes: []
+
+- spell: slow
+  name: Slow
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes: []
+
+- spell: nulshock
+  name: NulShock
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: nulblaze
+  name: NulBlaze
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: nulfrost
+  name: NulFrost
+  learnableBy:
+    - white-mage
+    - red-mage
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: nuldeath
+  name: NulDeath
+  learnableBy:
+    - white-mage
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: protera
+  name: Protera
+  learnableBy:
+    - white-mage
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: invisira
+  name: Invisira
+  learnableBy:
+    - white-mage
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- spell: flare
+  name: Flare
+  learnableBy:
+    - black-wizard
+  attributes:
+    - offensive-magic
+
+- spell: life
+  name: Life
+  learnableBy:
+    - white-mage
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
+- spell: saber
+  name: Saber
+  learnableBy:
+    - black-wizard
+  attributes: []

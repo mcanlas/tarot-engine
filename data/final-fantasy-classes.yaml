@@ -1,0 +1,63 @@
+- class: warrior
+  name: Warrior
+  plural: Warriors
+  attackerPriority: 0
+  promotion:
+    class: knight
+    name: Knight
+    plural: Knights
+  attributes:
+    - physical-damage
+
+- class: thief
+  name: Thief
+  plural: Thieves
+  attackerPriority: 2
+  promotion:
+    class: ninja
+    name: Ninja
+    plural: Ninjas
+  attributes:
+    - physical-damage
+
+- class: monk
+  name: Monk
+  plural: Monks
+  attackerPriority: 1
+  promotion:
+    class: master
+    name: Master
+    plural: Masters
+  attributes:
+    - physical-damage
+
+- class: red-mage
+  name: Red Mage
+  plural: Red Mages
+  attackerPriority: 3
+  promotion:
+    class: red-wizard
+    name: Red Wizard
+    plural: Red Wizards
+  attributes:
+    - physical-damage
+
+- class: white-mage
+  name: White Mage
+  plural: White Mages
+  attackerPriority: 4
+  promotion:
+    class: white-wizard
+    name: White Wizard
+    plural: White Wizards
+  attributes: []
+
+- class: black-mage
+  name: Black Mage
+  plural: Black Mages
+  attackerPriority: 4
+  promotion:
+    class: black-wizard
+    name: Black Wizard
+    plural: Black Wizards
+  attributes: []
