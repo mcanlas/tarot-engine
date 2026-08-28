@@ -6,10 +6,10 @@ Small deterministic tools and strategy experiments for classic RPGs
 
 - [Web apps](#web-apps)
   - [Final Fantasy party generator](#final-fantasy-party-generator)
+  - [Final Fantasy dynamic strategy](#final-fantasy-dynamic-strategy)
   - [Final Fantasy VI roster](#final-fantasy-vi-roster)
   - [Chrono Trigger quest randomizer](#chrono-trigger-quest-randomizer)
-- [Console apps](#console-apps)
-  - [Final Fantasy strategy guide](#final-fantasy-strategy-guide)
+- [Project planning](#project-planning)
 - [Run locally](#run-locally)
 
 ## Web apps
@@ -17,6 +17,10 @@ Small deterministic tools and strategy experiments for classic RPGs
 ### Final Fantasy party generator
 
 [`/final-fantasy`](http://localhost:8083/final-fantasy) generates parties of one to four characters from the six original classes. Controls switch between unique combinations and all ordered formations, with optional required-class filters.
+
+### Final Fantasy dynamic strategy
+
+[`/final-fantasy/dynamic-strategy`](http://localhost:8083/final-fantasy/dynamic-strategy) mounts the TypeScript browser entry point for the YAML-backed, party-specific strategy engine. The page is intentionally a nominal UI while the engine and its validation live in independently tested TypeScript modules.
 
 ### Final Fantasy VI roster
 
@@ -26,11 +30,9 @@ Small deterministic tools and strategy experiments for classic RPGs
 
 [`/chrono-trigger`](http://localhost:8083/chrono-trigger) simulates chapter progression, roster changes, randomized side-quest parties, boolean story flags, and base or secret triple-tech designations.
 
-## Console apps
+## Project planning
 
-### Final Fantasy strategy guide
-
-The Final Fantasy strategy guide generates deterministic, party-specific advice across 18 boss encounters. Its YAML-backed catalog models six starting classes and their required promotions, 22 spells, learned-spell permissions, shared items, and rules for offense, recovery, buffs, resistances, and rematches.
+See the [Final Fantasy strategy roadmap](TODO.md#final-fantasy-strategy).
 
 ## Run locally
 
@@ -50,15 +52,9 @@ sbt stage && ./target/universal/stage/bin/tarot-engine
 
 The service starts on [http://localhost:8083](http://localhost:8083)
 
-Run the console strategy guide:
-
-```bash
-sbt "runMain com.htmlism.tarotengine.finalfantasy.vibe.VibeApp"
-```
-
 Run the test suite:
 
 ```bash
 npm run test:js
-sbt testQuick
+sbt test
 ```

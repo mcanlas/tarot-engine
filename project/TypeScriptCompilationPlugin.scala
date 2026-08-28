@@ -7,6 +7,13 @@ object TypeScriptCompilationPlugin extends AutoPlugin {
   override def trigger: PluginTrigger =
     allRequirements
 
+  private def runOrFail(command: Seq[String], projectRoot: File, failureMessage: String): Unit = {
+    val exitCode = Process(command, projectRoot).!
+
+    if (exitCode != 0)
+      sys.error(failureMessage)
+  }
+
   object autoImport {
     val compileTypeScript = taskKey[Seq[File]]("Compile TypeScript into managed resources")
     val testTypeScript    = taskKey[Unit]("Run TypeScript unit tests")
@@ -21,7 +28,7 @@ object TypeScriptCompilationPlugin extends AutoPlugin {
 
             IO.createDirectory(outputDir)
 
-            val exitCode = Process(
+            runOrFail(
               Seq(
                 "npm",
                 "run",
@@ -30,11 +37,9 @@ object TypeScriptCompilationPlugin extends AutoPlugin {
                 "--outDir",
                 outputDir.getAbsolutePath
               ),
-              projectRoot
-            ).!
-
-            if (exitCode != 0)
-              sys.error("TypeScript compilation failed")
+              projectRoot,
+              "TypeScript compilation failed"
+            )
 
             val generatedResources = (outputDir ** "*").get.filter { file =>
               file.getName.endsWith(".js") || file.getName.endsWith(".js.map")
@@ -46,10 +51,12 @@ object TypeScriptCompilationPlugin extends AutoPlugin {
           },
           testTypeScript := {
             val projectRoot = baseDirectory.value
-            val exitCode    = Process(Seq("npm", "run", "test:ts"), projectRoot).!
 
-            if (exitCode != 0)
-              sys.error("TypeScript tests failed")
+            runOrFail(
+              Seq("npm", "run", "test:ts"),
+              projectRoot,
+              "TypeScript tests failed"
+            )
           },
           Compile / resourceGenerators += compileTypeScript.taskValue,
           Test / test := ((Test / test) dependsOn testTypeScript).value

@@ -1,6 +1,6 @@
 import {
   describeFinalFantasyStrategyCatalog,
-} from "./final-fantasy-strategy-core.js"
+} from "./final-fantasy-strategy-core.ts"
 
 const status = document.querySelector<HTMLElement>("[data-strategy-status]")
 
