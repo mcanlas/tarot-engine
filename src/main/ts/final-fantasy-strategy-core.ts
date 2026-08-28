@@ -19,6 +19,12 @@ export interface FinalFantasyStrategyData {
   bossStrategy: YamlDocument
 }
 
+export function describeFinalFantasyStrategyCatalog(): string {
+  const catalogCount = Object.keys(finalFantasyStrategyYamlFiles).length
+
+  return `TypeScript connected; ${catalogCount} YAML catalogs configured.`
+}
+
 async function loadYamlDocument(
   path: string,
   loadText: YamlTextLoader,

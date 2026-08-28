@@ -11,10 +11,11 @@ import com.htmlism.tarotengine.chronotrigger.FlagCondition
 import com.htmlism.tarotengine.chronotrigger.Roster
 import com.htmlism.tarotengine.chronotrigger.RosterChange
 import com.htmlism.tarotengine.chronotrigger.SecretTripleTech
+import com.htmlism.tarotengine.finalfantasy.FinalFantasyDynamicStrategyPage
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
 object TarotEngineRoutesHtmlSpec extends FunSuite:
-  test("index renders app and unassigned tiles and loads its assets"):
+  test("index renders assigned and unassigned tiles and loads its stylesheet"):
     val html = TarotEngineRoutesHtml.index.render
 
     expect(html.contains("<h1><span aria-hidden=\"true\">✦</span> Tarot Engine</h1>")) &&
@@ -33,10 +34,19 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     expect(html.contains("href=\"/final-fantasy\"")) &&
     expect(html.contains("href=\"/final-fantasy-vi\"")) &&
     expect(html.contains("href=\"/chrono-trigger\"")) &&
-    expect(html.contains("href=\"/final-fantasy-vibe\"")) &&
+    expect(html.contains("href=\"/final-fantasy/dynamic-strategy\"")) &&
+    expect(html.contains("class=\"app-tile tile-strategy\"")) &&
     expect(html.contains("href=\"/chrono-trigger-vibe\"")) &&
     expect(html.split("app-tile ").length == 11) &&
-    expect(html.contains("src=\"/tarot-engine-app.js\"")) &&
+    expect(!html.contains("src=\"/tarot-engine-app.js\""))
+
+  test("Final Fantasy dynamic strategy mounts its TypeScript entry point"):
+    val html = FinalFantasyDynamicStrategyPage.html.render
+
+    expect(html.contains("<h1>Final Fantasy Dynamic Strategy</h1>")) &&
+    expect(html.contains("data-strategy-status=\"\"")) &&
+    expect(html.contains("Waiting for TypeScript…")) &&
+    expect(html.contains("src=\"/final-fantasy-strategy-app.js\"")) &&
     expect(html.contains("type=\"module\""))
 
   test("Final Fantasy VI renders all 14 playable characters as themed pills"):

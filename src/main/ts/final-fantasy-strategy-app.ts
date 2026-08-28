@@ -1,11 +1,10 @@
 import {
-  loadFinalFantasyStrategyData,
-  type FinalFantasyStrategyData,
-  type YamlTextLoader,
+  describeFinalFantasyStrategyCatalog,
 } from "./final-fantasy-strategy-core.js"
 
-export function startFinalFantasyStrategyApp(
-  loadText: YamlTextLoader,
-): Promise<FinalFantasyStrategyData> {
-  return loadFinalFantasyStrategyData(loadText)
+const status = document.querySelector<HTMLElement>("[data-strategy-status]")
+
+if (status !== null) {
+  status.textContent = describeFinalFantasyStrategyCatalog()
+  status.dataset.typescript = "ready"
 }

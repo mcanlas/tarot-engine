@@ -13,6 +13,7 @@ import org.http4s.server.middleware.Logger
 
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerDefinition
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
+import com.htmlism.tarotengine.finalfantasy.FinalFantasyDynamicStrategyPage
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyPage
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
@@ -27,6 +28,9 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
 
       case GET -> Root / "final-fantasy" =>
         Ok(FinalFantasyPage.html)
+
+      case GET -> Root / "final-fantasy" / "dynamic-strategy" =>
+        Ok(FinalFantasyDynamicStrategyPage.html)
 
       case GET -> Root / "chrono-trigger" =>
         for

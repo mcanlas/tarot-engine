@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises"
 import test from "node:test"
 
 import {
+  describeFinalFantasyStrategyCatalog,
   finalFantasyStrategyYamlFiles,
   loadFinalFantasyStrategyData,
 } from "../../main/ts/final-fantasy-strategy-core.ts"
@@ -21,4 +22,8 @@ test("loads the Final Fantasy strategy YAML catalogs", async () => {
   assert.match(data.spells.text, /^- spell:/)
   assert.match(data.bosses.text, /^- boss: garland/)
   assert.match(data.bossStrategy.text, /^bossGroups:/)
+  assert.equal(
+    describeFinalFantasyStrategyCatalog(),
+    "TypeScript connected; 4 YAML catalogs configured.",
+  )
 })

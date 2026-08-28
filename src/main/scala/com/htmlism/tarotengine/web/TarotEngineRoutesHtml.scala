@@ -55,7 +55,7 @@ object TarotEngineRoutesHtml:
             ),
             span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
           ),
-          a(cls := "app-tile tile-vibe", href := "/final-fantasy-vibe")(
+          a(cls := "app-tile tile-strategy", href := "/final-fantasy/dynamic-strategy")(
             span(cls := "tile-kicker")("Final Fantasy I"),
             span(cls := "tile-emoji", attr("aria-hidden") := "true")("🔮"),
             span(cls := "tile-copy")(
@@ -118,8 +118,7 @@ object TarotEngineRoutesHtml:
               span(cls := "tile-description")("Come back later!")
             )
           )
-        ),
-        script(tpe := "module", src := "/tarot-engine-app.js")
+        )
       )
     )
 
