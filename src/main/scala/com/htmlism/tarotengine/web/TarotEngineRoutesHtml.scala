@@ -20,17 +20,82 @@ object TarotEngineRoutesHtml:
 
   val index: Text.TypedTag[String] =
     html(
-      commonHead("tarot-engine", None),
-      body(
-        ul(
-          li(
-            a(href := "/final-fantasy")("Final Fantasy")
+      commonHead("Tarot Engine", Some("/tarot-engine.css")),
+      body(cls := "landing-page")(
+        div(cls := "aurora aurora-one", attr("aria-hidden") := "true"),
+        div(cls := "aurora aurora-two", attr("aria-hidden") := "true"),
+        header(cls := "hero")(
+          h1(span(attr("aria-hidden") := "true")("✦"), " Tarot Engine")
+        ),
+        tag("main")(cls := "app-grid")(
+          a(cls := "app-tile tile-ff", href := "/final-fantasy")(
+            span(cls := "tile-kicker")("Final Fantasy"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("⚔️"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Party Generator"),
+              span(cls := "tile-description")("Generate all party combinations")
+            ),
+            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
           ),
-          li(
-            a(href := "/final-fantasy-vi")("Final Fantasy VI")
+          a(cls := "app-tile tile-ffvi", href := "/final-fantasy-vi")(
+            span(cls := "tile-kicker")("Final Fantasy VI"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("🎭"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Character Roster"),
+              span(cls := "tile-description")("All 14 playable characters")
+            ),
+            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
           ),
-          li(
-            a(href := "/chrono-trigger")("Chrono Trigger")
+          a(cls := "app-tile tile-chrono", href := "/chrono-trigger")(
+            span(cls := "tile-kicker")("Chrono Trigger"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("⏳"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Quest Randomizer"),
+              span(cls := "tile-description")("Random parties and side quests")
+            ),
+            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
+          ),
+          a(cls := "app-tile tile-vibe", href := "/final-fantasy-vibe")(
+            span(cls := "tile-kicker")("Final Fantasy I"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("🔮"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Dynamic Strategy"),
+              span(cls := "tile-description")("Party-specific advice")
+            ),
+            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
+          ),
+          a(cls := "app-tile tile-chrono-vibe", href := "/chrono-trigger-vibe")(
+            span(cls := "tile-kicker")("Chrono Trigger"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("🧠"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Dynamic Strategy"),
+              span(cls := "tile-description")("Party-specific advice")
+            ),
+            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
+          ),
+          tag("article")(cls := "app-tile tile-placeholder tile-slot-coral")(
+            span(cls := "tile-kicker")("Unknown"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Unknown"),
+              span(cls := "tile-description")("Come back later!")
+            )
+          ),
+          tag("article")(cls := "app-tile tile-placeholder tile-slot-lime")(
+            span(cls := "tile-kicker")("Unknown"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Unknown"),
+              span(cls := "tile-description")("Come back later!")
+            )
+          ),
+          tag("article")(cls := "app-tile tile-placeholder tile-slot-cyan")(
+            span(cls := "tile-kicker")("Unknown"),
+            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
+            span(cls := "tile-copy")(
+              span(cls := "tile-title")("Unknown"),
+              span(cls := "tile-description")("Come back later!")
+            )
           )
         ),
         script(tpe := "module", src := "/tarot-engine-app.js")

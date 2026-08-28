@@ -14,9 +14,25 @@ import com.htmlism.tarotengine.chronotrigger.SecretTripleTech
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
 object TarotEngineRoutesHtmlSpec extends FunSuite:
-  test("index loads the TypeScript module"):
+  test("index renders app and unassigned tiles and loads its assets"):
     val html = TarotEngineRoutesHtml.index.render
 
+    expect(html.contains("<h1><span aria-hidden=\"true\">✦</span> Tarot Engine</h1>")) &&
+    expect(html.contains("Party Generator")) &&
+    expect(html.contains("Character Roster")) &&
+    expect(html.contains("Quest Randomizer")) &&
+    expect(html.split("Boss Strategy").length == 3) &&
+    expect(html.split("tile-placeholder").length == 4) &&
+    expect(html.split("Come back later!").length == 4) &&
+    expect(html.split("class=\"tile-arrow\"").length == 6) &&
+    expect(!html.contains("↗")) &&
+    expect(html.contains("href=\"/tarot-engine.css\"")) &&
+    expect(html.contains("href=\"/final-fantasy\"")) &&
+    expect(html.contains("href=\"/final-fantasy-vi\"")) &&
+    expect(html.contains("href=\"/chrono-trigger\"")) &&
+    expect(html.contains("href=\"/final-fantasy-vibe\"")) &&
+    expect(html.contains("href=\"/chrono-trigger-vibe\"")) &&
+    expect(html.split("app-tile ").length == 9) &&
     expect(html.contains("src=\"/tarot-engine-app.js\"")) &&
     expect(html.contains("type=\"module\""))
 
