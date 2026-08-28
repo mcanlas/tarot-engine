@@ -22,6 +22,7 @@ object TarotEngineRoutesHtml:
     html(
       commonHead("tarot-engine", None),
       body(
+        p(id := "typescript-hello", attr("aria-live") := "polite")("Loading TypeScript..."),
         ul(
           li(
             a(href := "/final-fantasy")("Final Fantasy")
@@ -32,7 +33,8 @@ object TarotEngineRoutesHtml:
           li(
             a(href := "/chrono-trigger")("Chrono Trigger")
           )
-        )
+        ),
+        script(tpe := "module", src := "/tarot-engine-app.js")
       )
     )
 

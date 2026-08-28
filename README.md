@@ -34,6 +34,14 @@ The Final Fantasy strategy guide generates deterministic, party-specific advice 
 
 ## Run locally
 
+Install the browser build tools after checkout or lockfile changes:
+
+```bash
+npm ci
+```
+
+Scala compilation, tests, and staging compile TypeScript automatically
+
 Start the web service:
 
 ```bash
@@ -51,5 +59,6 @@ sbt "runMain com.htmlism.tarotengine.finalfantasy.vibe.VibeApp"
 Run the test suite:
 
 ```bash
+npm run test:js
 sbt testQuick
 ```

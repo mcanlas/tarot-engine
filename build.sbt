@@ -6,8 +6,10 @@ lazy val root =
     .withYaml
     .withLogging
     .withTesting
+    .withTypeScriptCompilation
     .enablePlugins(JavaAppPackaging, DockerPlugin)
     .settings(
+      // Native packager needs an explicit entry point because this project has web and console main classes
       Compile / mainClass := Some("com.htmlism.tarotengine.web.TarotEngineServiceApp"),
       dockerExposedPorts := Seq(8083),
 

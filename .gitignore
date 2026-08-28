@@ -2,5 +2,6 @@
 *.log
 .bsp/
 .metals/
+node_modules/
 target/
 .idea
