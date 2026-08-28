@@ -38,7 +38,9 @@ object TypeScriptCompilationPlugin extends AutoPlugin {
             val generatedResources = (outputDir ** "*").get.filter { file =>
               file.getName.endsWith(".js") || file.getName.endsWith(".js.map")
             }
+
             log.info(s"Generated ${generatedResources.size} resources from TypeScript")
+
             generatedResources
           },
           Compile / resourceGenerators += compileTypeScript.taskValue
