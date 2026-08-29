@@ -55,7 +55,7 @@
       type: active
       level: 0
       abp: 0
-      assignable: false
+      assignment: never
     - key: focus
       name: Focus
       type: active
@@ -276,8 +276,8 @@
   innates:
     - mimic
   abilities:
-    - { key: attack, name: Attack, type: active, level: 0, abp: 0 }
-    - { key: items, name: Items, type: active, level: 0, abp: 0 }
+    - { key: attack, name: Attack, type: active, level: 0, abp: 0, assignment: mime-only }
+    - { key: items, name: Items, type: active, level: 0, abp: 0, assignment: mime-only }
     - { key: mimic, name: Mimic, type: active, level: 1, abp: 999 }
 
 - key: beastmaster

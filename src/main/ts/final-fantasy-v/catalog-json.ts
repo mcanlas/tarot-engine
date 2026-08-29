@@ -2,7 +2,7 @@ import type {
   FinalFantasyVAbilityDefinition,
   FinalFantasyVAbilityRankDefinition,
   FinalFantasyVJobDefinition,
-} from "./final-fantasy-v-strategy-core.ts"
+} from "./catalog.ts"
 
 export function decodeFinalFantasyVJobs(value: unknown): FinalFantasyVJobDefinition[] {
   return requireArray(value, "Final Fantasy V jobs").map(decodeJob)
@@ -28,9 +28,9 @@ function decodeAbility(value: unknown, path: string): FinalFantasyVAbilityDefini
     key: requireString(record.key, `${path}.key`),
     name: requireString(record.name, `${path}.name`),
     type: requireString(record.type, `${path}.type`),
-    ...(record.assignable === undefined
+    ...(record.assignment === undefined
       ? {}
-      : { assignable: requireBoolean(record.assignable, `${path}.assignable`) }),
+      : { assignment: requireString(record.assignment, `${path}.assignment`) }),
   }
 
   if (record.ranks !== undefined) {
@@ -94,14 +94,6 @@ function requireString(value: unknown, path: string): string {
 function requireStringArray(value: unknown, path: string): string[] {
   return requireArray(value, path)
     .map((item, index) => requireString(item, `${path}[${index}]`))
-}
-
-function requireBoolean(value: unknown, path: string): boolean {
-  if (typeof value !== "boolean") {
-    throw new Error(`${path} must be a boolean`)
-  }
-
-  return value
 }
 
 function requireNumber(value: unknown, path: string): number {

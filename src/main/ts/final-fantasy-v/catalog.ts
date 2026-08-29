@@ -6,6 +6,8 @@ export type FinalFantasyVCrystalId = "none" | "wind" | "water" | "fire" | "earth
 
 export type FinalFantasyVAbilityType = "active" | "passive"
 
+export type FinalFantasyVAssignmentPolicy = "learned" | "mime-only" | "never"
+
 export interface FinalFantasyVAbilityRankDefinition {
   rank: number
   jobLevel: number
@@ -16,7 +18,7 @@ interface FinalFantasyVAbilityDefinitionBase {
   key: string
   name: string
   type: string
-  assignable?: boolean
+  assignment?: string
 }
 
 export interface FinalFantasyVFlatAbilityDefinition extends FinalFantasyVAbilityDefinitionBase {
@@ -52,7 +54,7 @@ interface FinalFantasyVAbilityBase {
   name: string
   type: FinalFantasyVAbilityType
   jobId: string
-  assignable: boolean
+  assignment: FinalFantasyVAssignmentPolicy
 }
 
 export interface FinalFantasyVFlatAbility extends FinalFantasyVAbilityBase {
@@ -136,7 +138,7 @@ export function describeFinalFantasyVStrategyCatalog(
     .filter((ability) => ability.type === "active").length
   const passiveCount = catalog.abilities.size - activeCount
   const assignableCount = [...catalog.abilities.values()]
-    .filter((ability) => ability.assignable).length
+    .filter((ability) => ability.assignment !== "never").length
 
   return [
     `${catalog.jobs.size} jobs`,
@@ -156,7 +158,7 @@ function buildAbility(
     name: definition.name,
     type: requireAbilityType(definition.type),
     jobId,
-    assignable: definition.assignable ?? true,
+    assignment: requireAssignmentPolicy(definition.assignment ?? "learned"),
   }
 
   if ("ranks" in definition) {
@@ -225,6 +227,14 @@ function requireAbilityType(value: string): FinalFantasyVAbilityType {
   return value as FinalFantasyVAbilityType
 }
 
+function requireAssignmentPolicy(value: string): FinalFantasyVAssignmentPolicy {
+  if (value !== "learned" && value !== "mime-only" && value !== "never") {
+    throw new Error(`Unknown Final Fantasy V assignment policy: ${value}`)
+  }
+
+  return value
+}
+
 function requirePositiveInteger(value: number, path: string): void {
   if (!Number.isInteger(value) || value < 1) {
     throw new Error(`${path} must be a positive integer`)
@@ -236,6 +246,3 @@ function requireNonNegativeInteger(value: number, path: string): void {
     throw new Error(`${path} must be a non-negative integer`)
   }
 }
-
-// TODO(boulder-2): enumerate legal loadouts from learned ranks, mastered jobs,
-// job innates, and the distinct normal/Freelancer/Mime slot rules.
