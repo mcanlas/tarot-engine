@@ -1,0 +1,189 @@
+# Final Fantasy Tactics: The War of the Lions
+- key: squire
+  name: Squire
+
+- key: chemist
+  name: Chemist
+
+- key: knight
+  name: Knight
+  requires:
+    jobs:
+      - key: squire
+        level: 2
+
+- key: archer
+  name: Archer
+  requires:
+    jobs:
+      - key: squire
+        level: 2
+
+- key: white-mage
+  name: White Mage
+  requires:
+    jobs:
+      - key: chemist
+        level: 2
+
+- key: black-mage
+  name: Black Mage
+  requires:
+    jobs:
+      - key: chemist
+        level: 2
+
+- key: monk
+  name: Monk
+  requires:
+    jobs:
+      - key: knight
+        level: 3
+
+- key: thief
+  name: Thief
+  requires:
+    jobs:
+      - key: archer
+        level: 3
+
+- key: mystic
+  name: Mystic
+  requires:
+    jobs:
+      - key: white-mage
+        level: 3
+
+- key: time-mage
+  name: Time Mage
+  requires:
+    jobs:
+      - key: black-mage
+        level: 3
+
+- key: geomancer
+  name: Geomancer
+  requires:
+    jobs:
+      - key: monk
+        level: 4
+
+- key: dragoon
+  name: Dragoon
+  requires:
+    jobs:
+      - key: thief
+        level: 4
+
+- key: orator
+  name: Orator
+  requires:
+    jobs:
+      - key: mystic
+        level: 3
+
+- key: summoner
+  name: Summoner
+  requires:
+    jobs:
+      - key: time-mage
+        level: 3
+
+- key: samurai
+  name: Samurai
+  requires:
+    jobs:
+      - key: knight
+        level: 4
+      - key: monk
+        level: 5
+      - key: dragoon
+        level: 2
+
+- key: ninja
+  name: Ninja
+  requires:
+    jobs:
+      - key: archer
+        level: 4
+      - key: thief
+        level: 5
+      - key: geomancer
+        level: 2
+
+- key: arithmetician
+  name: Arithmetician
+  requires:
+    jobs:
+      - key: white-mage
+        level: 5
+      - key: black-mage
+        level: 5
+      - key: time-mage
+        level: 4
+      - key: mystic
+        level: 4
+
+- key: dancer
+  name: Dancer
+  requires:
+    sex: female
+    jobs:
+      - key: geomancer
+        level: 5
+      - key: dragoon
+        level: 5
+
+- key: bard
+  name: Bard
+  requires:
+    sex: male
+    jobs:
+      - key: summoner
+        level: 5
+      - key: orator
+        level: 5
+
+- key: mime
+  name: Mime
+  requires:
+    jobs:
+      - key: squire
+        level: 8
+      - key: chemist
+        level: 8
+      - key: geomancer
+        level: 5
+      - key: dragoon
+        level: 5
+      - key: orator
+        level: 5
+      - key: summoner
+        level: 5
+
+- key: dark-knight
+  name: Dark Knight
+  requires:
+    kills: 20
+    jobs:
+      - key: knight
+        mastered: true
+      - key: black-mage
+        mastered: true
+      - key: dragoon
+        level: 8
+      - key: samurai
+        level: 8
+      - key: ninja
+        level: 8
+      - key: geomancer
+        level: 8
+
+- key: onion-knight
+  name: Onion Knight
+  requires:
+    jobs:
+      - key: squire
+        level: 6
+      - key: chemist
+        level: 6

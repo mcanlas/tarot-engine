@@ -1,0 +1,504 @@
+- key: soldier
+  name: Soldier
+  races:
+    - hume
+
+- key: white-mage
+  name: White Mage
+  races:
+    - hume
+    - viera
+    - nu-mou
+
+- key: fencer
+  name: Fencer
+  races:
+    - viera
+
+- key: animist
+  name: Animist
+  races:
+    - moogle
+
+- key: warrior
+  name: Warrior
+  races:
+    - bangaa
+
+- key: white-monk
+  name: White Monk
+  races:
+    - bangaa
+
+- key: berserker
+  name: Berserker
+  races:
+    - seeq
+
+- key: ranger
+  name: Ranger
+  races:
+    - seeq
+
+- key: archer
+  name: Archer
+  races:
+    - hume
+    - viera
+  requires:
+    jobs:
+      - key: soldier
+        masteredAbilities: 1
+        race: hume
+
+- key: black-mage
+  name: Black Mage
+  races:
+    - hume
+    - nu-mou
+    - moogle
+  requires:
+    jobs:
+      - key: white-mage
+        masteredAbilities: 1
+        race: hume
+
+- key: thief
+  name: Thief
+  races:
+    - hume
+    - moogle
+  requires:
+    jobs:
+      - key: soldier
+        masteredAbilities: 1
+        race: hume
+
+- key: hunter
+  name: Hunter
+  races:
+    - hume
+    - gria
+  requires:
+    jobs:
+      - key: archer
+        masteredAbilities: 1
+        race: hume
+
+- key: bishop
+  name: Bishop
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: white-monk
+        masteredAbilities: 2
+
+- key: fusilier
+  name: Fusilier
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: animist
+        masteredAbilities: 1
+
+- key: moogle-knight
+  name: Moogle Knight
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: animist
+        masteredAbilities: 1
+
+- key: gladiator
+  name: Gladiator
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: warrior
+        masteredAbilities: 2
+
+- key: defender
+  name: Defender
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: gladiator
+        masteredAbilities: 2
+
+- key: elementalist
+  name: Elementalist
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: white-mage
+        masteredAbilities: 2
+
+- key: juggler
+  name: Juggler
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: tinker
+        masteredAbilities: 2
+
+- key: tinker
+  name: Tinker
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: thief
+        masteredAbilities: 2
+
+- key: ninja
+  name: Ninja
+  races:
+    - hume
+  requires:
+    jobs:
+      - key: thief
+        masteredAbilities: 4
+
+- key: paladin
+  name: Paladin
+  races:
+    - hume
+  requires:
+    jobs:
+      - key: soldier
+        masteredAbilities: 3
+
+- key: parivir
+  name: Parivir
+  races:
+    - hume
+  requires:
+    jobs:
+      - key: fighter
+        masteredAbilities: 3
+
+- key: red-mage
+  name: Red Mage
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: fencer
+        masteredAbilities: 1
+      - key: white-mage
+        masteredAbilities: 1
+
+- key: sage
+  name: Sage
+  races:
+    - nu-mou
+  requires:
+    jobs:
+      - key: beastmaster
+        masteredAbilities: 1
+      - key: white-mage
+        masteredAbilities: 2
+
+- key: sniper
+  name: Sniper
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: archer
+        masteredAbilities: 2
+
+- key: summoner
+  name: Summoner
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: elementalist
+        masteredAbilities: 2
+
+- key: templar
+  name: Templar
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: bishop
+        masteredAbilities: 2
+
+- key: time-mage
+  name: Time Mage
+  races:
+    - moogle
+    - nu-mou
+  requires:
+    jobs:
+      - key: black-mage
+        masteredAbilities: 5
+
+- key: alchemist
+  name: Alchemist
+  races:
+    - nu-mou
+  requires:
+    jobs:
+      - key: illusionist
+        masteredAbilities: 2
+
+- key: blue-mage
+  name: Blue Mage
+  races:
+    - hume
+  requires:
+    jobs:
+      - key: black-mage
+        masteredAbilities: 1
+
+- key: illusionist
+  name: Illusionist
+  races:
+    - hume
+    - nu-mou
+  requires:
+    jobs:
+      - key: white-mage
+        masteredAbilities: 2
+      - key: black-mage
+        masteredAbilities: 4
+
+- key: fighter
+  name: Fighter
+  races:
+    - hume
+  requires:
+    quest: To Be a Fighter
+    jobs:
+      - key: soldier
+        masteredAbilities: 3
+
+- key: beastmaster
+  name: Beastmaster
+  races:
+    - nu-mou
+  requires:
+    quest: Knowing the Beast
+
+- key: dragoon
+  name: Dragoon
+  races:
+    - bangaa
+  requires:
+    quest: Kyrra, Dragoon
+    jobs:
+      - key: warrior
+        masteredAbilities: 2
+
+- key: green-mage
+  name: Green Mage
+  races:
+    - viera
+  requires:
+    quest: Green Dominion
+    jobs:
+      - key: white-mage
+        masteredAbilities: 1
+
+- key: spellblade
+  name: Spellblade
+  races:
+    - viera
+  requires:
+    quest: To Be a Spellblade
+    jobs:
+      - key: red-mage
+        masteredAbilities: 2
+
+- key: chocobo-knight
+  name: Chocobo Knight
+  races:
+    - moogle
+  requires:
+    quest: Popocho's Chocobos
+    jobs:
+      - key: animist
+        masteredAbilities: 2
+
+- key: cannoneer
+  name: Cannoneer
+  races:
+    - bangaa
+  requires:
+    quest: The Bangaa Brotherhood
+    jobs:
+      - key: dragoon
+        masteredAbilities: 2
+
+- key: arcanist
+  name: Arcanist
+  races:
+    - nu-mou
+  requires:
+    quest: The Nu Mou Nobles
+    jobs:
+      - key: time-mage
+        masteredAbilities: 2
+
+- key: raptor
+  name: Raptor
+  races:
+    - gria
+  requires:
+    quest: Instrument of Inspiration
+    jobs:
+      - key: hunter
+        masteredAbilities: 1
+
+- key: ravager
+  name: Ravager
+  races:
+    - gria
+  requires:
+    quest: Ravager
+    jobs:
+      - key: hunter
+        masteredAbilities: 1
+
+- key: geomancer
+  name: Geomancer
+  races:
+    - gria
+  requires:
+    quests:
+      - Geomancer's Way - Sun
+      - Geomancer's Way - Rain
+      - Geomancer's Way - Snow
+      - Geomancer's Way - Mist
+    jobs:
+      - key: hunter
+        masteredAbilities: 1
+
+- key: lanista
+  name: Lanista
+  races:
+    - seeq
+  requires:
+    quest: A Lanista's Pride
+    jobs:
+      - key: berserker
+        masteredAbilities: 1
+
+- key: viking
+  name: Viking
+  races:
+    - seeq
+  requires:
+    quest: Lord Grayrl!
+    jobs:
+      - key: ranger
+        masteredAbilities: 1
+
+- key: master-monk
+  name: Master Monk
+  races:
+    - bangaa
+  requires:
+    quest: Babanga!
+    jobs:
+      - key: warrior
+        masteredAbilities: 2
+      - key: white-monk
+        masteredAbilities: 2
+
+- key: scholar
+  name: Scholar
+  races:
+    - nu-mou
+  requires:
+    quest: Treasured Tomes
+    jobs:
+      - key: sage
+        masteredAbilities: 1
+      - key: time-mage
+        masteredAbilities: 2
+
+- key: seer
+  name: Seer
+  races:
+    - hume
+  requires:
+    quest: The Cat's Meow
+    jobs:
+      - key: white-mage
+        masteredAbilities: 4
+
+- key: trickster
+  name: Trickster
+  races:
+    - bangaa
+  requires:
+    quest: Sleight of Hand
+    jobs:
+      - key: master-monk
+        masteredAbilities: 2
+
+- key: flintlock
+  name: Flintlock
+  races:
+    - moogle
+  requires:
+    quest: Of Kupos and Cannons
+    jobs:
+      - key: tinker
+        masteredAbilities: 2
+      - key: fusilier
+        masteredAbilities: 2
+
+- key: assassin
+  name: Assassin
+  races:
+    - viera
+  requires:
+    quest: Veis, Assassin
+    jobs:
+      - key: elementalist
+        masteredAbilities: 2
+      - key: sniper
+        masteredAbilities: 1
+
+- key: agent
+  name: Agent
+  requires:
+    unit: al-cid
+    postgame: true
+    quest: A Dashing Duel
+
+- key: bard
+  name: Bard
+  requires:
+    unit: hurdy
+    quest: Making Music
+
+- key: dancer
+  name: Dancer
+  requires:
+    unit: penelo
+    quest: Pirate Problems
+
+- key: heritor
+  name: Heritor
+  requires:
+    unit: adelle
+    quest: Through Another's Eyes
+
+- key: sky-pirate
+  name: Sky Pirate
+  requires:
+    unit: vaan
+    quest: Pirate Problems

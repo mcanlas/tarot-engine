@@ -1,0 +1,287 @@
+- key: soldier
+  name: Soldier
+  races:
+    - human
+
+- key: thief
+  name: Thief
+  races:
+    - human
+    - moogle
+
+- key: archer
+  name: Archer
+  races:
+    - human
+    - viera
+
+- key: white-mage
+  name: White Mage
+  races:
+    - human
+    - nu-mou
+    - viera
+
+- key: black-mage
+  name: Black Mage
+  races:
+    - human
+    - nu-mou
+    - moogle
+
+- key: fighter
+  name: Fighter
+  races:
+    - human
+  requires:
+    jobs:
+      - key: soldier
+        masteredAbilities: 2
+
+- key: paladin
+  name: Paladin
+  races:
+    - human
+  requires:
+    jobs:
+      - key: soldier
+        masteredAbilities: 2
+
+- key: ninja
+  name: Ninja
+  races:
+    - human
+  requires:
+    jobs:
+      - key: thief
+        masteredAbilities: 2
+
+- key: hunter
+  name: Hunter
+  races:
+    - human
+  requires:
+    jobs:
+      - key: archer
+        masteredAbilities: 2
+
+- key: blue-mage
+  name: Blue Mage
+  races:
+    - human
+  requires:
+    jobs:
+      - key: white-mage
+        masteredAbilities: 1
+      - key: black-mage
+        masteredAbilities: 1
+
+- key: illusionist
+  name: Illusionist
+  races:
+    - human
+    - nu-mou
+  requires:
+    jobs:
+      - key: white-mage
+        masteredAbilities: 3
+      - key: black-mage
+        masteredAbilities: 5
+
+- key: white-monk
+  name: White Monk
+  races:
+    - bangaa
+
+- key: warrior
+  name: Warrior
+  races:
+    - bangaa
+
+- key: bishop
+  name: Bishop
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: white-monk
+        masteredAbilities: 2
+
+- key: templar
+  name: Templar
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: white-monk
+        masteredAbilities: 2
+
+- key: dragoon
+  name: Dragoon
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: warrior
+        masteredAbilities: 2
+
+- key: defender
+  name: Defender
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: warrior
+        masteredAbilities: 2
+
+- key: gladiator
+  name: Gladiator
+  races:
+    - bangaa
+  requires:
+    jobs:
+      - key: warrior
+        masteredAbilities: 2
+
+- key: beastmaster
+  name: Beastmaster
+  races:
+    - nu-mou
+
+- key: time-mage
+  name: Time Mage
+  races:
+    - nu-mou
+    - moogle
+  requires:
+    jobs:
+      - key: black-mage
+        masteredAbilities: 5
+
+- key: alchemist
+  name: Alchemist
+  races:
+    - nu-mou
+  requires:
+    jobs:
+      - key: black-mage
+        masteredAbilities: 5
+      - key: white-mage
+        masteredAbilities: 3
+
+- key: sage
+  name: Sage
+  races:
+    - nu-mou
+  requires:
+    jobs:
+      - key: white-mage
+        masteredAbilities: 3
+      - key: beastmaster
+        masteredAbilities: 2
+
+- key: morpher
+  name: Morpher
+  races:
+    - nu-mou
+  requires:
+    jobs:
+      - key: beastmaster
+        masteredAbilities: 5
+
+- key: fencer
+  name: Fencer
+  races:
+    - viera
+
+- key: red-mage
+  name: Red Mage
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: fencer
+        masteredAbilities: 1
+
+- key: elementalist
+  name: Elementalist
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: fencer
+        masteredAbilities: 1
+      - key: white-mage
+        masteredAbilities: 1
+
+- key: sniper
+  name: Sniper
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: archer
+        masteredAbilities: 2
+
+- key: summoner
+  name: Summoner
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: white-mage
+        masteredAbilities: 2
+      - key: elementalist
+        masteredAbilities: 2
+
+- key: assassin
+  name: Assassin
+  races:
+    - viera
+  requires:
+    jobs:
+      - key: elementalist
+        masteredAbilities: 2
+      - key: sniper
+        masteredAbilities: 1
+
+- key: animist
+  name: Animist
+  races:
+    - moogle
+
+- key: gunner
+  name: Gunner
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: animist
+        masteredAbilities: 1
+
+- key: mog-knight
+  name: Mog Knight
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: animist
+        masteredAbilities: 1
+
+- key: juggler
+  name: Juggler
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: thief
+        masteredAbilities: 2
+
+- key: gadgeteer
+  name: Gadgeteer
+  races:
+    - moogle
+  requires:
+    jobs:
+      - key: thief
+        masteredAbilities: 2
