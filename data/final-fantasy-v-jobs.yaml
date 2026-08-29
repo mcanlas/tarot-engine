@@ -1,0 +1,385 @@
+- key: freelancer
+  name: Freelancer
+  crystal: none
+  innates: []
+  abilities: []
+
+- key: knight
+  name: Knight
+  crystal: wind
+  innates:
+    - cover
+    - guard
+  abilities:
+    - key: cover
+      name: Cover
+      type: passive
+      level: 1
+      abp: 10
+    - key: guard
+      name: Guard
+      type: active
+      level: 2
+      abp: 30
+    - key: two-handed
+      name: Two-Handed
+      type: passive
+      level: 3
+      abp: 50
+    - key: equip-shields
+      name: Equip Shields
+      type: passive
+      level: 4
+      abp: 100
+    - key: equip-armor
+      name: Equip Armor
+      type: passive
+      level: 5
+      abp: 150
+    - key: equip-swords
+      name: Equip Swords
+      type: passive
+      level: 6
+      abp: 350
+
+- key: monk
+  name: Monk
+  crystal: wind
+  innates:
+    - kick
+    - barehanded
+    - counter
+  abilities:
+    - key: kick
+      name: Kick
+      type: active
+      level: 0
+      abp: 0
+      assignable: false
+    - key: focus
+      name: Focus
+      type: active
+      level: 1
+      abp: 15
+    - key: barehanded
+      name: Barehanded
+      type: passive
+      level: 2
+      abp: 30
+    - key: chakra
+      name: Chakra
+      type: active
+      level: 3
+      abp: 45
+    - key: counter
+      name: Counter
+      type: passive
+      level: 4
+      abp: 60
+    - key: hp-plus-10-percent
+      name: HP +10%
+      type: passive
+      level: 5
+      abp: 100
+    - key: hp-plus-20-percent
+      name: HP +20%
+      type: passive
+      level: 6
+      abp: 150
+    - key: hp-plus-30-percent
+      name: HP +30%
+      type: passive
+      level: 7
+      abp: 300
+
+- key: thief
+  name: Thief
+  crystal: wind
+  innates:
+    - find-passages
+    - sprint
+    - steal
+    - vigilance
+    - artful-dodger
+  abilities:
+    - key: find-passages
+      name: Find Passages
+      type: passive
+      level: 1
+      abp: 10
+    - key: flee
+      name: Flee
+      type: active
+      level: 2
+      abp: 20
+    - key: sprint
+      name: Sprint
+      type: passive
+      level: 3
+      abp: 30
+    - key: steal
+      name: Steal
+      type: active
+      level: 4
+      abp: 50
+    - key: vigilance
+      name: Vigilance
+      type: passive
+      level: 5
+      abp: 75
+    - key: mug
+      name: Mug
+      type: active
+      level: 6
+      abp: 150
+    - key: artful-dodger
+      name: Artful Dodger
+      type: passive
+      level: 7
+      abp: 300
+
+- key: white-mage
+  name: White Mage
+  crystal: wind
+  innates:
+    - white-magic
+  abilities:
+    - key: white-magic
+      name: White Magic
+      type: active
+      innateRank: 6
+      ranks:
+        - { rank: 1, jobLevel: 1, abp: 10 }
+        - { rank: 2, jobLevel: 2, abp: 20 }
+        - { rank: 3, jobLevel: 3, abp: 30 }
+        - { rank: 4, jobLevel: 4, abp: 50 }
+        - { rank: 5, jobLevel: 5, abp: 70 }
+        - { rank: 6, jobLevel: 6, abp: 100 }
+    - { key: mp-plus-10-percent, name: MP +10%, type: passive, level: 7, abp: 300 }
+
+- key: black-mage
+  name: Black Mage
+  crystal: wind
+  innates:
+    - black-magic
+  abilities:
+    - key: black-magic
+      name: Black Magic
+      type: active
+      innateRank: 6
+      ranks:
+        - { rank: 1, jobLevel: 1, abp: 10 }
+        - { rank: 2, jobLevel: 2, abp: 20 }
+        - { rank: 3, jobLevel: 3, abp: 30 }
+        - { rank: 4, jobLevel: 4, abp: 50 }
+        - { rank: 5, jobLevel: 5, abp: 70 }
+        - { rank: 6, jobLevel: 6, abp: 100 }
+    - { key: mp-plus-30-percent, name: MP +30%, type: passive, level: 7, abp: 450 }
+
+- key: blue-mage
+  name: Blue Mage
+  crystal: wind
+  innates:
+    - learning
+    - blue-magic
+  abilities:
+    - { key: check, name: Check, type: active, level: 1, abp: 10 }
+    - { key: learning, name: Learning, type: passive, level: 2, abp: 20 }
+    - { key: blue-magic, name: Blue Magic, type: active, level: 3, abp: 70 }
+    - { key: scan, name: Scan, type: active, level: 4, abp: 250 }
+
+- key: berserker
+  name: Berserker
+  crystal: water
+  innates:
+    - berserk
+  abilities:
+    - { key: berserk, name: Berserk, type: passive, level: 1, abp: 100 }
+    - { key: equip-axes, name: Equip Axes, type: passive, level: 2, abp: 400 }
+
+- key: mystic-knight
+  name: Mystic Knight
+  crystal: water
+  innates:
+    - magic-shell
+    - spellblade
+  abilities:
+    - { key: magic-shell, name: Magic Shell, type: passive, level: 1, abp: 10 }
+    - key: spellblade
+      name: Spellblade
+      type: active
+      innateRank: 6
+      ranks:
+        - { rank: 1, jobLevel: 2, abp: 20 }
+        - { rank: 2, jobLevel: 3, abp: 30 }
+        - { rank: 3, jobLevel: 4, abp: 50 }
+        - { rank: 4, jobLevel: 5, abp: 70 }
+        - { rank: 5, jobLevel: 6, abp: 100 }
+        - { rank: 6, jobLevel: 7, abp: 400 }
+
+- key: time-mage
+  name: Time Mage
+  crystal: water
+  innates:
+    - time-magic
+  abilities:
+    - key: time-magic
+      name: Time Magic
+      type: active
+      innateRank: 6
+      ranks:
+        - { rank: 1, jobLevel: 1, abp: 10 }
+        - { rank: 2, jobLevel: 2, abp: 20 }
+        - { rank: 3, jobLevel: 3, abp: 30 }
+        - { rank: 4, jobLevel: 4, abp: 50 }
+        - { rank: 5, jobLevel: 5, abp: 70 }
+        - { rank: 6, jobLevel: 6, abp: 100 }
+    - { key: equip-rods, name: Equip Rods, type: passive, level: 7, abp: 250 }
+
+- key: summoner
+  name: Summoner
+  crystal: water
+  innates:
+    - summon
+  abilities:
+    - key: summon
+      name: Summon
+      type: active
+      innateRank: 5
+      ranks:
+        - { rank: 1, jobLevel: 1, abp: 15 }
+        - { rank: 2, jobLevel: 2, abp: 30 }
+        - { rank: 3, jobLevel: 3, abp: 45 }
+        - { rank: 4, jobLevel: 4, abp: 60 }
+        - { rank: 5, jobLevel: 5, abp: 100 }
+    - { key: call, name: Call, type: active, level: 6, abp: 500 }
+
+- key: red-mage
+  name: Red Mage
+  crystal: water
+  innates:
+    - red-magic
+  abilities:
+    - key: red-magic
+      name: Red Magic
+      type: active
+      innateRank: 3
+      ranks:
+        - { rank: 1, jobLevel: 1, abp: 20 }
+        - { rank: 2, jobLevel: 2, abp: 40 }
+        - { rank: 3, jobLevel: 3, abp: 100 }
+    - { key: dualcast, name: Dualcast, type: active, level: 4, abp: 999 }
+
+- key: mime
+  name: Mime
+  crystal: water
+  innates:
+    - mimic
+  abilities:
+    - { key: attack, name: Attack, type: active, level: 0, abp: 0 }
+    - { key: items, name: Items, type: active, level: 0, abp: 0 }
+    - { key: mimic, name: Mimic, type: active, level: 1, abp: 999 }
+
+- key: beastmaster
+  name: Beastmaster
+  crystal: fire
+  innates:
+    - catch-release
+  abilities:
+    - { key: calm, name: Calm, type: active, level: 1, abp: 10 }
+    - { key: control, name: Control, type: active, level: 2, abp: 50 }
+    - { key: equip-whips, name: Equip Whips, type: passive, level: 3, abp: 100 }
+    - { key: catch-release, name: Catch / Release, type: active, level: 4, abp: 300 }
+
+- key: geomancer
+  name: Geomancer
+  crystal: fire
+  innates:
+    - gaia
+    - find-pits
+    - light-step
+  abilities:
+    - { key: gaia, name: Gaia, type: active, level: 1, abp: 25 }
+    - { key: find-pits, name: Find Pits, type: passive, level: 2, abp: 50 }
+    - { key: light-step, name: Light Step, type: passive, level: 3, abp: 100 }
+
+- key: ninja
+  name: Ninja
+  crystal: fire
+  innates:
+    - first-strike
+    - throw
+    - dual-wield
+  abilities:
+    - { key: smoke, name: Smoke, type: active, level: 1, abp: 10 }
+    - { key: image, name: Image, type: active, level: 2, abp: 30 }
+    - { key: first-strike, name: First Strike, type: passive, level: 3, abp: 50 }
+    - { key: throw, name: Throw, type: active, level: 4, abp: 150 }
+    - { key: dual-wield, name: Dual-Wield, type: passive, level: 5, abp: 450 }
+
+- key: bard
+  name: Bard
+  crystal: fire
+  innates:
+    - sing
+  abilities:
+    - { key: hide-reveal, name: Hide / Reveal, type: active, level: 1, abp: 25 }
+    - { key: equip-harps, name: Equip Harps, type: passive, level: 2, abp: 50 }
+    - { key: sing, name: Sing, type: active, level: 3, abp: 100 }
+
+- key: ranger
+  name: Ranger
+  crystal: fire
+  innates:
+    - aim
+  abilities:
+    - { key: animals, name: Animals, type: active, level: 1, abp: 15 }
+    - { key: aim, name: Aim, type: active, level: 2, abp: 45 }
+    - { key: equip-bows, name: Equip Bows, type: passive, level: 3, abp: 135 }
+    - { key: rapid-fire, name: Rapid Fire, type: active, level: 4, abp: 405 }
+
+- key: dragoon
+  name: Dragoon
+  crystal: earth
+  innates:
+    - jump
+  abilities:
+    - { key: jump, name: Jump, type: active, level: 1, abp: 10 }
+    - { key: lance, name: Lance, type: active, level: 2, abp: 150 }
+    - { key: equip-lances, name: Equip Lances, type: passive, level: 3, abp: 400 }
+
+- key: samurai
+  name: Samurai
+  crystal: earth
+  innates:
+    - zeninage
+    - shirahadori
+  abilities:
+    - { key: mineuchi, name: Mineuchi, type: active, level: 1, abp: 10 }
+    - { key: zeninage, name: Zeninage, type: active, level: 2, abp: 30 }
+    - { key: shirahadori, name: Shirahadori, type: passive, level: 3, abp: 60 }
+    - { key: equip-katanas, name: Equip Katanas, type: passive, level: 4, abp: 180 }
+    - { key: iainuki, name: Iainuki, type: active, level: 5, abp: 540 }
+
+- key: chemist
+  name: Chemist
+  crystal: earth
+  innates:
+    - pharmacology
+    - drink
+  abilities:
+    - { key: pharmacology, name: Pharmacology, type: passive, level: 1, abp: 15 }
+    - { key: mix, name: Mix, type: active, level: 2, abp: 30 }
+    - { key: drink, name: Drink, type: active, level: 3, abp: 45 }
+    - { key: recover, name: Recover, type: active, level: 4, abp: 135 }
+    - { key: revive, name: Revive, type: active, level: 5, abp: 405 }
+
+- key: dancer
+  name: Dancer
+  crystal: earth
+  innates:
+    - dance
+  abilities:
+    - { key: flirt, name: Flirt, type: active, level: 1, abp: 25 }
+    - { key: dance, name: Dance, type: active, level: 2, abp: 50 }
+    - { key: equip-ribbons, name: Equip Ribbons, type: passive, level: 3, abp: 325 }
