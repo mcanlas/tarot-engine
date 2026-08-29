@@ -40,6 +40,7 @@ export interface SpellDefinition {
 export interface BossDefinition {
   key: string
   name: string
+  templateName?: string
   tags: string[]
 }
 
@@ -115,7 +116,7 @@ export interface BossGuide {
   fragments: readonly GuideFragment[]
 }
 
-interface BossProfile { key: string; name: string; tags: ReadonlySet<EnemyTagId> }
+interface BossProfile { key: string; name: string; templateName: string; tags: ReadonlySet<EnemyTagId> }
 type PartyCondition = (party: Party) => boolean
 type BossCondition = (boss: BossProfile) => boolean
 interface MemberSelector {
@@ -166,6 +167,7 @@ export class FinalFantasyStrategyEngine {
     const boss = this.#bossProfiles.get(bossKey) ?? {
       key: bossKey,
       name: bossKey,
+      templateName: bossKey,
       tags: new Set<EnemyTagId>(),
     }
     const fragments = this.#rules.flatMap((rule) =>
@@ -292,6 +294,7 @@ function buildBossProfiles(definitions: readonly BossDefinition[]): ReadonlyMap<
     return [definition.key, {
       key: definition.key,
       name: definition.name,
+      templateName: definition.templateName ?? definition.name,
       tags: new Set(definition.tags.map(requireEnemyTag)),
     }]
   }))
@@ -441,7 +444,7 @@ function parseAdviceToken(token: string, catalog: FinalFantasyCatalog): Exclude<
 
   if (parts.length === 1 && parts[0] === "boss") {
 
-    return (_party, boss) => boss.name
+    return (_party, boss) => boss.templateName
   }
 
   if (parts[0] !== "members") {

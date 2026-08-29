@@ -46,6 +46,15 @@ test("loads and validates the complete YAML strategy catalog", () => {
     engine.bosses.find((boss) => boss.key === "blue-dragon"),
     { key: "blue-dragon", name: "Blue Dragon", tags: [] },
   )
+  assert.deepEqual(
+    engine.bosses.filter((boss) => boss.templateName !== undefined),
+    [
+      { key: "lich-rematch", name: "Lich (Rematch)", templateName: "Lich", tags: [] },
+      { key: "marilith-rematch", name: "Marilith (Rematch)", templateName: "Marilith", tags: [] },
+      { key: "kraken-rematch", name: "Kraken (Rematch)", templateName: "Kraken", tags: [] },
+      { key: "tiamat-rematch", name: "Tiamat (Rematch)", templateName: "Tiamat", tags: [] },
+    ],
+  )
   assert.equal(
     describeFinalFantasyStrategyCatalog(),
     "TypeScript connected; 4 YAML catalogs configured.",
@@ -208,6 +217,8 @@ test("boss-specific, group, and rematch rules stay distinct", () => {
   assert(adviceFor("dragon-zombies", members).some((line) => line.includes("cast Dia into the undead pair")))
   assert(adviceFor("kraken", members).some((line) => line.includes("lightning weakness")))
   assert(adviceFor("kraken-rematch", members).some((line) => line.includes("lightning weakness is gone")))
+  assert(adviceFor("kraken-rematch", members).some((line) => line.includes("against Kraken")))
+  assert(!adviceFor("kraken-rematch", members).some((line) => line.includes("Kraken (Rematch)")))
   assert(adviceFor("chaos", members).some((line) => line.includes("cast Haste on the Warrior")))
 })
 

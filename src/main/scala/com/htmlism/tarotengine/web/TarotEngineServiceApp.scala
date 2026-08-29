@@ -5,7 +5,9 @@ import scala.util.Random
 import cats.effect.*
 import cats.syntax.all.*
 import com.comcast.ip4s.*
+import io.circe.Json
 import org.http4s.*
+import org.http4s.circe.*
 import org.http4s.dsl.io.*
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.scalatags.*
@@ -15,10 +17,11 @@ import com.htmlism.tarotengine.chronotrigger.ChronoTriggerDefinition
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyDynamicStrategyPage
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyPage
+import com.htmlism.tarotengine.finalfantasy.FinalFantasyStrategyData
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
 object TarotEngineServiceApp extends ResourceApp.Forever:
-  private def routes(definition: ChronoTriggerDefinition) =
+  private def routes(definition: ChronoTriggerDefinition, finalFantasyStrategy: Json) =
     HttpRoutes.of[IO]:
       case GET -> Root =>
         Ok(TarotEngineRoutesHtml.index)
@@ -31,6 +34,9 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
 
       case GET -> Root / "final-fantasy" / "dynamic-strategy" =>
         Ok(FinalFantasyDynamicStrategyPage.html)
+
+      case GET -> Root / "api" / "final-fantasy" / "strategy" =>
+        Ok(finalFantasyStrategy)
 
       case GET -> Root / "chrono-trigger" =>
         for
@@ -47,6 +53,9 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
       definition <- Resource
         .eval(ChronoTriggerQuestData.load)
 
+      finalFantasyStrategy <- Resource
+        .eval(FinalFantasyStrategyData.load)
+
       _ <- Resource
         .eval(IO.println(s"Loaded ${definition.chapters.size} Chrono Trigger chapters"))
 
@@ -58,7 +67,7 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
           Logger.httpApp(logHeaders = true, logBody = false)(
             (
               StaticFileRoutes.routes <+>
-                routes(definition)
+                routes(definition, finalFantasyStrategy)
             ).orNotFound
           )
         )

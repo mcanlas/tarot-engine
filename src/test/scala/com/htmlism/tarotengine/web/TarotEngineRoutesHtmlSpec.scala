@@ -40,12 +40,17 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     expect(html.split("app-tile ").length == 11) &&
     expect(!html.contains("src=\"/tarot-engine-app.js\""))
 
-  test("Final Fantasy dynamic strategy mounts its TypeScript entry point"):
+  test("Final Fantasy dynamic strategy renders the party and boss workspace"):
     val html = FinalFantasyDynamicStrategyPage.html.render
 
-    expect(html.contains("<h1>Final Fantasy Dynamic Strategy</h1>")) &&
+    expect(html.contains("<h1>Party strategy, built around your lineup</h1>")) &&
+    expect(html.split("data-party-slot").length == 5) &&
+    expect(html.contains("data-party-strengths")) &&
+    expect(html.contains("data-party-weaknesses")) &&
+    expect(html.contains("data-boss-select")) &&
+    expect(html.contains("href=\"/final-fantasy-strategy.css\"")) &&
     expect(html.contains("data-strategy-status=\"\"")) &&
-    expect(html.contains("Waiting for TypeScript…")) &&
+    expect(html.contains("Loading strategy data…")) &&
     expect(html.contains("src=\"/final-fantasy-strategy-app.js\"")) &&
     expect(html.contains("type=\"module\""))
 

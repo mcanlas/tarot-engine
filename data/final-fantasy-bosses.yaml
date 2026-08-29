@@ -41,15 +41,19 @@
   tags: []
 - key: lich-rematch
   name: Lich (Rematch)
+  templateName: Lich
   tags: []
 - key: marilith-rematch
   name: Marilith (Rematch)
+  templateName: Marilith
   tags: []
 - key: kraken-rematch
   name: Kraken (Rematch)
+  templateName: Kraken
   tags: []
 - key: tiamat-rematch
   name: Tiamat (Rematch)
+  templateName: Tiamat
   tags: []
 - key: chaos
   name: Chaos
