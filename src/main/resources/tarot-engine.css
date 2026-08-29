@@ -71,6 +71,27 @@ body {
   padding: clamp(1rem, 3vw, 3rem) 0 clamp(2.5rem, 5vw, 4.5rem);
 }
 
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #fffdf8bf;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.back-link:hover {
+  color: #fff;
+}
+
+.back-link:focus-visible {
+  border-radius: 0.25rem;
+  outline: 0.2rem solid #fff;
+  outline-offset: 0.3rem;
+}
+
 .hero h1 {
   margin: 0;
   font-size: clamp(3rem, 7vw, 5.5rem);
@@ -255,10 +276,24 @@ a.app-tile .tile-copy {
 }
 
 .tile-title {
-  max-width: 10ch;
+  max-width: 13ch;
   font-size: clamp(1.8rem, 3.4vw, 3rem);
   font-weight: 900;
   line-height: 0.88;
+}
+
+.series-tile .tile-title {
+  max-width: none;
+  font-size: clamp(1.35rem, 2.5vw, 2.2rem);
+  line-height: 0.94;
+}
+
+a.app-tile.series-tile .tile-copy {
+  padding-right: 0;
+}
+
+.series-tile .tile-description {
+  padding-right: calc(3.2rem + var(--tile-edge-inset) + 0.75rem);
 }
 
 .tile-description {

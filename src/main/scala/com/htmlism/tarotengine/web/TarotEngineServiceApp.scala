@@ -26,6 +26,9 @@ object TarotEngineServiceApp extends ResourceApp.Forever:
       case GET -> Root =>
         Ok(TarotEngineRoutesHtml.index)
 
+      case GET -> Root / "series" / slug =>
+        TarotEngineRoutesHtml.series(slug).fold(NotFound())(Ok(_))
+
       case GET -> Root / "final-fantasy-vi" =>
         Ok(FinalFantasyVIPage.html)
 

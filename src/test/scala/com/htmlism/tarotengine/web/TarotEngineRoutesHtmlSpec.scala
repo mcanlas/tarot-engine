@@ -15,30 +15,62 @@ import com.htmlism.tarotengine.finalfantasy.FinalFantasyDynamicStrategyPage
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
 object TarotEngineRoutesHtmlSpec extends FunSuite:
-  test("index renders assigned and unassigned tiles and loads its stylesheet"):
+  test("index renders one linked tile for each game series"):
     val html = TarotEngineRoutesHtml.index.render
 
     expect(html.contains("<h1><span aria-hidden=\"true\">✦</span> Tarot Engine</h1>")) &&
-    expect(html.contains("Party Generator")) &&
-    expect(html.contains("Character Roster")) &&
-    expect(html.contains("Quest Randomizer")) &&
-    expect(html.split("Dynamic Strategy").length == 3) &&
-    expect(html.split("tile-placeholder").length == 6) &&
-    expect(html.split("Come back later!").length == 6) &&
-    expect(html.contains("tile-slot-slate")) &&
-    expect(html.contains("tile-slot-granite")) &&
-    expect(html.contains("tile-slot-copper")) &&
-    expect(html.split("class=\"tile-arrow\"").length == 6) &&
+    expect(html.contains("Final Fantasy VI")) &&
+    expect(html.contains("Chrono Trigger")) &&
+    expect(html.contains("Final Fantasy V")) &&
+    expect(html.contains("Final Fantasy Tactics")) &&
+    expect(html.contains("Final Fantasy Tactics Advance")) &&
+    expect(html.contains("Final Fantasy Tactics A2")) &&
+    expect(html.split("SNES").length == 4) &&
+    expect(html.contains("NES")) &&
+    expect(html.contains("PlayStation")) &&
+    expect(html.contains("Game Boy Advance")) &&
+    expect(html.contains("Nintendo DS")) &&
+    expect(html.contains("1992")) &&
+    expect(html.contains("1994")) &&
+    expect(html.contains("1995")) &&
+    expect(html.contains("1987")) &&
+    expect(html.contains("1997")) &&
+    expect(html.contains("2003")) &&
+    expect(html.contains("2007")) &&
+    expect(!html.contains("Game series")) &&
+    expect(html.split("class=\"tile-arrow\"").length == 8) &&
+    expect(html.split("app-tile ").length == 8) &&
+    expect(!html.contains("tile-placeholder")) &&
+    expect(!html.contains("Party Generator")) &&
     expect(!html.contains("↗")) &&
     expect(html.contains("href=\"/tarot-engine.css\"")) &&
-    expect(html.contains("href=\"/final-fantasy\"")) &&
-    expect(html.contains("href=\"/final-fantasy-vi\"")) &&
-    expect(html.contains("href=\"/chrono-trigger\"")) &&
-    expect(html.contains("href=\"/final-fantasy/dynamic-strategy\"")) &&
-    expect(html.contains("class=\"app-tile tile-strategy\"")) &&
-    expect(html.contains("href=\"/chrono-trigger-vibe\"")) &&
-    expect(html.split("app-tile ").length == 11) &&
+    expect(html.contains("href=\"/series/final-fantasy\"")) &&
+    expect(html.contains("href=\"/series/final-fantasy-vi\"")) &&
+    expect(html.contains("href=\"/series/chrono-trigger\"")) &&
     expect(!html.contains("src=\"/tarot-engine-app.js\""))
+
+  test("series pages render app tiles and a route back to the game index"):
+    val html = TarotEngineRoutesHtml.series("final-fantasy").fold("")(_.render)
+
+    expect(html.contains("<title>Final Fantasy · Tarot Engine</title>")) &&
+    expect(html.contains("href=\"/\">← All games</a>")) &&
+    expect(html.contains("Party Generator")) &&
+    expect(html.contains("href=\"/final-fantasy\"")) &&
+    expect(html.contains("Dynamic Strategy")) &&
+    expect(html.contains("href=\"/final-fantasy/dynamic-strategy\"")) &&
+    expect(html.split("class=\"tile-arrow\"").length == 3) &&
+    expect(!html.contains("tile-placeholder"))
+
+  test("series pages without apps render a factual empty state"):
+    val html = TarotEngineRoutesHtml.series("final-fantasy-v").fold("")(_.render)
+
+    expect(html.contains("Final Fantasy V")) &&
+    expect(html.contains("❔")) &&
+    expect(html.contains("Unknown")) &&
+    expect(html.contains("Come back later!")) &&
+    expect(html.contains("tile-placeholder")) &&
+    expect(!html.contains("class=\"tile-arrow\"")) &&
+    expect(TarotEngineRoutesHtml.series("not-a-game").isEmpty)
 
   test("Final Fantasy dynamic strategy renders the party and boss workspace"):
     val html = FinalFantasyDynamicStrategyPage.html.render

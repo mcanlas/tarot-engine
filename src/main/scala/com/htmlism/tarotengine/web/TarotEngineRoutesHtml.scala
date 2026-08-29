@@ -11,6 +11,118 @@ import com.htmlism.tarotengine.chronotrigger.SideQuestState
 import com.htmlism.tarotengine.chronotrigger.TripleTechDesignation
 
 object TarotEngineRoutesHtml:
+  private case class LandingTile(
+      kicker: String,
+      emoji: String,
+      title: String,
+      description: String,
+      theme: String,
+      href: String
+  )
+
+  private case class GameSeries(
+      slug: String,
+      name: String,
+      emoji: String,
+      platform: String,
+      releaseYear: String,
+      theme: String,
+      apps: List[LandingTile]
+  )
+
+  private val gameSeries = List(
+    GameSeries(
+      "final-fantasy-vi",
+      "Final Fantasy VI",
+      "🎭",
+      "SNES",
+      "1994",
+      "tile-ffvi",
+      List(
+        LandingTile(
+          "Final Fantasy VI",
+          "👥",
+          "Character Roster",
+          "All 14 playable characters",
+          "tile-ffvi",
+          "/final-fantasy-vi"
+        )
+      )
+    ),
+    GameSeries(
+      "chrono-trigger",
+      "Chrono Trigger",
+      "⏳",
+      "SNES",
+      "1995",
+      "tile-chrono",
+      List(
+        LandingTile(
+          "Chrono Trigger",
+          "🌀",
+          "Quest Randomizer",
+          "Random parties and side quests",
+          "tile-chrono",
+          "/chrono-trigger"
+        )
+      )
+    ),
+    GameSeries("final-fantasy-v", "Final Fantasy V", "💎", "SNES", "1992", "tile-slot-lime", List.empty),
+    GameSeries(
+      "final-fantasy",
+      "Final Fantasy",
+      "⚔️",
+      "NES",
+      "1987",
+      "tile-ff",
+      List(
+        LandingTile(
+          "Final Fantasy",
+          "🛡️",
+          "Party Generator",
+          "Generate all party combinations",
+          "tile-ff",
+          "/final-fantasy"
+        ),
+        LandingTile(
+          "Final Fantasy",
+          "🔮",
+          "Dynamic Strategy",
+          "Party-specific advice",
+          "tile-strategy",
+          "/final-fantasy/dynamic-strategy"
+        )
+      )
+    ),
+    GameSeries(
+      "final-fantasy-tactics",
+      "Final Fantasy Tactics",
+      "♟️",
+      "PlayStation",
+      "1997",
+      "tile-strategy",
+      List.empty
+    ),
+    GameSeries(
+      "final-fantasy-tactics-advance",
+      "Final Fantasy Tactics Advance",
+      "🛡️",
+      "Game Boy Advance",
+      "2003",
+      "tile-slot-coral",
+      List.empty
+    ),
+    GameSeries(
+      "final-fantasy-tactics-a2",
+      "Final Fantasy Tactics A2",
+      "📜",
+      "Nintendo DS",
+      "2007",
+      "tile-slot-copper",
+      List.empty
+    )
+  )
+
   private def commonHead(pageTitle: String, stylesheet: Option[String]) =
     head(
       tag("title")(pageTitle),
@@ -18,109 +130,80 @@ object TarotEngineRoutesHtml:
       stylesheet.map(path => link(rel := "stylesheet", href := path))
     )
 
-  val index: Text.TypedTag[String] =
+  private def linkedTile(tile: LandingTile): Text.TypedTag[String] =
+    a(cls := s"app-tile ${tile.theme}", href := tile.href)(
+      span(cls := "tile-kicker")(tile.kicker),
+      span(cls := "tile-emoji", attr("aria-hidden") := "true")(tile.emoji),
+      span(cls := "tile-copy")(
+        span(cls := "tile-title")(tile.title),
+        span(cls := "tile-description")(tile.description)
+      ),
+      span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
+    )
+
+  private def landingPage(
+      pageTitle: String,
+      heading: Frag,
+      backLink: Option[Text.TypedTag[String]],
+      tiles: Seq[Frag]
+  ): Text.TypedTag[String] =
     html(
-      commonHead("Tarot Engine", Some("/tarot-engine.css")),
+      commonHead(pageTitle, Some("/tarot-engine.css")),
       body(cls := "landing-page")(
         div(cls := "aurora aurora-one", attr("aria-hidden") := "true"),
         div(cls := "aurora aurora-two", attr("aria-hidden") := "true"),
         header(cls := "hero")(
-          h1(span(attr("aria-hidden") := "true")("✦"), " Tarot Engine")
+          backLink,
+          h1(heading)
         ),
-        tag("main")(cls := "app-grid")(
-          a(cls := "app-tile tile-ff", href := "/final-fantasy")(
-            span(cls := "tile-kicker")("Final Fantasy"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("⚔️"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Party Generator"),
-              span(cls := "tile-description")("Generate all party combinations")
-            ),
-            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
-          ),
-          a(cls := "app-tile tile-ffvi", href := "/final-fantasy-vi")(
-            span(cls := "tile-kicker")("Final Fantasy VI"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("🎭"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Character Roster"),
-              span(cls := "tile-description")("All 14 playable characters")
-            ),
-            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
-          ),
-          a(cls := "app-tile tile-chrono", href := "/chrono-trigger")(
-            span(cls := "tile-kicker")("Chrono Trigger"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("⏳"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Quest Randomizer"),
-              span(cls := "tile-description")("Random parties and side quests")
-            ),
-            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
-          ),
-          a(cls := "app-tile tile-strategy", href := "/final-fantasy/dynamic-strategy")(
-            span(cls := "tile-kicker")("Final Fantasy I"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("🔮"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Dynamic Strategy"),
-              span(cls := "tile-description")("Party-specific advice")
-            ),
-            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
-          ),
-          a(cls := "app-tile tile-chrono-vibe", href := "/chrono-trigger-vibe")(
-            span(cls := "tile-kicker")("Chrono Trigger"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("🧠"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Dynamic Strategy"),
-              span(cls := "tile-description")("Party-specific advice")
-            ),
-            span(cls := "tile-arrow", attr("aria-hidden") := "true")("→")
-          ),
-          // ff5 parties
-          tag("article")(cls := "app-tile tile-placeholder tile-slot-coral")(
-            span(cls := "tile-kicker")("Unknown"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Unknown"),
-              span(cls := "tile-description")("Come back later!")
-            )
-          ),
-          // ff6 parties
-          tag("article")(cls := "app-tile tile-placeholder tile-slot-lime")(
-            span(cls := "tile-kicker")("Unknown"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Unknown"),
-              span(cls := "tile-description")("Come back later!")
-            )
-          ),
-          // fft parties
-          tag("article")(cls := "app-tile tile-placeholder tile-slot-slate")(
-            span(cls := "tile-kicker")("Unknown"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Unknown"),
-              span(cls := "tile-description")("Come back later!")
-            )
-          ),
-          // ffta parties
-          tag("article")(cls := "app-tile tile-placeholder tile-slot-granite")(
-            span(cls := "tile-kicker")("Unknown"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Unknown"),
-              span(cls := "tile-description")("Come back later!")
-            )
-          ),
-          // ffta2 parties
-          tag("article")(cls := "app-tile tile-placeholder tile-slot-copper")(
-            span(cls := "tile-kicker")("Unknown"),
-            span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
-            span(cls := "tile-copy")(
-              span(cls := "tile-title")("Unknown"),
-              span(cls := "tile-description")("Come back later!")
-            )
-          )
-        )
+        tag("main")(cls := "app-grid")(tiles)
       )
     )
+
+  val index: Text.TypedTag[String] =
+    val tiles = gameSeries.map: series =>
+      linkedTile(
+        LandingTile(
+          series.platform,
+          series.emoji,
+          series.name,
+          series.releaseYear,
+          s"series-tile ${series.theme}",
+          s"/series/${series.slug}"
+        )
+      )
+
+    landingPage(
+      "Tarot Engine",
+      frag(span(attr("aria-hidden") := "true")("✦"), " Tarot Engine"),
+      None,
+      tiles
+    )
+
+  def series(slug: String): Option[Text.TypedTag[String]] =
+    gameSeries
+      .find(_.slug == slug)
+      .map: selectedSeries =>
+        val tiles =
+          if selectedSeries.apps.nonEmpty then selectedSeries.apps.map(linkedTile)
+          else
+            List(
+              tag("article")(cls := s"app-tile tile-placeholder ${selectedSeries.theme}")(
+                span(cls := "tile-kicker")(selectedSeries.name),
+                span(cls := "tile-emoji", attr("aria-hidden") := "true")("❔"),
+                span(cls := "tile-copy")(
+                  span(cls := "tile-title")("Unknown"),
+                  span(cls := "tile-description")("Come back later!")
+                )
+              )
+            )
+
+        landingPage(
+          s"${selectedSeries.name} · Tarot Engine",
+          frag(span(attr("aria-hidden") := "true")(selectedSeries.emoji), s" ${selectedSeries.name}"),
+          Some(a(cls := "back-link", href := "/")("← All games")),
+          tiles
+        )
 
   private def characterTheme(character: String): String =
     character match
