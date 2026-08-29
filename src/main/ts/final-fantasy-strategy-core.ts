@@ -181,7 +181,7 @@ export class FinalFantasyStrategyEngine {
 export function buildFinalFantasyStrategyEngine(
   definitions: FinalFantasyStrategyDefinitions,
 ): FinalFantasyStrategyEngine {
-  const catalog = buildCatalog(definitions.classes, definitions.spells)
+  const catalog = buildFinalFantasyCatalog(definitions.classes, definitions.spells)
   const bossProfiles = buildBossProfiles(definitions.bosses)
   validateBossGroups(definitions.strategy.bossGroups, bossProfiles)
   const rules = definitions.strategy.rules.map((rule, index) =>
@@ -242,7 +242,7 @@ export function canUseItem(party: Party, member: PartyMember, item: ItemId): boo
   return party.members.includes(member) && party.inventory.has(item)
 }
 
-function buildCatalog(
+export function buildFinalFantasyCatalog(
   classDefinitions: readonly ClassDefinition[],
   spellDefinitions: readonly SpellDefinition[],
 ): FinalFantasyCatalog {

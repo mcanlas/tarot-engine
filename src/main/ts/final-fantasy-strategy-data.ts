@@ -1,6 +1,7 @@
 import { parse } from "yaml"
 
 import {
+  buildFinalFantasyCatalog,
   buildFinalFantasyStrategyEngine,
   finalFantasyStrategyYamlFiles,
   type BossDefinition,
@@ -9,11 +10,26 @@ import {
   type ClassDefinition,
   type FinalFantasyStrategyDefinitions,
   type FinalFantasyStrategyEngine,
+  type FinalFantasyCatalog,
   type PartyConditionDefinition,
   type SpellDefinition,
 } from "./final-fantasy-strategy-core.ts"
 
 export type YamlTextLoader = (path: string) => Promise<string>
+
+export async function loadFinalFantasyCatalog(
+  loadText: YamlTextLoader,
+): Promise<FinalFantasyCatalog> {
+  const [classes, spells] = await Promise.all([
+    loadYaml(finalFantasyStrategyYamlFiles.classes, loadText),
+    loadYaml(finalFantasyStrategyYamlFiles.spells, loadText),
+  ])
+
+  return buildFinalFantasyCatalog(
+    requireArray(classes, "classes").map(decodeClass),
+    requireArray(spells, "spells").map(decodeSpell),
+  )
+}
 
 export async function loadFinalFantasyStrategyEngine(
   loadText: YamlTextLoader,
