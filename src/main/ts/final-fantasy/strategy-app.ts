@@ -4,8 +4,7 @@ import {
 } from "./party-strategy-core.ts"
 import {
   buildFinalFantasyStrategyEngine,
-  createParty,
-  createPartyMember,
+  createFullToolkitParty,
   type FinalFantasyStrategyEngine,
   type GuideSectionId,
   type Party,
@@ -38,7 +37,7 @@ async function loadStrategy(): Promise<void> {
 
   const render = (): void => {
     const classIds = selects.map((select) => select.value)
-    const party = createFullToolkitParty(classIds, bossEngine)
+    const party = createFullToolkitParty(bossEngine.catalog, classIds)
     const profile = partyEngine.analyze(classIds)
 
     selects.forEach(updateSelectTheme)
@@ -70,21 +69,6 @@ function populatePartySelects(
 
 function populateBossSelect(select: HTMLSelectElement, engine: FinalFantasyStrategyEngine): void {
   select.replaceChildren(...engine.bosses.map((boss) => option(boss.key, boss.name)))
-}
-
-function createFullToolkitParty(
-  classIds: readonly string[],
-  engine: FinalFantasyStrategyEngine,
-): Party {
-  const members = classIds.map((classId) => {
-    const learnedSpells = [...engine.catalog.spells.values()]
-      .filter((spell) => spell.learnableBy.has(classId))
-      .map((spell) => spell.id)
-
-    return createPartyMember(engine.catalog, classId, learnedSpells)
-  })
-
-  return createParty(members, ["potion"])
 }
 
 function renderPartySignature(party: Party): void {

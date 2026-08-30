@@ -70,18 +70,16 @@ function decodeBoss(value: unknown, index: number): BossDefinition {
       ? {}
       : { templateName: requireString(record.templateName, `bosses[${index}].templateName`) }),
     tags: record.tags === undefined ? [] : requireStringArray(record.tags, `bosses[${index}].tags`),
+    traits: record.traits === undefined
+      ? []
+      : requireStringArray(record.traits, `bosses[${index}].traits`),
   }
 }
 
 function decodeBossStrategy(value: unknown): BossStrategyDefinition {
   const record = requireRecord(value, "strategy")
-  const groups = requireRecord(record.bossGroups, "strategy.bossGroups")
 
   return {
-    bossGroups: Object.fromEntries(Object.entries(groups).map(([name, bosses]) => [
-      name,
-      requireStringArray(bosses, `strategy.bossGroups.${name}`),
-    ])),
     rules: requireArray(record.rules, "strategy.rules").map(decodeBossRule),
   }
 }
@@ -92,8 +90,10 @@ function decodeBossRule(value: unknown, index: number): BossStrategyRuleDefiniti
 
   return {
     ...(record.boss === undefined ? {} : { boss: requireString(record.boss, `${path}.boss`) }),
-    ...(record.bossGroup === undefined ? {} : { bossGroup: requireString(record.bossGroup, `${path}.bossGroup`) }),
     ...(record.bossTag === undefined ? {} : { bossTag: requireString(record.bossTag, `${path}.bossTag`) }),
+    ...(record.bossTrait === undefined
+      ? {}
+      : { bossTrait: requireString(record.bossTrait, `${path}.bossTrait`) }),
     section: requireString(record.section, `${path}.section`),
     when: decodeBossCondition(record.when, `${path}.when`),
     advice: requireString(record.advice, `${path}.advice`),

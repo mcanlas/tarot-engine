@@ -5,15 +5,29 @@ import { parse } from "yaml"
 
 import {
   FinalFantasyPartyStrategyEngine,
+  type PartyStrategy,
   type PartyStrategyConditionDefinition as PartyConditionDefinition,
   type PartyStrategyRuleDefinition as PartyRuleDefinition,
 } from "../../../main/ts/final-fantasy/party-strategy-core.ts"
+import {
+  createFullToolkitParty,
+  type BossDefinition,
+  type BossGuide,
+  type FinalFantasyStrategyEngine,
+  type GuideSectionId,
+} from "../../../main/ts/final-fantasy/strategy-core.ts"
 import {
   loadFinalFantasyCatalog,
   type YamlTextLoader,
 } from "../../../main/ts/final-fantasy/strategy-data.ts"
 
 export const partyStrategyYamlFile = "data/final-fantasy-party-strategy.yaml"
+
+export interface RandomPartyBossStrategy {
+  partyStrategy: PartyStrategy
+  boss: BossDefinition
+  bossGuide: BossGuide
+}
 
 export async function loadFinalFantasyPartyStrategyEngine(
   loadText: YamlTextLoader,
@@ -33,6 +47,42 @@ export function runConsole(
   write: (line: string) => void = console.log,
 ): void {
   write(engine.render(engine.analyze(args)))
+}
+
+export function createRandomPartyBossStrategy(
+  partyEngine: FinalFantasyPartyStrategyEngine,
+  bossEngine: FinalFantasyStrategyEngine,
+  random: () => number = Math.random,
+): RandomPartyBossStrategy {
+  const classIds = partyEngine.createRandomParty(random)
+  const boss = bossEngine.selectRandomBoss(random)
+  const party = createFullToolkitParty(bossEngine.catalog, classIds)
+
+  return {
+    partyStrategy: partyEngine.analyze(classIds),
+    boss,
+    bossGuide: bossEngine.guideFor(party, boss.key),
+  }
+}
+
+export function renderBossStrategy(strategy: RandomPartyBossStrategy): string {
+  const lines = [`Boss: ${strategy.boss.name}`]
+  const sections: readonly GuideSectionId[] = ["opening", "party-edge", "safety"]
+
+  for (const section of sections) {
+    const fragments = strategy.bossGuide.fragments.filter((fragment) => fragment.section === section)
+    if (fragments.length === 0) {
+      continue
+    }
+    lines.push(`${section === "party-edge" ? "Party edge" : capitalize(section)}:`)
+    lines.push(...fragments.map((fragment) => `- ${fragment.advice}`))
+  }
+
+  return lines.join("\n")
+}
+
+function capitalize(value: string): string {
+  return `${value.slice(0, 1).toUpperCase()}${value.slice(1)}`
 }
 
 function decodeRules(value: unknown): PartyRuleDefinition[] {

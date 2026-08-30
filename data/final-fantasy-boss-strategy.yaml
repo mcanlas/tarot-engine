@@ -1,60 +1,3 @@
-bossGroups:
-  physical-buff:
-    - marilith
-    - warmech
-    - tiamat
-    - lich-rematch
-    - marilith-rematch
-    - kraken-rematch
-    - tiamat-rematch
-    - chaos
-  physical-defense:
-    - marilith
-    - kraken
-    - warmech
-    - marilith-rematch
-    - kraken-rematch
-    - chaos
-  endurance:
-    - warmech
-    - tiamat
-    - lich-rematch
-    - marilith-rematch
-    - kraken-rematch
-    - tiamat-rematch
-    - chaos
-  lightning-threat:
-    - blue-dragon
-    - tiamat
-    - kraken-rematch
-    - tiamat-rematch
-    - chaos
-  fire-threat:
-    - marilith
-    - tiamat
-    - marilith-rematch
-    - tiamat-rematch
-    - chaos
-  ice-threat:
-    - lich
-    - tiamat
-    - tiamat-rematch
-    - chaos
-  instant-death:
-    - astos
-    - evil-eye
-    - lich-rematch
-    - marilith-rematch
-    - tiamat-rematch
-  resistant-endgame:
-    - warmech
-    - tiamat
-    - lich-rematch
-    - marilith-rematch
-    - kraken-rematch
-    - tiamat-rematch
-    - chaos
-
 rules:
   - boss: garland
     section: opening
@@ -100,7 +43,7 @@ rules:
   - boss: pirates
     section: party-edge
     when: { spell: sleep }
-    advice: "Have {{members:knows:sleep}} cast Sleep to control the full crowd, then clean up awake targets first"
+    advice: "Have {{members:first-knows:sleep}} cast Sleep to control the full crowd, then clean up awake targets first"
 
   - boss: pirates
     section: party-edge
@@ -133,7 +76,7 @@ rules:
       all:
         - spell: temper
         - capability: physical-damage
-    advice: "Have {{members:knows:temper}} cast Temper on {{members:capability:physical-damage}}; weapon damage is more reliable here than most offensive magic"
+    advice: "Have {{members:first-knows:temper}} cast Temper on {{members:preferred-physical-attacker}}; weapon damage is more reliable here than most offensive magic"
 
   - boss: piscodemons
     section: party-edge
@@ -141,7 +84,7 @@ rules:
       all:
         - spell: haste
         - capability: physical-damage
-    advice: "Have {{members:knows:haste}} cast Haste on {{members:preferred-physical-attacker}} to shorten the dangerous opening rounds"
+    advice: "Have {{members:first-knows:haste}} cast Haste on {{members:preferred-physical-attacker}} to shorten the dangerous opening rounds"
 
   - boss: piscodemons
     section: party-edge
@@ -159,7 +102,7 @@ rules:
   - boss: astos
     section: party-edge
     when: { spell: silence }
-    advice: "Have {{members:knows:silence}} cast Silence immediately; if it lands, Astos loses Death and the rest of his spell list"
+    advice: "Have {{members:first-knows:silence}} cast Silence immediately; if it lands, Astos loses Death and the rest of his spell list"
 
   - boss: astos
     section: party-edge
@@ -167,7 +110,7 @@ rules:
       all:
         - spell: temper
         - capability: physical-damage
-    advice: "Have {{members:knows:temper}} cast Temper on {{members:capability:physical-damage}} to end the fight before Astos gets more spell turns"
+    advice: "Have {{members:first-knows:temper}} cast Temper on {{members:preferred-physical-attacker}} to end the fight before Astos gets more spell turns"
 
   - boss: astos
     section: party-edge
@@ -175,7 +118,7 @@ rules:
       all:
         - spell: haste
         - capability: physical-damage
-    advice: "Have {{members:knows:haste}} cast Haste on {{members:preferred-physical-attacker}} for the quickest knockout line"
+    advice: "Have {{members:first-knows:haste}} cast Haste on {{members:preferred-physical-attacker}} for the quickest knockout line"
 
   - boss: astos
     section: safety
@@ -183,7 +126,7 @@ rules:
       all:
         - spell: slow
         - not: { spell: silence }
-    advice: "Without Silence, have {{members:knows:slow}} try Slow to blunt Astos's physical attacks; it will not prevent Death"
+    advice: "Without Silence, have {{members:first-knows:slow}} try Slow to blunt Astos's physical attacks; it will not prevent Death"
 
   - boss: vampire
     section: opening
@@ -288,7 +231,7 @@ rules:
   - boss: marilith
     section: party-edge
     when: { spell: sleep }
-    advice: "Have {{members:knows:sleep}} try Sleep; unlike most bosses, Marilith can lose turns to it"
+    advice: "Have {{members:first-knows:sleep}} try Sleep; unlike most bosses, Marilith can lose turns to it"
 
   - boss: evil-eye
     section: party-edge
@@ -343,78 +286,78 @@ rules:
     when: { spell: thunder }
     advice: "Have {{members:knows:thunder}} conserve Thunder; Kraken's lightning weakness is gone in the rematch"
 
-  - bossGroup: physical-buff
+  - bossTrait: physical-buffs-effective
     section: party-edge
     when:
       all:
         - spell: haste
         - capability: physical-damage
-    advice: "Have {{members:knows:haste}} cast Haste on {{members:preferred-physical-attacker}} for the main damage line against {{boss}}"
+    advice: "Have {{members:first-knows:haste}} cast Haste on {{members:preferred-physical-attacker}} for the main damage line against {{boss}}"
 
-  - bossGroup: physical-buff
+  - bossTrait: physical-buffs-effective
     section: party-edge
     when:
       all:
         - spell: temper
         - capability: physical-damage
-    advice: "Have {{members:knows:temper}} cast Temper on {{members:preferred-physical-attacker}} once Haste or the opening defense is covered"
+    advice: "Have {{members:first-knows:temper}} cast Temper on {{members:preferred-physical-attacker}} once Haste or the opening defense is covered"
 
-  - bossGroup: physical-defense
+  - bossTrait: repeated-physical-damage
     section: safety
     when: { spell: protect }
     advice: "Have {{members:knows:protect}} use Protect to blunt repeated physical hits from {{boss}}"
 
-  - bossGroup: endurance
+  - bossTrait: endurance
     section: safety
     when: { capability: healing }
     advice: "Have {{members:capability:healing}} preserve recovery turns and MP; this fight is too long to treat as a pure damage race"
 
-  - bossGroup: endurance
+  - bossTrait: endurance
     section: safety
     when: { not: { capability: healing } }
     advice: "With no recovery magic, have {{members:all}} commit to a short buff-and-burst line; {{boss}} will win a long fight"
 
-  - bossGroup: lightning-threat
+  - bossTrait: lightning-damage
     section: safety
     when: { spell: nulshock }
-    advice: "Have {{members:knows:nulshock}} cast NulShock before the party is exposed to repeated lightning damage from {{boss}}"
+    advice: "Have {{members:first-knows:nulshock}} cast NulShock before the party is exposed to repeated lightning damage from {{boss}}"
 
-  - bossGroup: fire-threat
+  - bossTrait: fire-damage
     section: safety
     when: { spell: nulblaze }
-    advice: "Have {{members:knows:nulblaze}} cast NulBlaze early to halve the party's fire damage"
+    advice: "Have {{members:first-knows:nulblaze}} cast NulBlaze early to halve the party's fire damage"
 
-  - bossGroup: ice-threat
+  - bossTrait: ice-damage
     section: safety
     when: { spell: nulfrost }
-    advice: "Have {{members:knows:nulfrost}} cast NulFrost before committing to offense so party-wide ice damage is easier to heal through"
+    advice: "Have {{members:first-knows:nulfrost}} cast NulFrost before committing to offense so party-wide ice damage is easier to heal through"
 
-  - bossGroup: instant-death
+  - bossTrait: instant-death
     section: safety
     when: { spell: nuldeath }
-    advice: "Have {{members:knows:nuldeath}} cast NulDeath before {{boss}} gets repeated chances to remove a party member instantly"
+    advice: "Have {{members:first-knows:nuldeath}} cast NulDeath before {{boss}} gets repeated chances to remove a party member instantly"
 
-  - bossGroup: instant-death
+  - bossTrait: instant-death
     section: safety
     when: { spell: life }
     advice: "Keep {{members:knows:life}} alive and reserve a Life charge to recover from an instant knockout"
 
-  - bossGroup: physical-defense
+  - bossTrait: repeated-physical-damage
     section: safety
     when: { spell: protera }
-    advice: "Have {{members:knows:protera}} cast Protera so the whole party can withstand {{boss}}'s repeated physical hits"
+    advice: "Have {{members:first-knows:protera}} cast Protera so the whole party can withstand {{boss}}'s repeated physical hits"
 
-  - bossGroup: physical-defense
+  - bossTrait: repeated-physical-damage
     section: safety
     when: { spell: invisira }
-    advice: "Have {{members:knows:invisira}} cast Invisira to raise the whole party's evasion before the long physical exchange"
+    advice: "Have {{members:first-knows:invisira}} cast Invisira to raise the whole party's evasion before the long physical exchange"
 
-  - bossGroup: resistant-endgame
+  - bossTrait: broad-elemental-resistance
     section: party-edge
     when: { spell: flare }
     advice: "Have {{members:knows:flare}} use Flare as reliable non-elemental offense against {{boss}}"
 
-  - bossGroup: resistant-endgame
+  - bossTrait: broad-elemental-resistance
     section: party-edge
     when: { spell: saber }
     advice: "Have {{members:knows:saber}} cast Saber on themselves when their best contribution is a self-buffed physical attack"

@@ -27,6 +27,16 @@ export type ItemId = "potion"
 
 export type EnemyTagId = "undead"
 
+export type BossTraitId =
+  | "physical-buffs-effective"
+  | "repeated-physical-damage"
+  | "endurance"
+  | "lightning-damage"
+  | "fire-damage"
+  | "ice-damage"
+  | "instant-death"
+  | "broad-elemental-resistance"
+
 export type GuideSectionId = "opening" | "party-edge" | "safety"
 
 export interface PromotionDefinition {
@@ -56,6 +66,7 @@ export interface BossDefinition {
   name: string
   templateName?: string
   tags: string[]
+  traits: string[]
 }
 
 export type PartyConditionDefinition =
@@ -70,15 +81,14 @@ export type PartyConditionDefinition =
 
 export interface BossStrategyRuleDefinition {
   boss?: string
-  bossGroup?: string
   bossTag?: string
+  bossTrait?: string
   section: string
   when: PartyConditionDefinition
   advice: string
 }
 
 export interface BossStrategyDefinition {
-  bossGroups: Record<string, string[]>
   rules: BossStrategyRuleDefinition[]
 }
 
@@ -130,7 +140,13 @@ export interface BossGuide {
   fragments: readonly GuideFragment[]
 }
 
-interface BossProfile { key: string; name: string; templateName: string; tags: ReadonlySet<EnemyTagId> }
+interface BossProfile {
+  key: string
+  name: string
+  templateName: string
+  tags: ReadonlySet<EnemyTagId>
+  traits: ReadonlySet<BossTraitId>
+}
 type PartyCondition = (party: Party) => boolean
 type BossCondition = (boss: BossProfile) => boolean
 interface MemberSelector {
@@ -174,6 +190,16 @@ const spellCapabilityAttributes = [
 ] as const
 const items = new Set<ItemId>(["potion"])
 const enemyTags = new Set<EnemyTagId>(["undead"])
+const bossTraits = new Set<BossTraitId>([
+  "physical-buffs-effective",
+  "repeated-physical-damage",
+  "endurance",
+  "lightning-damage",
+  "fire-damage",
+  "ice-damage",
+  "instant-death",
+  "broad-elemental-resistance",
+])
 const guideSections = new Set<GuideSectionId>(["opening", "party-edge", "safety"])
 
 export function describeFinalFantasyStrategyCatalog(): string {
@@ -207,6 +233,7 @@ export class FinalFantasyStrategyEngine {
       name: bossKey,
       templateName: bossKey,
       tags: new Set<EnemyTagId>(),
+      traits: new Set<BossTraitId>(),
     }
     const fragments = this.#rules.flatMap((rule) =>
       rule.bossMatches(boss) && rule.partyMatches(party)
@@ -216,6 +243,15 @@ export class FinalFantasyStrategyEngine {
 
     return { boss: boss.key, fragments }
   }
+
+  selectRandomBoss(random: () => number = Math.random): BossDefinition {
+    const boss = this.bosses[randomIndex(this.bosses.length, random)]
+    if (boss === undefined) {
+      throw new Error("Cannot select a random boss from an empty Final Fantasy boss catalog")
+    }
+
+    return boss
+  }
 }
 
 export function buildFinalFantasyStrategyEngine(
@@ -223,9 +259,8 @@ export function buildFinalFantasyStrategyEngine(
 ): FinalFantasyStrategyEngine {
   const catalog = buildFinalFantasyCatalog(definitions.classes, definitions.spells)
   const bossProfiles = buildBossProfiles(definitions.bosses)
-  validateBossGroups(definitions.strategy.bossGroups, bossProfiles)
   const rules = definitions.strategy.rules.map((rule, index) =>
-    buildRule(rule, index, catalog, definitions.strategy.bossGroups, bossProfiles),
+    buildRule(rule, index, catalog, bossProfiles),
   )
 
   return new FinalFantasyStrategyEngine(catalog, definitions.bosses, bossProfiles, rules)
@@ -264,6 +299,21 @@ export function createParty(
 ): Party {
 
   return { members: [...members], inventory: new Set(inventory) }
+}
+
+export function createFullToolkitParty(
+  catalog: FinalFantasyCatalog,
+  classIds: readonly string[],
+): Party {
+  const members = classIds.map((classId) => {
+    const learnedSpells = [...catalog.spells.values()]
+      .filter((spell) => spell.learnableBy.has(classId))
+      .map((spell) => spell.id)
+
+    return createPartyMember(catalog, classId, learnedSpells)
+  })
+
+  return createParty(members, ["potion"])
 }
 
 export function partyMemberLabel(member: PartyMember): string {
@@ -334,6 +384,7 @@ function buildBossProfiles(definitions: readonly BossDefinition[]): ReadonlyMap<
       name: definition.name,
       templateName: definition.templateName ?? definition.name,
       tags: new Set(definition.tags.map(requireEnemyTag)),
+      traits: new Set(definition.traits.map(requireBossTrait)),
     }]
   }))
 }
@@ -342,12 +393,11 @@ function buildRule(
   definition: BossStrategyRuleDefinition,
   index: number,
   catalog: FinalFantasyCatalog,
-  bossGroups: Readonly<Record<string, string[]>>,
   bossProfiles: ReadonlyMap<string, BossProfile>,
 ): BossStrategyRule {
 
   return {
-    bossMatches: buildBossCondition(definition, index, bossGroups, bossProfiles),
+    bossMatches: buildBossCondition(definition, index, bossProfiles),
     section: requireGuideSection(definition.section),
     partyMatches: buildPartyCondition(definition.when, catalog),
     advice: parseAdvice(definition.advice, catalog),
@@ -357,13 +407,12 @@ function buildRule(
 function buildBossCondition(
   definition: BossStrategyRuleDefinition,
   index: number,
-  bossGroups: Readonly<Record<string, string[]>>,
   bossProfiles: ReadonlyMap<string, BossProfile>,
 ): BossCondition {
-  const alternatives = [definition.boss, definition.bossGroup, definition.bossTag]
+  const alternatives = [definition.boss, definition.bossTag, definition.bossTrait]
     .filter((value) => value !== undefined)
   if (alternatives.length !== 1) {
-    throw new Error(`Rule ${index + 1} must define exactly one of boss, bossGroup, or bossTag`)
+    throw new Error(`Rule ${index + 1} must define exactly one of boss, bossTag, or bossTrait`)
   }
 
   if (definition.boss !== undefined) {
@@ -376,16 +425,10 @@ function buildBossCondition(
     return (boss) => boss.key === key
   }
 
-  if (definition.bossGroup !== undefined) {
-    const names = bossGroups[definition.bossGroup]
+  if (definition.bossTrait !== undefined) {
+    const trait = requireBossTrait(definition.bossTrait)
 
-    if (names === undefined) {
-      throw new Error(`Unknown boss group: ${definition.bossGroup}`)
-    }
-
-    const keys = new Set(names)
-
-    return (boss) => keys.has(boss.key)
+    return (boss) => boss.traits.has(trait)
   }
 
   const tag = requireEnemyTag(definition.bossTag ?? "")
@@ -527,6 +570,15 @@ function buildMemberSelector(parts: readonly string[], catalog: FinalFantasyCata
       qualifier: (count) => count === 1 ? `who knows ${spell.name}` : `who know ${spell.name}`,
     }
   }
+  if (parts.length === 2 && parts[0] === "first-knows") {
+    const spell = requireSpell(catalog, parts[1] ?? "", "Unknown advice spell")
+
+    return {
+      select: (party) => party.members
+        .filter((member) => member.learnedSpells.has(spell))
+        .slice(0, 1),
+    }
+  }
   if (parts.length === 2 && parts[0] === "knows-attribute") {
     const matchingSpells = spellsWithAttribute(catalog, requireSpellAttribute(parts[1] ?? ""))
 
@@ -607,18 +659,6 @@ function spellsWithAttribute(catalog: FinalFantasyCatalog, attribute: SpellAttri
   return new Set([...catalog.spells.values()].filter((spell) => spell.attributes.has(attribute)))
 }
 
-function validateBossGroups(
-  groups: Readonly<Record<string, string[]>>,
-  bosses: ReadonlyMap<string, BossProfile>,
-): void {
-  const unknown = Object.entries(groups).flatMap(([group, names]) => names
-    .filter((key) => !bosses.has(key))
-    .map((key) => `${group} -> ${key}`))
-  if (unknown.length > 0) {
-    throw new Error(`Boss groups reference unknown bosses: ${unknown.sort().join(", ")}`)
-  }
-}
-
 function rejectDuplicates(kind: string, ids: readonly string[]): void {
   const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))].sort()
 
@@ -682,10 +722,26 @@ function requireEnemyTag(id: string): EnemyTagId {
 
   return id as EnemyTagId
 }
+function requireBossTrait(id: string): BossTraitId {
+  if (!bossTraits.has(id as BossTraitId)) {
+    throw new Error(`Unknown boss trait: ${id}`)
+  }
+
+  return id as BossTraitId
+}
 function requireGuideSection(id: string): GuideSectionId {
   if (!guideSections.has(id as GuideSectionId)) {
     throw new Error(`Unknown guide section: ${id}`)
   }
 
   return id as GuideSectionId
+}
+
+function randomIndex(length: number, random: () => number): number {
+  const value = random()
+  if (!Number.isFinite(value) || value < 0 || value >= 1) {
+    throw new Error(`Random source must return a number from 0 up to, but not including, 1: ${value}`)
+  }
+
+  return Math.floor(value * length)
 }

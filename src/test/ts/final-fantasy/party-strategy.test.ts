@@ -3,15 +3,19 @@ import { readFile } from "node:fs/promises"
 import test from "node:test"
 
 import {
+  createRandomPartyBossStrategy,
   loadFinalFantasyPartyStrategyEngine,
   partyStrategyYamlFile,
+  renderBossStrategy,
   runConsole,
 } from "./party-strategy.ts"
+import { loadFinalFantasyStrategyEngine } from "../../../main/ts/final-fantasy/strategy-data.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
 const engine = await loadFinalFantasyPartyStrategyEngine(loadProjectFile)
+const bossEngine = await loadFinalFantasyStrategyEngine(loadProjectFile)
 
 function partiesWithReplacement(classIds: readonly string[]): string[][] {
   const parties: string[][] = []
@@ -158,6 +162,22 @@ test("rejects values outside the random source contract", () => {
   assert.throws(() => engine.createRandomParty(() => -0.01), /Random source must return/)
   assert.throws(() => engine.createRandomParty(() => 1), /Random source must return/)
   assert.throws(() => engine.createRandomParty(() => Number.NaN), /Random source must return/)
+})
+
+test("pairs each random party with a random boss and a party-specific guide", () => {
+  const values = [0, 0.999999, 0.52]
+  const strategy = createRandomPartyBossStrategy(
+    engine,
+    bossEngine,
+    () => values.shift() ?? 0,
+  )
+  const rendered = renderBossStrategy(strategy)
+
+  assert.deepEqual(strategy.partyStrategy.party, ["black-mage"])
+  assert.equal(strategy.boss.key, "kraken")
+  assert.match(rendered, /^Boss: Kraken\nOpening:/)
+  assert.match(rendered, /Black Mage exploit Kraken's lightning weakness with Thunder/)
+  assert.doesNotMatch(rendered, /White Mage|cast Dia/)
 })
 
 test("renders console output without exposing rule mechanics", () => {

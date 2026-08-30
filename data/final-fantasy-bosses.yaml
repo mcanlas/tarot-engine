@@ -1,60 +1,125 @@
 - key: garland
   name: Garland
   tags: []
+  traits: []
 - key: pirates
   name: Pirates
   tags: []
+  traits: []
 - key: piscodemons
   name: Piscodemons
   tags: []
+  traits: []
 - key: astos
   name: Astos
   tags: []
+  traits:
+    - instant-death
 - key: vampire
   name: Vampire
   tags:
     - undead
+  traits: []
 - key: lich
   name: Lich
   tags:
     - undead
+  traits:
+    - ice-damage
 - key: marilith
   name: Marilith
   tags: []
+  traits:
+    - physical-buffs-effective
+    - repeated-physical-damage
+    - fire-damage
 - key: evil-eye
   name: Evil Eye
   tags: []
+  traits:
+    - instant-death
 - key: dragon-zombies
   name: Dragon Zombies
   tags: []
+  traits: []
 - key: kraken
   name: Kraken
   tags: []
+  traits:
+    - repeated-physical-damage
 - key: blue-dragon
   name: Blue Dragon
   tags: []
+  traits:
+    - lightning-damage
 - key: warmech
   name: Warmech
   tags: []
+  traits:
+    - physical-buffs-effective
+    - repeated-physical-damage
+    - endurance
+    - broad-elemental-resistance
 - key: tiamat
   name: Tiamat
   tags: []
+  traits:
+    - physical-buffs-effective
+    - endurance
+    - lightning-damage
+    - fire-damage
+    - ice-damage
+    - broad-elemental-resistance
 - key: lich-rematch
   name: Lich (Rematch)
   templateName: Lich
   tags: []
+  traits:
+    - physical-buffs-effective
+    - endurance
+    - instant-death
+    - broad-elemental-resistance
 - key: marilith-rematch
   name: Marilith (Rematch)
   templateName: Marilith
   tags: []
+  traits:
+    - physical-buffs-effective
+    - repeated-physical-damage
+    - endurance
+    - fire-damage
+    - instant-death
+    - broad-elemental-resistance
 - key: kraken-rematch
   name: Kraken (Rematch)
   templateName: Kraken
   tags: []
+  traits:
+    - physical-buffs-effective
+    - repeated-physical-damage
+    - endurance
+    - lightning-damage
+    - broad-elemental-resistance
 - key: tiamat-rematch
   name: Tiamat (Rematch)
   templateName: Tiamat
   tags: []
+  traits:
+    - physical-buffs-effective
+    - endurance
+    - lightning-damage
+    - fire-damage
+    - ice-damage
+    - instant-death
+    - broad-elemental-resistance
 - key: chaos
   name: Chaos
   tags: []
+  traits:
+    - physical-buffs-effective
+    - repeated-physical-damage
+    - endurance
+    - lightning-damage
+    - fire-damage
+    - ice-damage
+    - broad-elemental-resistance

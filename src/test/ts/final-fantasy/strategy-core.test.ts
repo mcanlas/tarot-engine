@@ -44,15 +44,17 @@ test("loads and validates the complete YAML strategy catalog", () => {
   )
   assert.deepEqual(
     engine.bosses.find((boss) => boss.key === "blue-dragon"),
-    { key: "blue-dragon", name: "Blue Dragon", tags: [] },
+    { key: "blue-dragon", name: "Blue Dragon", tags: [], traits: ["lightning-damage"] },
   )
   assert.deepEqual(
-    engine.bosses.filter((boss) => boss.templateName !== undefined),
+    engine.bosses
+      .filter((boss) => boss.templateName !== undefined)
+      .map(({ key, name, templateName }) => ({ key, name, templateName })),
     [
-      { key: "lich-rematch", name: "Lich (Rematch)", templateName: "Lich", tags: [] },
-      { key: "marilith-rematch", name: "Marilith (Rematch)", templateName: "Marilith", tags: [] },
-      { key: "kraken-rematch", name: "Kraken (Rematch)", templateName: "Kraken", tags: [] },
-      { key: "tiamat-rematch", name: "Tiamat (Rematch)", templateName: "Tiamat", tags: [] },
+      { key: "lich-rematch", name: "Lich (Rematch)", templateName: "Lich" },
+      { key: "marilith-rematch", name: "Marilith (Rematch)", templateName: "Marilith" },
+      { key: "kraken-rematch", name: "Kraken (Rematch)", templateName: "Kraken" },
+      { key: "tiamat-rematch", name: "Tiamat (Rematch)", templateName: "Tiamat" },
     ],
   )
   assert.equal(
@@ -156,13 +158,14 @@ test("conditions compose counts, spell attributes, items, and negation", () => {
   assert(!withPotion.some((advice) => advice.includes("no in-party healing")))
 })
 
-test("spell templates name all contributing classes and respect learned spells", () => {
+test("spell templates choose one control caster and respect learned spells", () => {
   const advice = adviceFor("pirates", [
     member("warrior"), member("red-mage", "sleep"), member("black-mage", "sleep"),
   ])
   const untrained = adviceFor("pirates", [member("warrior"), member("black-mage")])
 
-  assert(advice.some((line) => line.includes("the Red Mage and the Black Mage cast Sleep")))
+  assert(advice.some((line) => line.includes("the Red Mage cast Sleep")))
+  assert(!advice.some((line) => line.includes("the Red Mage and the Black Mage cast Sleep")))
   assert(!untrained.some((line) => line.includes("cast Sleep") || line.includes("elemental magic")))
 })
 
@@ -207,7 +210,7 @@ test("Lich combines spell-specific defenses with its no-healer fallback", () => 
   assert(!damageRace.some((line) => line.includes("reserve enough healing")))
 })
 
-test("boss-specific, group, and rematch rules stay distinct", () => {
+test("boss-specific, trait, and rematch rules stay distinct", () => {
   const members = [
     member("warrior"),
     member("white-mage", "cure", "dia", "protect"),
@@ -257,6 +260,13 @@ test("every configured boss has deterministic baseline coverage", () => {
   assert.deepEqual(engine.guideFor(baseline, "missing boss").fragments, [])
 })
 
+test("selects random bosses across the complete catalog and validates the source", () => {
+  assert.equal(engine.selectRandomBoss(() => 0).key, "garland")
+  assert.equal(engine.selectRandomBoss(() => 0.999999).key, "chaos")
+  assert.throws(() => engine.selectRandomBoss(() => -0.01), /Random source must return/)
+  assert.throws(() => engine.selectRandomBoss(() => 1), /Random source must return/)
+})
+
 test("catalog validation rejects duplicate IDs and dangling references", () => {
   const duplicateClass = structuredClone(definitions)
   duplicateClass.classes[1]!.class = duplicateClass.classes[0]!.class
@@ -266,14 +276,14 @@ test("catalog validation rejects duplicate IDs and dangling references", () => {
   danglingSpell.spells[0]!.learnableBy.push("mime")
   assert.throws(() => buildFinalFantasyStrategyEngine(danglingSpell), /references unknown classes: mime/)
 
-  const danglingGroup = structuredClone(definitions)
-  danglingGroup.strategy.bossGroups.invalid = ["missing boss"]
-  assert.throws(() => buildFinalFantasyStrategyEngine(danglingGroup), /reference unknown bosses/)
+  const danglingBoss = structuredClone(definitions)
+  danglingBoss.strategy.rules[0]!.boss = "missing boss"
+  assert.throws(() => buildFinalFantasyStrategyEngine(danglingBoss), /Unknown rule boss/)
 })
 
 test("rule validation rejects malformed targeting, conditions, sections, and templates", () => {
   const malformedTarget = structuredClone(definitions)
-  malformedTarget.strategy.rules[0]!.bossGroup = "physical-buff"
+  malformedTarget.strategy.rules[0]!.bossTrait = "physical-buffs-effective"
   assert.throws(() => buildFinalFantasyStrategyEngine(malformedTarget), /exactly one of boss/)
 
   const invalidCount = structuredClone(definitions)
@@ -301,6 +311,10 @@ test("closed vocabularies reject unknown attributes, tags, spells, and bosses", 
   const invalidTag = structuredClone(definitions)
   invalidTag.bosses[0]!.tags = ["dragon"]
   assert.throws(() => buildFinalFantasyStrategyEngine(invalidTag), /Unknown enemy tag: dragon/)
+
+  const invalidTrait = structuredClone(definitions)
+  invalidTrait.bosses[0]!.traits = ["dramatic-entrance"]
+  assert.throws(() => buildFinalFantasyStrategyEngine(invalidTrait), /Unknown boss trait: dramatic-entrance/)
 
   const invalidSpell = structuredClone(definitions)
   invalidSpell.strategy.rules[0]!.when = { spell: "ultima" }
