@@ -37,14 +37,14 @@ test("loads and validates the complete YAML strategy catalog", () => {
   assert.equal(engine.catalog.jobs.size, 12)
   assert.equal(engine.catalog.spells.size, 22)
   assert.equal(engine.bosses.length, 18)
-  assert.equal(engine.ruleCount, 69)
+  assert.equal(engine.ruleCount, 71)
   assert.deepEqual(
     engine.bosses.filter((boss) => boss.tags.includes("undead")).map((boss) => boss.key),
-    ["vampire", "lich"],
+    ["vampire", "lich", "dragon-zombies"],
   )
   assert.deepEqual(
     engine.bosses.find((boss) => boss.key === "blue-dragon"),
-    { key: "blue-dragon", name: "Blue Dragon", tags: [], traits: ["lightning-damage"] },
+    { key: "blue-dragon", name: "Blue Dragon", tags: [], traits: ["burst-fight", "lightning-damage"] },
   )
   assert.deepEqual(
     engine.bosses
@@ -230,6 +230,34 @@ test("repeated physical pressure adapts to the immutable front member", () => {
   assert(whiteMageFront.some((line) => line.includes("White Mage cast Blink early")))
   assert(unsupportedBlackMageFront.some((line) =>
     line.includes("Black Mage as the survival bottleneck")))
+
+  const unsupportedWarriorFront = adviceFor("kraken", [member("warrior"), member("black-mage")])
+  assert(unsupportedWarriorFront.some((line) =>
+    line.includes("Warrior already fits the front line without support magic")))
+})
+
+test("grouped-enemies, burst-fight, and inflicts-paralysis traits cover every party", () => {
+  const bare = [member("warrior"), member("black-mage")]
+  const withLife = [member("warrior"), member("white-wizard", "life")]
+
+  assert(adviceFor("pirates", bare).some((line) =>
+    line.includes("Pirates fields multiple enemies")))
+  assert(adviceFor("piscodemons", bare).some((line) =>
+    line.includes("Piscodemons fields multiple enemies")))
+  assert(adviceFor("dragon-zombies", bare).some((line) =>
+    line.includes("Dragon Zombies fields multiple enemies")))
+
+  assert(adviceFor("vampire", bare).some((line) =>
+    line.includes("commit fully to offense against Vampire")))
+  assert(adviceFor("vampire", [member("warrior"), member("white-mage", "cure")]).some((line) =>
+    line.includes("White Mage save recovery for after the fight")))
+  assert(adviceFor("blue-dragon", bare).some((line) =>
+    line.includes("commit fully to offense against Blue Dragon")))
+
+  assert(adviceFor("vampire", bare).some((line) =>
+    line.includes("avoid concentrating your whole offense behind one attacker Vampire could paralyze")))
+  assert(adviceFor("vampire", withLife).some((line) =>
+    line.includes("revive whichever member Vampire paralyzes")))
 })
 
 test("boss-specific, trait, and rematch rules stay distinct", () => {
@@ -239,7 +267,8 @@ test("boss-specific, trait, and rematch rules stay distinct", () => {
     member("black-mage", "fire", "thunder", "haste", "temper"),
   ]
 
-  assert(adviceFor("dragon-zombies", members).some((line) => line.includes("cast Dia into the undead pair")))
+  assert(adviceFor("dragon-zombies", members).some((line) =>
+    line.includes("Dragon Zombies is undead") && line.includes("cast Dia")))
   assert(adviceFor("kraken", members).some((line) => line.includes("lightning weakness")))
   assert(adviceFor("kraken-rematch", members).some((line) => line.includes("lightning weakness is gone")))
   assert(adviceFor("kraken-rematch", members).some((line) => line.includes("against Kraken")))

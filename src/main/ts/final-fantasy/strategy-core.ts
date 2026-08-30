@@ -30,6 +30,9 @@ export type EnemyTagId = "undead"
 export type FrontlineSuitabilityId = "primary" | "fallback" | "fragile"
 
 export type BossTraitId =
+  | "grouped-enemies"
+  | "burst-fight"
+  | "inflicts-paralysis"
   | "physical-buffs-effective"
   | "repeated-physical-damage"
   | "endurance"
@@ -202,6 +205,9 @@ const frontlineSuitabilities = new Set<FrontlineSuitabilityId>([
   "fragile",
 ])
 const bossTraits = new Set<BossTraitId>([
+  "grouped-enemies",
+  "burst-fight",
+  "inflicts-paralysis",
   "physical-buffs-effective",
   "repeated-physical-damage",
   "endurance",

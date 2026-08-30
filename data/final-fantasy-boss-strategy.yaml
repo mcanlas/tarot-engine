@@ -74,22 +74,6 @@ rules:
     section: party-edge
     when:
       all:
-        - spell: temper
-        - capability: physical-damage
-    advice: "Have {{members:first-knows:temper}} cast Temper on {{members:preferred-physical-attacker}}; weapon damage is more reliable here than most offensive magic"
-
-  - boss: piscodemons
-    section: party-edge
-    when:
-      all:
-        - spell: haste
-        - capability: physical-damage
-    advice: "Have {{members:first-knows:haste}} cast Haste on {{members:preferred-physical-attacker}} to shorten the dangerous opening rounds"
-
-  - boss: piscodemons
-    section: party-edge
-    when:
-      all:
         - spell: thunder
         - not: { capability: physical-damage }
     advice: "With no physical attacker, have {{members:knows:thunder}} cast Thunder; avoid the Piscodemons' resistance to Fire and Blizzard"
@@ -246,16 +230,6 @@ rules:
         - capability: offensive-magic
     advice: "With no physical attacker, have {{members:capability:offensive-magic}} spend learned attack magic immediately before Evil Eye can disable the party"
 
-  - boss: dragon-zombies
-    section: party-edge
-    when: { spell: dia }
-    advice: "Have {{members:knows:dia}} cast Dia into the undead pair while the rest of the party focuses one target"
-
-  - boss: dragon-zombies
-    section: party-edge
-    when: { spell: fire }
-    advice: "Have {{members:knows:fire}} use Fire against the Dragon Zombies instead of basic mage attacks"
-
   - boss: kraken
     section: party-edge
     when: { spell: thunder }
@@ -330,6 +304,14 @@ rules:
     section: safety
     when:
       all:
+        - front: primary
+        - not: { spell: protect }
+    advice: "{{members:front}} already fits the front line without support magic; treat further defensive investment there as optional and shorten {{boss}}'s physical exchange with focused damage instead"
+
+  - bossTrait: repeated-physical-damage
+    section: safety
+    when:
+      all:
         - not: { front: primary }
         - not: { spell: protect }
         - not: { frontSpell: blink }
@@ -389,3 +371,28 @@ rules:
     section: party-edge
     when: { spell: saber }
     advice: "Have {{members:knows:saber}} cast Saber on themselves when their best contribution is a self-buffed physical attack"
+
+  - bossTrait: grouped-enemies
+    section: safety
+    when: always
+    advice: "{{boss}} fields multiple enemies that each act every round; have {{members:all}} finish one off before spreading damage to the rest"
+
+  - bossTrait: burst-fight
+    section: safety
+    when: { capability: healing }
+    advice: "Have {{members:capability:healing}} save recovery for after the fight; {{boss}} will not last long enough to need a mid-fight heal"
+
+  - bossTrait: burst-fight
+    section: safety
+    when: { not: { capability: healing } }
+    advice: "With no healer, commit fully to offense against {{boss}}; the fight is short enough that raw damage matters more than a survival margin"
+
+  - bossTrait: inflicts-paralysis
+    section: safety
+    when: { spell: life }
+    advice: "Keep {{members:knows:life}} alive and ready to revive whichever member {{boss}} paralyzes out of the fight"
+
+  - bossTrait: inflicts-paralysis
+    section: safety
+    when: { not: { spell: life } }
+    advice: "Without a revival spell, avoid concentrating your whole offense behind one attacker {{boss}} could paralyze"

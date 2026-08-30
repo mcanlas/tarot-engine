@@ -5,11 +5,15 @@
 - key: pirates
   name: Pirates
   tags: []
-  traits: []
+  traits:
+    - grouped-enemies
 - key: piscodemons
   name: Piscodemons
   tags: []
-  traits: []
+  traits:
+    - grouped-enemies
+    - physical-buffs-effective
+    - repeated-physical-damage
 - key: astos
   name: Astos
   tags: []
@@ -19,7 +23,9 @@
   name: Vampire
   tags:
     - undead
-  traits: []
+  traits:
+    - burst-fight
+    - inflicts-paralysis
 - key: lich
   name: Lich
   tags:
@@ -40,8 +46,10 @@
     - instant-death
 - key: dragon-zombies
   name: Dragon Zombies
-  tags: []
-  traits: []
+  tags:
+    - undead
+  traits:
+    - grouped-enemies
 - key: kraken
   name: Kraken
   tags: []
@@ -51,6 +59,7 @@
   name: Blue Dragon
   tags: []
   traits:
+    - burst-fight
     - lightning-damage
 - key: warmech
   name: Warmech

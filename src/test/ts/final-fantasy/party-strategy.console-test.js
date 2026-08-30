@@ -19,7 +19,7 @@ if (
   || !Number.isSafeInteger(occurrences)
   || occurrences < 1
 ) {
-  console.error("Usage: node src/test/ts/final-fantasy/final-fantasy-party-strategy.console-test.js <positive integer occurrences>")
+  console.error("Usage: node src/test/ts/final-fantasy/party-strategy.console-test.js <positive integer occurrences>")
   process.exitCode = 1
 } else {
   const [partyEngine, bossEngine] = await Promise.all([
