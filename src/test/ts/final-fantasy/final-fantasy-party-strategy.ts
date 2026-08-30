@@ -66,6 +66,7 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
     "sizeAtLeast",
     "distinctJobsAtLeast",
     "repeatedJobAtLeast",
+    "sameMemberCapabilities",
     "all",
     "not",
   ]
@@ -94,6 +95,17 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
   if (operations[0] === "repeatedJobAtLeast") {
     return {
       repeatedJobAtLeast: requireNumber(record.repeatedJobAtLeast, `${path}.repeatedJobAtLeast`),
+    }
+  }
+  if (operations[0] === "sameMemberCapabilities") {
+    return {
+      sameMemberCapabilities: requireArray(
+        record.sameMemberCapabilities,
+        `${path}.sameMemberCapabilities`,
+      ).map((capability, index) => requireString(
+        capability,
+        `${path}.sameMemberCapabilities[${index}]`,
+      )),
     }
   }
 

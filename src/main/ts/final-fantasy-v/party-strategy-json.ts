@@ -46,7 +46,7 @@ function decodeCondition(
 
 function decodeSelector(value: unknown, path: string): FinalFantasyVMemberSelectorDefinition {
   const record = requireRecord(value, path)
-  const operations = ["job", "assignment", "innate", "assignmentType"]
+  const operations = ["job", "assignment", "assignmentOneOf", "innate", "assignmentType"]
     .filter((operation) => record[operation] !== undefined)
   if (operations.length !== 1) {
     throw new Error(`${path} must have exactly one selector`)
@@ -61,6 +61,17 @@ function decodeSelector(value: unknown, path: string): FinalFantasyVMemberSelect
     rejectRank(record, path)
 
     return { assignmentType: requireAbilityType(record.assignmentType, `${path}.assignmentType`) }
+  }
+  if (operation === "assignmentOneOf") {
+    rejectRank(record, path)
+
+    return {
+      assignmentOneOf: requireArray(record.assignmentOneOf, `${path}.assignmentOneOf`)
+        .map((ability, index) => requireString(
+          ability,
+          `${path}.assignmentOneOf[${index}]`,
+        )),
+    }
   }
   const atLeastRank = record.atLeastRank === undefined
     ? {}

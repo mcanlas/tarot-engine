@@ -44,7 +44,7 @@ test("loads class facts from existing catalogs and party rules from their own YA
     "white-mage",
     "black-mage",
   ])
-  assert.equal(engine.ruleCount, 20)
+  assert.equal(engine.ruleCount, 25)
   assert.equal(partyStrategyYamlFile, "data/final-fantasy-party-strategy.yaml")
 })
 
@@ -58,6 +58,11 @@ test("derives a balanced party's capabilities from classes and potential spells"
   assert(matchedRules.includes("magical-offense"))
   assert(matchedRules.includes("magical-depth"))
   assert(matchedRules.includes("mixed-offense"))
+  assert(matchedRules.includes("defensive-support"))
+  assert(matchedRules.includes("physical-amplification"))
+  assert(matchedRules.includes("battlefield-control"))
+  assert(matchedRules.includes("anti-undead-specialist"))
+  assert(matchedRules.includes("hybrid-action-bottleneck"))
   assert(matchedRules.includes("diverse-roster"))
   assert(!engine.ruleIds.includes("warrior-front-line"))
 })
@@ -67,6 +72,8 @@ test("does not treat White Mage's undead-only Dia as general magical offense", (
     .observations.map((observation) => observation.ruleId)
 
   assert(matchedRules.includes("recovery"))
+  assert(matchedRules.includes("defensive-support"))
+  assert(matchedRules.includes("anti-undead-specialist"))
   assert(matchedRules.includes("no-magical-offense"))
   assert(!matchedRules.includes("magical-offense"))
 })
@@ -206,5 +213,16 @@ test("rejects invalid or unreachable YAML rule definitions", async () => {
     statement: Invalid.
 `),
     /Unknown party strategy capability: time-magic/,
+  )
+  await assert.rejects(
+    loadWithStrategy(`rules:
+  - id: trivial-same-member
+    kind: strength
+    when:
+      sameMemberCapabilities:
+        - healing
+    statement: Invalid.
+`),
+    /sameMemberCapabilities must combine at least two distinct capabilities/,
   )
 })

@@ -69,7 +69,8 @@
     - ninja
     - black-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - control-magic
 
 - spell: protect
   name: Protect
@@ -79,7 +80,8 @@
     - knight
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: blink
   name: Blink
@@ -88,7 +90,8 @@
     - knight
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: silence
   name: Silence
@@ -98,7 +101,8 @@
     - knight
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - control-magic
 
 - spell: temper
   name: Temper
@@ -108,7 +112,8 @@
     - ninja
     - black-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - physical-support
 
 - spell: haste
   name: Haste
@@ -118,7 +123,8 @@
     - ninja
     - black-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - physical-support
 
 - spell: slow
   name: Slow
@@ -128,7 +134,8 @@
     - ninja
     - black-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - control-magic
 
 - spell: nulshock
   name: NulShock
@@ -138,7 +145,8 @@
     - knight
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: nulblaze
   name: NulBlaze
@@ -148,7 +156,8 @@
     - knight
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: nulfrost
   name: NulFrost
@@ -157,7 +166,8 @@
     - red-mage
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: nuldeath
   name: NulDeath
@@ -165,7 +175,8 @@
     - white-mage
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: protera
   name: Protera
@@ -173,7 +184,8 @@
     - white-mage
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: invisira
   name: Invisira
@@ -181,7 +193,8 @@
     - white-mage
     - white-wizard
     - red-wizard
-  attributes: []
+  attributes:
+    - defensive-magic
 
 - spell: flare
   name: Flare

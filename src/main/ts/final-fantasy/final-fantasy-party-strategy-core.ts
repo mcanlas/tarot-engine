@@ -24,6 +24,7 @@ export type PartyStrategyConditionDefinition =
   | { sizeAtLeast: number }
   | { distinctJobsAtLeast: number }
   | { repeatedJobAtLeast: number }
+  | { sameMemberCapabilities: string[] }
   | { all: PartyStrategyConditionDefinition[] }
   | { not: PartyStrategyConditionDefinition }
 
@@ -109,15 +110,22 @@ export class FinalFantasyPartyStrategyEngine {
     const job = this.#requireStartingJob(id)
     const capabilities = new Set(job.capabilities)
 
+    const spellCapabilities = [
+      "healing",
+      "offensive-magic",
+      "defensive-magic",
+      "physical-support",
+      "control-magic",
+      "anti-undead",
+    ] as const
     for (const spell of this.#catalog.spells.values()) {
       if (!spell.learnableBy.has(job.id)) {
         continue
       }
-      if (spell.attributes.has("healing")) {
-        capabilities.add("healing")
-      }
-      if (spell.attributes.has("offensive-magic")) {
-        capabilities.add("offensive-magic")
+      for (const capability of spellCapabilities) {
+        if (spell.attributes.has(capability)) {
+          capabilities.add(capability)
+        }
       }
     }
 
@@ -198,6 +206,15 @@ function buildCondition(
       party.filter((candidate) => candidate.job.id === member.job.id).length >= count,
     )
   }
+  if ("sameMemberCapabilities" in definition) {
+    const required = [...new Set(definition.sameMemberCapabilities.map(requireCapability))]
+    if (required.length < 2) {
+      throw new Error("sameMemberCapabilities must combine at least two distinct capabilities")
+    }
+
+    return (party) => party.some((member) =>
+      required.every((capability) => member.capabilities.has(capability)))
+  }
   if ("all" in definition) {
     const conditions = definition.all.map((condition) => buildCondition(condition, catalog))
 
@@ -210,7 +227,15 @@ function buildCondition(
 }
 
 function requireCapability(value: string): CapabilityId {
-  if (value !== "physical-damage" && value !== "healing" && value !== "offensive-magic") {
+  if (
+    value !== "physical-damage"
+    && value !== "healing"
+    && value !== "offensive-magic"
+    && value !== "defensive-magic"
+    && value !== "physical-support"
+    && value !== "control-magic"
+    && value !== "anti-undead"
+  ) {
     throw new Error(`Unknown party strategy capability: ${value}`)
   }
 

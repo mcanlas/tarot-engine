@@ -23,9 +23,9 @@ const strategyYaml = await readFile(finalFantasyVStrategyYamlFiles.partyStrategy
 const rules = decodeFinalFantasyVPartyStrategy(parse(strategyYaml))
 const engine = new FinalFantasyVPartyStrategyEngine(catalog, rules)
 
-test("loads Wind, Water, and Fire party strategy rules from YAML", () => {
+test("loads party strategy rules from YAML", () => {
   assert.equal(finalFantasyVStrategyYamlFiles.partyStrategy, "data/final-fantasy-v-party-strategy.yaml")
-  assert.equal(rules.length, 47)
+  assert.equal(rules.length, 57)
   assert.deepEqual(engine.ruleIds, rules.map((rule) => rule.id))
 })
 
@@ -42,6 +42,7 @@ test("analyzes sparse membership while requiring an interesting setup", () => {
 })
 
 test("does not emit trivial class or innate-ability descriptions", () => {
+  assert.deepEqual(engine.analyze([member("krile", "knight")]).observations, [])
   assert.deepEqual(engine.analyze([member("krile", "white-mage")]).observations, [])
   assert.deepEqual(engine.analyze([member("krile", "black-mage")]).observations, [])
   assert(!engine.ruleIds.some((id) => id === "can-use-white-magic" || id === "can-use-black-magic"))
@@ -77,12 +78,10 @@ test("supports a full party and reports distinct-member interactions", () => {
   assert.deepEqual(strategy.observations.map((observation) => observation.ruleId), [
     "dedicated-white-and-black-actions",
     "knight-shelters-white-mage",
-    "cover-guard-fortress",
   ])
   assert.deepEqual(strategy.observations.map((observation) => observation.memberIds), [
     ["lenna", "faris"],
     ["bartz", "lenna"],
-    ["bartz"],
   ])
 })
 
@@ -122,6 +121,20 @@ test("covers representative Water command tradeoffs", () => {
   ])
 })
 
+test("generalizes redundant Freelancer equipment assignments", () => {
+  const freelancer = engine.analyze([
+    member("bartz", "freelancer", [flat("equip-swords")]),
+  ])
+  const blackMage = engine.analyze([
+    member("bartz", "black-mage", [flat("equip-swords")]),
+  ])
+
+  assert(freelancer.observations.some((observation) =>
+    observation.ruleId === "freelancer-equipment-access-redundancy"))
+  assert(!blackMage.observations.some((observation) =>
+    observation.ruleId === "freelancer-equipment-access-redundancy"))
+})
+
 test("finds Water ability interactions within and across members", () => {
   const quickSummoner = engine.analyze([
     member("krile", "time-mage", [ranked("summon", 5)]),
@@ -140,16 +153,17 @@ test("finds Water ability interactions within and across members", () => {
   assert.deepEqual(relay.observations[0]?.memberIds, ["lenna", "krile"])
 })
 
-test("accounts for every ability through the Fire crystal", () => {
-  const contributedCrystals = new Set(["wind", "water", "fire"])
+test("accounts for interaction-worthy abilities without forcing filler or version-specific advice", () => {
   const contributedAbilityIds = [...catalog.jobs.values()]
-    .filter((job) => contributedCrystals.has(job.crystal))
     .flatMap((job) => job.abilities.map((ability) => ability.id))
     .sort()
   const referencedAbilityIds = new Set(rules.flatMap((rule) =>
     selectors(rule.when).flatMap((selector) => {
       if ("assignment" in selector) {
         return [selector.assignment]
+      }
+      if ("assignmentOneOf" in selector) {
+        return selector.assignmentOneOf
       }
       if ("innate" in selector) {
         return [selector.innate]
@@ -160,11 +174,11 @@ test("accounts for every ability through the Fire crystal", () => {
 
   assert.deepEqual(
     contributedAbilityIds.filter((abilityId) => !referencedAbilityIds.has(abilityId)),
-    [],
+    ["guard", "mineuchi"],
   )
 })
 
-test("keeps every authored rule through Fire reachable with legal loadouts", () => {
+test("keeps every authored rule reachable with legal loadouts", () => {
   const parties: FinalFantasyVPartyMember[][] = [
     [member("bartz", "white-mage", [ranked("black-magic", 3)])],
     [member("bartz", "black-mage", [ranked("white-magic", 3)])],
@@ -222,6 +236,17 @@ test("keeps every authored rule through Fire reachable with legal loadouts", () 
     [member("bartz", "freelancer", [flat("animals"), flat("call")])],
     [member("bartz", "ranger", [flat("rapid-fire")])],
     [member("bartz", "freelancer", [flat("equip-bows"), flat("two-handed")])],
+    [member("bartz", "freelancer", [flat("jump"), flat("equip-lances")])],
+    [member("bartz", "freelancer", [flat("lance"), ranked("summon", 5)])],
+    [member("bartz", "samurai"), member("lenna", "mime")],
+    [member("bartz", "knight", [flat("shirahadori")])],
+    [member("bartz", "freelancer", [flat("equip-katanas"), flat("two-handed")])],
+    [member("bartz", "ninja", [flat("iainuki")])],
+    [member("bartz", "chemist", [flat("mix")])],
+    [member("bartz", "freelancer", [flat("recover"), flat("revive")])],
+    [member("bartz", "freelancer", [flat("flirt"), flat("control")])],
+    [member("bartz", "freelancer", [flat("dance"), flat("equip-ribbons")])],
+    [member("bartz", "freelancer", [flat("equip-lances")])],
   ]
   const activatedRuleIds = new Set(parties.flatMap((party) =>
     engine.analyze(party).observations.map((observation) => observation.ruleId)))
@@ -284,6 +309,22 @@ test("validates the intentionally interaction-only vocabulary", () => {
     ]),
     /Duplicate Final Fantasy V party strategy rule ids: duplicate/,
   )
+  assert.throws(
+    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+      rule("empty-one-of", {
+        sameMember: [{ job: "freelancer" }, { assignmentOneOf: [] }],
+      }),
+    ]),
+    /assignmentOneOf must not be empty/,
+  )
+  assert.throws(
+    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+      rule("unknown-one-of", {
+        sameMember: [{ job: "freelancer" }, { assignmentOneOf: ["missing"] }],
+      }),
+    ]),
+    /Unknown Final Fantasy V strategy ability: missing/,
+  )
 })
 
 test("defensively decodes YAML rule structure", () => {
@@ -326,6 +367,17 @@ test("defensively decodes YAML rule structure", () => {
       statement: "Invalid.",
     }] }),
     /atLeastRank requires an assignment or innate selector/,
+  )
+  assert.throws(
+    () => decodeFinalFantasyVPartyStrategy({ rules: [{
+      id: "one-of",
+      kind: "tradeoff",
+      when: {
+        sameMember: [{ job: "freelancer" }, { assignmentOneOf: "equip-swords" }],
+      },
+      statement: "Invalid.",
+    }] }),
+    /assignmentOneOf must be an array/,
   )
 })
 

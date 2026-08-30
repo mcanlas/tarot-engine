@@ -147,14 +147,6 @@ rules:
         - innate: mimic
     statement: A Mime acting immediately after a Summoner can repeat the summon without paying its MP cost again, making turn order part of the setup
 
-  - id: cover-guard-fortress
-    kind: setup
-    when:
-      sameMember:
-        - innate: cover
-        - innate: guard
-    statement: Guard can nullify physical attacks while Cover redirects attacks from critical allies, letting one Knight shelter several vulnerable party members for a turn
-
   - id: armored-black-mage
     kind: tradeoff
     when:
@@ -276,13 +268,13 @@ rules:
         - assignment: dualcast
     statement: Dualcast cannot repeat Blue Magic, so these two commands provide separate menus without the expected double-cast synergy
 
-  - id: mp-only-mime
+  - id: stacked-mp-without-command
     kind: tradeoff
     when:
       sameMember:
         - assignment: mp-plus-10-percent
         - assignment: mp-plus-30-percent
-    statement: Layering both MP bonuses expands the resource pool, but spends two Mime slots without supplying a spell command that can use it
+    statement: Layering both MP bonuses expands the resource pool, but spends two flexible slots without supplying a spell command that can use it
 
   - id: calm-control-overlap
     kind: tradeoff
@@ -397,14 +389,6 @@ rules:
         - assignment: summon
     statement: Lance can recover both HP and MP between Summon turns, exchanging immediate offense for a way to sustain an expensive magic command
 
-  - id: mineuchi-preserves-control
-    kind: setup
-    when:
-      distinctMembers:
-        - assignment: mineuchi
-        - assignment: control
-    statement: Mineuchi can damage a controlled enemy without breaking Control, letting one member attack while another continues choosing the monster's actions
-
   - id: mimic-zeninage-cost
     kind: tradeoff
     when:
@@ -470,10 +454,21 @@ rules:
         - assignment: equip-ribbons
     statement: Equip Ribbons opens Dancer-exclusive gear that replaces Tempting Tango with another Sword Dance chance, making the random Dance command more damage-focused
 
-  - id: freelancer-equip-lance-redundancy
+  - id: freelancer-equipment-access-redundancy
     kind: tradeoff
     when:
       sameMember:
         - job: freelancer
-        - assignment: equip-lances
-    statement: Freelancer already equips lances, so assigning Equip Lances spends a flexible slot without changing its equipment access
+        - assignmentOneOf:
+            - equip-shields
+            - equip-armor
+            - equip-swords
+            - equip-axes
+            - equip-rods
+            - equip-whips
+            - equip-harps
+            - equip-bows
+            - equip-lances
+            - equip-katanas
+            - equip-ribbons
+    statement: Freelancer already has unrestricted equipment access, so assigning an Equip ability spends a flexible slot without unlocking new gear

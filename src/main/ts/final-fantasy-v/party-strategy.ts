@@ -33,6 +33,7 @@ export interface FinalFantasyVPartyStrategy {
 export type FinalFantasyVMemberSelectorDefinition =
   | { readonly job: string }
   | { readonly assignment: string; readonly atLeastRank?: number }
+  | { readonly assignmentOneOf: readonly string[] }
   | { readonly innate: string; readonly atLeastRank?: number }
   | { readonly assignmentType: FinalFantasyVAbilityType }
 
@@ -150,6 +151,22 @@ function compileSelector(
   if ("assignmentType" in definition) {
     return (member) => member.loadout.assignments.some((resolved) =>
       catalog.abilities.get(resolved.abilityId)?.type === definition.assignmentType)
+  }
+
+  if ("assignmentOneOf" in definition) {
+    if (definition.assignmentOneOf.length === 0) {
+      throw new Error("Final Fantasy V strategy assignmentOneOf must not be empty")
+    }
+    const abilityIds = new Set(definition.assignmentOneOf.map((abilityId) => {
+      if (!catalog.abilities.has(abilityId)) {
+        throw new Error(`Unknown Final Fantasy V strategy ability: ${abilityId}`)
+      }
+
+      return abilityId
+    }))
+
+    return (member) => member.loadout.assignments.some((resolved) =>
+      abilityIds.has(resolved.abilityId))
   }
 
   const abilityId = "assignment" in definition ? definition.assignment : definition.innate

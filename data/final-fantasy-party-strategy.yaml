@@ -62,6 +62,33 @@ rules:
         - capability: offensive-magic
     statement: Physical and magical offense give the party answers to different enemy defenses
 
+  - id: defensive-support
+    kind: strength
+    when:
+      capability: defensive-magic
+    statement: Defensive magic can reduce physical or elemental pressure instead of relying only on recovery after damage lands
+
+  - id: physical-amplification
+    kind: strength
+    when:
+      all:
+        - capability: physical-damage
+          atLeast: 2
+        - capability: physical-support
+    statement: Temper or Haste can convert support turns into stronger sustained output from the party's physical core
+
+  - id: battlefield-control
+    kind: strength
+    when:
+      capability: control-magic
+    statement: Sleep, Silence, or Slow can suppress dangerous enemy actions when direct damage is not the safest answer
+
+  - id: anti-undead-specialist
+    kind: strength
+    when:
+      capability: anti-undead
+    statement: Dia gives the party a resource-efficient magical attack against undead groups
+
   - id: no-physical-offense
     kind: weakness
     when:
@@ -124,6 +151,15 @@ rules:
       not:
         capability: offensive-magic
     statement: The party has few conventional answers when physical damage is ineffective
+
+  - id: hybrid-action-bottleneck
+    kind: weakness
+    when:
+      sameMemberCapabilities:
+        - physical-damage
+        - healing
+        - offensive-magic
+    statement: One generalist covers physical damage, recovery, and offensive magic, but those roles compete for the same turn and spell budget
 
   # Diversity and specialization tradeoffs
   - id: diverse-roster

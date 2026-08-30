@@ -5,9 +5,23 @@ export const finalFantasyStrategyYamlFiles = Object.freeze({
   bossStrategy: "data/final-fantasy-boss-strategy.yaml",
 })
 
-export type CapabilityId = "physical-damage" | "healing" | "offensive-magic"
+export type CapabilityId =
+  | "physical-damage"
+  | "healing"
+  | "offensive-magic"
+  | "defensive-magic"
+  | "physical-support"
+  | "control-magic"
+  | "anti-undead"
 
-export type SpellAttributeId = "healing" | "offensive-magic" | "elemental" | "anti-undead"
+export type SpellAttributeId =
+  | "healing"
+  | "offensive-magic"
+  | "defensive-magic"
+  | "physical-support"
+  | "control-magic"
+  | "elemental"
+  | "anti-undead"
 
 export type ItemId = "potion"
 
@@ -132,8 +146,32 @@ interface BossStrategyRule {
   advice: readonly AdvicePart[]
 }
 
-const capabilities = new Set<CapabilityId>(["physical-damage", "healing", "offensive-magic"])
-const spellAttributes = new Set<SpellAttributeId>(["healing", "offensive-magic", "elemental", "anti-undead"])
+const capabilities = new Set<CapabilityId>([
+  "physical-damage",
+  "healing",
+  "offensive-magic",
+  "defensive-magic",
+  "physical-support",
+  "control-magic",
+  "anti-undead",
+])
+const spellAttributes = new Set<SpellAttributeId>([
+  "healing",
+  "offensive-magic",
+  "defensive-magic",
+  "physical-support",
+  "control-magic",
+  "elemental",
+  "anti-undead",
+])
+const spellCapabilityAttributes = [
+  "healing",
+  "offensive-magic",
+  "defensive-magic",
+  "physical-support",
+  "control-magic",
+  "anti-undead",
+] as const
 const items = new Set<ItemId>(["potion"])
 const enemyTags = new Set<EnemyTagId>(["undead"])
 const guideSections = new Set<GuideSectionId>(["opening", "party-edge", "safety"])
@@ -555,12 +593,10 @@ function renderAdvice(parts: readonly AdvicePart[], party: Party, boss: BossProf
 function memberCapabilities(member: PartyMember): ReadonlySet<CapabilityId> {
   const result = new Set(member.job.capabilities)
 
-  if ([...member.learnedSpells].some((spell) => spell.attributes.has("healing"))) {
-    result.add("healing")
-  }
-
-  if ([...member.learnedSpells].some((spell) => spell.attributes.has("offensive-magic"))) {
-    result.add("offensive-magic")
+  for (const capability of spellCapabilityAttributes) {
+    if ([...member.learnedSpells].some((spell) => spell.attributes.has(capability))) {
+      result.add(capability)
+    }
   }
 
   return result
