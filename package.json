@@ -6,6 +6,7 @@
     "build:ts": "tsc --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "demo:party-strategy": "node src/test/ts/final-fantasy/final-fantasy-party-strategy.ts",
+    "test:party-strategy-console": "node src/test/ts/final-fantasy/final-fantasy-party-strategy.console-test.js",
     "test:js": "node --test src/test/js/*.test.js",
     "test:ts": "node --experimental-test-coverage --test-coverage-lines=95 --test-coverage-branches=90 --test-coverage-functions=95 --test src/test/ts/*.test.ts src/test/ts/**/*.test.ts"
   },

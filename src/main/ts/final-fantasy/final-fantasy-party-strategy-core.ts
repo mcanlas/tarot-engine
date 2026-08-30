@@ -82,6 +82,15 @@ export class FinalFantasyPartyStrategyEngine {
     return { party: party.map((member) => member.job.id), observations }
   }
 
+  createRandomParty(random: () => number = Math.random): readonly string[] {
+    const partySize = randomIndex(4, random) + 1
+
+    return Array.from(
+      { length: partySize },
+      () => this.classIds[randomIndex(this.classIds.length, random)] ?? "",
+    )
+  }
+
   render(strategy: PartyStrategy): string {
     const lines = [`Party: ${strategy.party.map((id) => this.#requireStartingJob(id).name).join(" / ")}`]
 
@@ -123,6 +132,15 @@ export class FinalFantasyPartyStrategyEngine {
 
     return job
   }
+}
+
+function randomIndex(length: number, random: () => number): number {
+  const value = random()
+  if (!Number.isFinite(value) || value < 0 || value >= 1) {
+    throw new Error(`Random source must return a number from 0 up to, but not including, 1: ${value}`)
+  }
+
+  return Math.floor(value * length)
 }
 
 function buildRule(

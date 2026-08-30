@@ -49,10 +49,10 @@ test("loads class facts from existing catalogs and party rules from their own YA
 })
 
 test("derives a balanced party's capabilities from classes and potential spells", () => {
-  const strategy = engine.analyze(["warrior", "monk", "white-mage", "black-mage"])
+  const strategy = engine.analyze(["warrior", "red-mage", "white-mage", "black-mage"])
   const matchedRules = strategy.observations.map((observation) => observation.ruleId)
 
-  assert.deepEqual(strategy.party, ["warrior", "monk", "white-mage", "black-mage"])
+  assert.deepEqual(strategy.party, ["warrior", "red-mage", "white-mage", "black-mage"])
   assert(matchedRules.includes("physical-core"))
   assert(matchedRules.includes("recovery"))
   assert(matchedRules.includes("magical-offense"))
@@ -60,6 +60,15 @@ test("derives a balanced party's capabilities from classes and potential spells"
   assert(matchedRules.includes("mixed-offense"))
   assert(matchedRules.includes("diverse-roster"))
   assert(!engine.ruleIds.includes("warrior-front-line"))
+})
+
+test("does not treat White Mage's undead-only Dia as general magical offense", () => {
+  const matchedRules = engine.analyze(["white-mage"])
+    .observations.map((observation) => observation.ruleId)
+
+  assert(matchedRules.includes("recovery"))
+  assert(matchedRules.includes("no-magical-offense"))
+  assert(!matchedRules.includes("magical-offense"))
 })
 
 test("applies YAML-authored tradeoff rules to a small physical party", () => {
@@ -116,6 +125,32 @@ test("accepts every supported party size and rejects invalid input", () => {
   )
   assert.throws(() => engine.analyze(["mime"]), /Unknown character class: mime/)
   assert.throws(() => engine.analyze(["knight"]), /Unknown character class: knight/)
+})
+
+test("creates random parties with equally sized probability ranges", () => {
+  const values = [
+    0, 0,
+    0.25, 0.2, 0.4,
+    0.5, 0.6, 0.7, 0.9,
+    0.75, 0, 0.2, 0.4, 0.999999,
+  ]
+  const random = (): number => values.shift() ?? 0
+
+  assert.deepEqual(engine.createRandomParty(random), ["warrior"])
+  assert.deepEqual(engine.createRandomParty(random), ["thief", "monk"])
+  assert.deepEqual(engine.createRandomParty(random), ["red-mage", "white-mage", "black-mage"])
+  assert.deepEqual(engine.createRandomParty(random), [
+    "warrior",
+    "thief",
+    "monk",
+    "black-mage",
+  ])
+})
+
+test("rejects values outside the random source contract", () => {
+  assert.throws(() => engine.createRandomParty(() => -0.01), /Random source must return/)
+  assert.throws(() => engine.createRandomParty(() => 1), /Random source must return/)
+  assert.throws(() => engine.createRandomParty(() => Number.NaN), /Random source must return/)
 })
 
 test("renders console output without exposing rule mechanics", () => {

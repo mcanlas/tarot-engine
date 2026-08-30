@@ -23,7 +23,6 @@
     - white-mage
     - white-wizard
   attributes:
-    - offensive-magic
     - anti-undead
 
 - spell: fire
