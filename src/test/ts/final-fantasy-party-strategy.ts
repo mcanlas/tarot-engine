@@ -7,11 +7,11 @@ import {
   FinalFantasyPartyStrategyEngine,
   type PartyStrategyConditionDefinition as PartyConditionDefinition,
   type PartyStrategyRuleDefinition as PartyRuleDefinition,
-} from "../../main/ts/final-fantasy-party-strategy-core.ts"
+} from "../../main/ts/final-fantasy/final-fantasy-party-strategy-core.ts"
 import {
   loadFinalFantasyCatalog,
   type YamlTextLoader,
-} from "../../main/ts/final-fantasy-strategy-data.ts"
+} from "../../main/ts/final-fantasy/final-fantasy-strategy-data.ts"
 
 export const partyStrategyYamlFile = "data/final-fantasy-party-strategy.yaml"
 

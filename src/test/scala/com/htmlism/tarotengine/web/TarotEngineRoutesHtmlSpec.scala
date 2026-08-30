@@ -83,7 +83,7 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     expect(html.contains("href=\"/final-fantasy-strategy.css\"")) &&
     expect(html.contains("data-strategy-status=\"\"")) &&
     expect(html.contains("Loading strategy data…")) &&
-    expect(html.contains("src=\"/final-fantasy-strategy-app.js\"")) &&
+    expect(html.contains("src=\"/final-fantasy/final-fantasy-strategy-app.js\"")) &&
     expect(html.contains("type=\"module\""))
 
   test("Final Fantasy VI renders all 14 playable characters as themed pills"):

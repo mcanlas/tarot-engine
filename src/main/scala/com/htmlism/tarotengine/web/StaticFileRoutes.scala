@@ -12,3 +12,8 @@ object StaticFileRoutes:
         StaticFile
           .fromResource[IO](s"/$path", Some(req))
           .getOrElseF(NotFound())
+      case req @ GET -> Root / directory / path
+          if path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".js.map") =>
+        StaticFile
+          .fromResource[IO](s"/$directory/$path", Some(req))
+          .getOrElseF(NotFound())

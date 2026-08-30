@@ -103,6 +103,6 @@ object FinalFantasyDynamicStrategyPage:
             "Loading strategy data…"
           )
         ),
-        script(tpe := "module", src := "/final-fantasy-strategy-app.js")
+        script(tpe := "module", src := "/final-fantasy/final-fantasy-strategy-app.js")
       )
     )
