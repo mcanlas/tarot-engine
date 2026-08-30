@@ -9,7 +9,7 @@ import {
 } from "./final-fantasy-party-strategy.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
-  readFile(new URL(`../../../${path}`, import.meta.url), "utf8")
+  readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
 const engine = await loadFinalFantasyPartyStrategyEngine(loadProjectFile)
 

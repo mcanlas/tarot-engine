@@ -10,14 +10,14 @@ import {
   describeFinalFantasyStrategyCatalog,
   partyLabel,
   promotePartyMember,
-} from "../../main/ts/final-fantasy/final-fantasy-strategy-core.ts"
+} from "../../../main/ts/final-fantasy/final-fantasy-strategy-core.ts"
 import {
   loadFinalFantasyStrategyDefinitions,
   loadFinalFantasyStrategyEngine,
-} from "../../main/ts/final-fantasy/final-fantasy-strategy-data.ts"
+} from "../../../main/ts/final-fantasy/final-fantasy-strategy-data.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
-  readFile(new URL(`../../../${path}`, import.meta.url), "utf8")
+  readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
 const definitions = await loadFinalFantasyStrategyDefinitions(loadProjectFile)
 const engine = await loadFinalFantasyStrategyEngine(loadProjectFile)

@@ -7,11 +7,11 @@ import {
   FinalFantasyPartyStrategyEngine,
   type PartyStrategyConditionDefinition as PartyConditionDefinition,
   type PartyStrategyRuleDefinition as PartyRuleDefinition,
-} from "../../main/ts/final-fantasy/final-fantasy-party-strategy-core.ts"
+} from "../../../main/ts/final-fantasy/final-fantasy-party-strategy-core.ts"
 import {
   loadFinalFantasyCatalog,
   type YamlTextLoader,
-} from "../../main/ts/final-fantasy/final-fantasy-strategy-data.ts"
+} from "../../../main/ts/final-fantasy/final-fantasy-strategy-data.ts"
 
 export const partyStrategyYamlFile = "data/final-fantasy-party-strategy.yaml"
 
@@ -139,7 +139,7 @@ function requireNumber(value: unknown, path: string): number {
 }
 
 const loadProjectFile = (path: string): Promise<string> =>
-  readFile(new URL(`../../../${path}`, import.meta.url), "utf8")
+  readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
 if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
