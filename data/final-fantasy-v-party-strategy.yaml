@@ -380,3 +380,100 @@ rules:
         - assignment: equip-bows
         - assignment: two-handed
     statement: Bows already require two hands and receive no benefit from Two-Handed, making this two-slot weapon pairing internally incompatible
+
+  - id: jump-lance-specialist
+    kind: setup
+    when:
+      sameMember:
+        - assignment: jump
+        - assignment: equip-lances
+    statement: Equip Lances supplies the weapon class that doubles Jump damage, turning two ability slots into a dedicated airborne attacker
+
+  - id: lance-summon-sustain
+    kind: setup
+    when:
+      sameMember:
+        - assignment: lance
+        - assignment: summon
+    statement: Lance can recover both HP and MP between Summon turns, exchanging immediate offense for a way to sustain an expensive magic command
+
+  - id: mineuchi-preserves-control
+    kind: setup
+    when:
+      distinctMembers:
+        - assignment: mineuchi
+        - assignment: control
+    statement: Mineuchi can damage a controlled enemy without breaking Control, letting one member attack while another continues choosing the monster's actions
+
+  - id: mimic-zeninage-cost
+    kind: tradeoff
+    when:
+      distinctMembers:
+        - innate: zeninage
+        - innate: mimic
+    statement: Mimic can repeat Zeninage but still spends gil, so the relay duplicates its damage and its resource cost
+
+  - id: shirahadori-cover
+    kind: setup
+    when:
+      sameMember:
+        - innate: cover
+        - assignment: shirahadori
+    statement: Shirahadori gives a covering Knight a persistent chance to evade the physical attacks redirected from critical allies
+
+  - id: two-handed-katana
+    kind: setup
+    when:
+      sameMember:
+        - assignment: equip-katanas
+        - assignment: two-handed
+    statement: Equip Katanas transfers Samurai strength while Two-Handed doubles a compatible katana's attack multiplier, concentrating two slots on weapon damage
+
+  - id: first-strike-iainuki
+    kind: setup
+    when:
+      sameMember:
+        - innate: first-strike
+        - assignment: iainuki
+    statement: First Strike improves the chance that Iainuki can attempt its group instant kill before ordinary enemies act
+
+  - id: chemist-item-economy
+    kind: setup
+    when:
+      sameMember:
+        - innate: pharmacology
+        - innate: drink
+        - assignment: mix
+    statement: Pharmacology strengthens curative items and healing mixes while Drink and Mix split self-buffing from targeted concoctions within one Chemist
+
+  - id: recover-revive-emergency-kit
+    kind: setup
+    when:
+      sameMember:
+        - assignment: recover
+        - assignment: revive
+    statement: Recover and Revive form a zero-MP party emergency kit for widespread status ailments and knockouts, but consume two command slots
+
+  - id: flirt-control-overlap
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: flirt
+        - assignment: control
+    statement: Flirt and Control both deny susceptible enemies their normal turns, making this two-slot pairing narrow and heavily dependent on enemy immunity
+
+  - id: dancer-gear-dance
+    kind: setup
+    when:
+      sameMember:
+        - assignment: dance
+        - assignment: equip-ribbons
+    statement: Equip Ribbons opens Dancer-exclusive gear that replaces Tempting Tango with another Sword Dance chance, making the random Dance command more damage-focused
+
+  - id: freelancer-equip-lance-redundancy
+    kind: tradeoff
+    when:
+      sameMember:
+        - job: freelancer
+        - assignment: equip-lances
+    statement: Freelancer already equips lances, so assigning Equip Lances spends a flexible slot without changing its equipment access
