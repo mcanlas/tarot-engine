@@ -13,7 +13,7 @@ import {
   type FinalFantasyCatalog,
   type PartyConditionDefinition,
   type SpellDefinition,
-} from "./final-fantasy-strategy-core.ts"
+} from "./strategy-core.ts"
 
 export type YamlTextLoader = (path: string) => Promise<string>
 

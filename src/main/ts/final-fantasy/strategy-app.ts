@@ -1,7 +1,7 @@
 import {
   FinalFantasyPartyStrategyEngine,
   type PartyObservation,
-} from "./final-fantasy-party-strategy-core.ts"
+} from "./party-strategy-core.ts"
 import {
   buildFinalFantasyStrategyEngine,
   createParty,
@@ -9,8 +9,8 @@ import {
   type FinalFantasyStrategyEngine,
   type GuideSectionId,
   type Party,
-} from "./final-fantasy-strategy-core.ts"
-import { decodeStrategyPayload } from "./final-fantasy-strategy-json.ts"
+} from "./strategy-core.ts"
+import { decodeStrategyPayload } from "./strategy-json.ts"
 
 const sectionLabels: Readonly<Record<GuideSectionId, string>> = {
   opening: "Opening",

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises"
 
 import {
   loadFinalFantasyPartyStrategyEngine,
-} from "./final-fantasy-party-strategy.ts"
+} from "./party-strategy.ts"
 
 const loadProjectFile = (path) =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")

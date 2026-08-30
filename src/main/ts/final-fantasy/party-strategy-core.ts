@@ -2,7 +2,7 @@ import type {
   CapabilityId,
   FinalFantasyCatalog,
   Job,
-} from "./final-fantasy-strategy-core.ts"
+} from "./strategy-core.ts"
 
 export type PartyObservationKind = "strength" | "weakness"
 

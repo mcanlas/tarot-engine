@@ -6,11 +6,11 @@ import {
   type FinalFantasyStrategyDefinitions,
   type PartyConditionDefinition,
   type SpellDefinition,
-} from "./final-fantasy-strategy-core.ts"
+} from "./strategy-core.ts"
 import type {
   PartyStrategyConditionDefinition,
   PartyStrategyRuleDefinition,
-} from "./final-fantasy-party-strategy-core.ts"
+} from "./party-strategy-core.ts"
 
 export interface FinalFantasyStrategyPayload {
   definitions: FinalFantasyStrategyDefinitions

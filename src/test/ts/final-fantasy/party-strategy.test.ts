@@ -6,7 +6,7 @@ import {
   loadFinalFantasyPartyStrategyEngine,
   partyStrategyYamlFile,
   runConsole,
-} from "./final-fantasy-party-strategy.ts"
+} from "./party-strategy.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
