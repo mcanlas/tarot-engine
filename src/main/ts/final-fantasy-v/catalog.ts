@@ -1,5 +1,6 @@
 export const finalFantasyVStrategyYamlFiles = Object.freeze({
   jobs: "data/final-fantasy-v-jobs.yaml",
+  partyStrategy: "data/final-fantasy-v-party-strategy.yaml",
 })
 
 export type FinalFantasyVCrystalId = "none" | "wind" | "water" | "fire" | "earth"

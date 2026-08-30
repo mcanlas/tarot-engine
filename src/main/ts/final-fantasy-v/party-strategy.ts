@@ -1,4 +1,7 @@
-import type { FinalFantasyVStrategyCatalog } from "./catalog.ts"
+import type {
+  FinalFantasyVAbilityType,
+  FinalFantasyVStrategyCatalog,
+} from "./catalog.ts"
 import type { FinalFantasyVLegalLoadout, FinalFantasyVResolvedAbility } from "./loadouts.ts"
 
 export const finalFantasyVCharacterIds = ["bartz", "lenna", "galuf", "faris", "krile"] as const
@@ -31,6 +34,7 @@ export type FinalFantasyVMemberSelectorDefinition =
   | { readonly job: string }
   | { readonly assignment: string; readonly atLeastRank?: number }
   | { readonly innate: string; readonly atLeastRank?: number }
+  | { readonly assignmentType: FinalFantasyVAbilityType }
 
 export type FinalFantasyVPartyStrategyConditionDefinition =
   | { readonly sameMember: readonly FinalFantasyVMemberSelectorDefinition[] }
@@ -54,39 +58,6 @@ interface CompiledRule {
 
 type MemberSelector = (member: FinalFantasyVPartyMember) => boolean
 
-export const finalFantasyVWindPartyStrategyRules: readonly FinalFantasyVPartyStrategyRuleDefinition[] = [
-  {
-    id: "white-mage-black-magic-flex",
-    kind: "tradeoff",
-    when: { sameMember: [{ innate: "white-magic" }, { assignment: "black-magic" }] },
-    statement: "A White Mage carrying Black Magic can pivot between recovery and elemental offense, but both menus compete for the same turns and MP.",
-  },
-  {
-    id: "black-mage-white-magic-flex",
-    kind: "tradeoff",
-    when: { sameMember: [{ innate: "black-magic" }, { assignment: "white-magic" }] },
-    statement: "A Black Mage carrying White Magic gains an emergency recovery branch, but every healing turn pauses that character's strongest offensive role.",
-  },
-  {
-    id: "barehanded-white-magic-sustain",
-    kind: "setup",
-    when: { sameMember: [{ innate: "barehanded" }, { assignment: "white-magic" }] },
-    statement: "A character with innate Barehanded carrying White Magic adds recovery without giving up weapon-independent physical pressure on turns when no healing is needed.",
-  },
-  {
-    id: "dedicated-white-and-black-actions",
-    kind: "setup",
-    when: { distinctMembers: [{ job: "white-mage" }, { job: "black-mage" }] },
-    statement: "Separate White and Black Mages can recover and attack in the same round instead of making one hybrid choose between those jobs.",
-  },
-  {
-    id: "knight-shelters-white-mage",
-    kind: "tradeoff",
-    when: { distinctMembers: [{ job: "knight" }, { job: "white-mage" }] },
-    statement: "Cover can keep a low-HP White Mage standing, but the Knight takes the redirected pressure and may need the recovery being protected.",
-  },
-]
-
 export class FinalFantasyVPartyStrategyEngine {
   readonly ruleIds: readonly string[]
   readonly #rules: readonly CompiledRule[]
@@ -96,7 +67,7 @@ export class FinalFantasyVPartyStrategyEngine {
     definitions: readonly FinalFantasyVPartyStrategyRuleDefinition[],
   ) {
     rejectDuplicateRuleIds(definitions)
-    this.#rules = definitions.map((definition) => compileRule(definition, catalog))
+    this.#rules = definitions.map((rule) => compileRule(rule, catalog))
     this.ruleIds = this.#rules.map((rule) => rule.id)
   }
 
@@ -173,20 +144,18 @@ function compileSelector(
     if (job === undefined) {
       throw new Error(`Unknown Final Fantasy V strategy job: ${definition.job}`)
     }
-    if (job.crystal !== "wind") {
-      throw new Error(`Initial Final Fantasy V strategy rules only support Wind jobs: ${job.id}`)
-    }
-
     return (member) => member.loadout.jobId === job.id
+  }
+
+  if ("assignmentType" in definition) {
+    return (member) => member.loadout.assignments.some((resolved) =>
+      catalog.abilities.get(resolved.abilityId)?.type === definition.assignmentType)
   }
 
   const abilityId = "assignment" in definition ? definition.assignment : definition.innate
   const ability = catalog.abilities.get(abilityId)
   if (ability === undefined) {
     throw new Error(`Unknown Final Fantasy V strategy ability: ${abilityId}`)
-  }
-  if (catalog.jobs.get(ability.jobId)?.crystal !== "wind") {
-    throw new Error(`Initial Final Fantasy V strategy rules only support Wind abilities: ${ability.id}`)
   }
   const atLeastRank = requireRank(definition.atLeastRank, ability.id)
   const source = "assignment" in definition ? "assignments" : "innateAbilities"

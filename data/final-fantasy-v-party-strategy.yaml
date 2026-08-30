@@ -1,0 +1,382 @@
+rules:
+  - id: white-mage-black-magic-flex
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: white-magic
+        - assignment: black-magic
+    statement: A White Mage carrying Black Magic can pivot between recovery and elemental offense, but both menus compete for the same turns and MP
+
+  - id: black-mage-white-magic-flex
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: black-magic
+        - assignment: white-magic
+    statement: A Black Mage carrying White Magic gains an emergency recovery branch, but every healing turn pauses that character's strongest offensive role
+
+  - id: barehanded-white-magic-sustain
+    kind: setup
+    when:
+      sameMember:
+        - innate: barehanded
+        - assignment: white-magic
+    statement: A character with innate Barehanded carrying White Magic adds recovery without giving up weapon-independent physical pressure on turns when no healing is needed
+
+  - id: dedicated-white-and-black-actions
+    kind: setup
+    when:
+      distinctMembers:
+        - job: white-mage
+        - job: black-mage
+    statement: Separate White and Black Mages can recover and attack in the same round instead of making one hybrid choose between those jobs
+
+  - id: knight-shelters-white-mage
+    kind: tradeoff
+    when:
+      distinctMembers:
+        - job: knight
+        - job: white-mage
+    statement: Cover can keep a low-HP White Mage standing, but the Knight takes the redirected pressure and may need the recovery being protected
+
+  - id: berserker-active-command-lockout
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: berserk
+        - assignmentType: active
+    statement: Berserk removes command selection, so an active command in the Berserker's only ability slot cannot be chosen in battle
+
+  - id: berserker-counter-pressure
+    kind: setup
+    when:
+      sameMember:
+        - innate: berserk
+        - assignment: counter
+    statement: Counter adds reactive attacks without asking an uncontrollable Berserker to select another command
+
+  - id: two-handed-axe-commitment
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: equip-axes
+        - assignment: two-handed
+    statement: Equip Axes and Two-Handed commit two slots to heavier physical attacks, concentrating the setup around an axe's naturally variable damage
+
+  - id: magic-shell-recovery-window
+    kind: setup
+    when:
+      sameMember:
+        - innate: magic-shell
+        - assignment: white-magic
+    statement: Magic Shell automatically hardens a critical Mystic Knight against magic, creating a better window for that same character to recover with White Magic
+
+  - id: two-handed-spellblade
+    kind: setup
+    when:
+      sameMember:
+        - innate: spellblade
+        - assignment: two-handed
+    statement: Two-Handed magnifies the weapon attack carrying Spellblade's element or status, trading shield access for a stronger enchanted strike
+
+  - id: time-magic-drives-berserker
+    kind: setup
+    when:
+      distinctMembers:
+        - innate: time-magic
+          atLeastRank: 2
+        - innate: berserk
+    statement: A Time Mage can Haste the Berserker, converting support turns into more frequent automatic physical attacks
+
+  - id: quick-summon-chain
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: time-magic
+          atLeastRank: 6
+        - assignment: summon
+          atLeastRank: 5
+    statement: Quick can open two consecutive Summon actions for one character, producing exceptional burst at an exceptional MP cost
+
+  - id: rod-backed-black-magic
+    kind: setup
+    when:
+      sameMember:
+        - assignment: equip-rods
+        - assignment: black-magic
+    statement: Equip Rods lets a Black Magic user carry an elemental rod that amplifies matching spells, though the pairing consumes two ability slots
+
+  - id: summon-call-fallback
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: summon
+        - assignment: call
+    statement: Call gives a Summoner a zero-MP fallback, exchanging deliberate summon selection for a random result
+
+  - id: red-mage-dualcast
+    kind: setup
+    when:
+      sameMember:
+        - innate: red-magic
+        - assignment: dualcast
+    statement: Dualcast replaces the Red Mage's single Red Magic action with two level-three White or Black spells, rewarding its extreme ABP cost with turn efficiency
+
+  - id: dualcast-summon-library
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: dualcast
+        - assignment: summon
+    statement: Equipping Summon beside Dualcast extends Dualcast beyond its built-in Red Magic list and permits two summons in one turn, with the MP demand doubled as well
+
+  - id: mime-restores-standard-actions
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: mimic
+        - assignment: attack
+        - assignment: items
+    statement: Giving a Mime both Attack and Items restores the standard commands it omits, but spends two of its three flexible slots before adding another learned command
+
+  - id: mime-summon-relay
+    kind: setup
+    when:
+      distinctMembers:
+        - innate: summon
+        - innate: mimic
+    statement: A Mime acting immediately after a Summoner can repeat the summon without paying its MP cost again, making turn order part of the setup
+
+  - id: cover-guard-fortress
+    kind: setup
+    when:
+      sameMember:
+        - innate: cover
+        - innate: guard
+    statement: Guard can nullify physical attacks while Cover redirects attacks from critical allies, letting one Knight shelter several vulnerable party members for a turn
+
+  - id: armored-black-mage
+    kind: tradeoff
+    when:
+      sameMember:
+        - job: black-mage
+        - assignment: equip-armor
+    statement: Equip Armor makes a Black Mage less fragile against physical pressure, but spends the only ability slot on durability instead of another command
+
+  - id: shielded-white-mage
+    kind: tradeoff
+    when:
+      sameMember:
+        - job: white-mage
+        - assignment: equip-shields
+    statement: Equip Shields raises a White Mage's physical protection, but dedicates its only ability slot to equipment access
+
+  - id: sword-trained-blue-mage
+    kind: setup
+    when:
+      sameMember:
+        - job: blue-mage
+        - assignment: equip-swords
+    statement: Equip Swords gives a Blue Mage Knight-level strength and a stronger physical fallback without replacing its innate Blue Magic command
+
+  - id: kick-focus-targeting
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: kick
+        - assignment: focus
+    statement: Kick supplies immediate group pressure while Focus trades one turn for a stronger single-target attack, giving the Monk two different physical tempos
+
+  - id: barehanded-chakra-sustain
+    kind: setup
+    when:
+      sameMember:
+        - innate: barehanded
+        - assignment: chakra
+    statement: Barehanded preserves weapon-independent offense while Chakra provides self-healing and clears poison or darkness without consuming items
+
+  - id: stacked-hp-mime
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: hp-plus-10-percent
+        - assignment: hp-plus-20-percent
+        - assignment: hp-plus-30-percent
+    statement: Stacking all three HP bonuses creates an extreme health pool, but consumes every flexible Mime slot without adding a selectable command
+
+  - id: hidden-route-specialist
+    kind: setup
+    when:
+      sameMember:
+        - innate: find-pits
+        - assignment: find-passages
+    statement: Find Pits and Find Passages combine trap detection with hidden-route visibility on one exploration specialist
+
+  - id: hazard-runner
+    kind: setup
+    when:
+      sameMember:
+        - innate: light-step
+        - assignment: sprint
+    statement: Light Step removes damaging-floor attrition while Sprint shortens traversal, concentrating two dungeon conveniences on one member
+
+  - id: initiative-control
+    kind: setup
+    when:
+      sameMember:
+        - innate: first-strike
+        - assignment: vigilance
+    statement: First Strike raises the chance of acting before enemies while Vigilance removes back attacks, improving both favorable and unfavorable battle openings
+
+  - id: fast-mug
+    kind: setup
+    when:
+      sameMember:
+        - innate: artful-dodger
+        - assignment: mug
+    statement: Artful Dodger's Thief-level agility helps a Mug user attempt its attack-and-steal action earlier and more often
+
+  - id: steal-mug-overlap
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: steal
+        - assignment: mug
+    statement: Mug adds weapon damage to a steal attempt, but overlaps the innate Steal command instead of broadening the character's options
+
+  - id: duplicate-escape-commands
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: flee
+        - assignment: smoke
+    statement: Flee and Smoke both guarantee escape from escapable battles, so carrying both spends a second slot without adding another exit option
+
+  - id: check-scan-overlap
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: check
+        - assignment: scan
+    statement: Scan already includes the information exposed by Check, making the two-command pairing redundant
+
+  - id: control-enables-learning
+    kind: setup
+    when:
+      distinctMembers:
+        - innate: learning
+        - assignment: control
+    statement: Control can force an enemy to use a learnable technique on the member with Learning, turning Blue Magic acquisition into a deliberate party setup
+
+  - id: blue-magic-dualcast-incompatibility
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: blue-magic
+        - assignment: dualcast
+    statement: Dualcast cannot repeat Blue Magic, so these two commands provide separate menus without the expected double-cast synergy
+
+  - id: mp-only-mime
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: mp-plus-10-percent
+        - assignment: mp-plus-30-percent
+    statement: Layering both MP bonuses expands the resource pool, but spends two Mime slots without supplying a spell command that can use it
+
+  - id: calm-control-overlap
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: calm
+        - assignment: control
+    statement: Calm and Control both manage susceptible creatures, so equipping both emphasizes monster control at the cost of broader commands
+
+  - id: whip-control-specialist
+    kind: setup
+    when:
+      sameMember:
+        - assignment: equip-whips
+        - assignment: control
+    statement: Equip Whips transfers Beastmaster strength and agility alongside Control, forming a physical monster-handler at the cost of two slots
+
+  - id: controlled-capture
+    kind: setup
+    when:
+      sameMember:
+        - innate: catch-release
+        - assignment: control
+    statement: Control can hold a capturable monster in place while nonphysical damage lowers it into Catch range for a later Release
+
+  - id: gaia-summon-flexibility
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: gaia
+        - assignment: summon
+    statement: Gaia offers free terrain-dependent effects while Summon supplies deliberate magic at an MP cost, trading predictability against resource use
+
+  - id: image-cover-interception
+    kind: setup
+    when:
+      sameMember:
+        - innate: cover
+        - assignment: image
+    statement: Image lets a covering Knight evade the first two physical attacks it intercepts instead of merely absorbing them
+
+  - id: throw-two-handed-mismatch
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: throw
+        - assignment: two-handed
+    statement: Two-Handed amplifies compatible equipped weapons but does not improve Throw, which consumes a selected inventory weapon instead
+
+  - id: dual-wield-spellblade-rapid-fire
+    kind: setup
+    when:
+      sameMember:
+        - innate: dual-wield
+        - assignment: spellblade
+        - assignment: rapid-fire
+    statement: Dual-Wield, Spellblade, and Rapid Fire combine two enchanted weapons with up to eight defense-ignoring attacks for a concentrated physical setup
+
+  - id: hidden-singer
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: sing
+        - assignment: hide-reveal
+    statement: Hide makes a Bard untargetable but unable to continue singing until Reveal, exchanging song uptime for temporary safety
+
+  - id: harp-summoner
+    kind: setup
+    when:
+      sameMember:
+        - assignment: equip-harps
+        - assignment: summon
+    statement: Equip Harps transfers Bard agility and magic to a Summon user, though the supporting equipment access consumes a second slot
+
+  - id: random-command-overlap
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: animals
+        - assignment: call
+    statement: Animals and Call both produce random effects, giving up two slots without adding a dependable selectable action
+
+  - id: aim-rapid-fire-overlap
+    kind: tradeoff
+    when:
+      sameMember:
+        - innate: aim
+        - assignment: rapid-fire
+    statement: Rapid Fire already cannot miss, so it bypasses the accuracy niche supplied by the Ranger's innate Aim command
+
+  - id: bow-two-handed-incompatibility
+    kind: tradeoff
+    when:
+      sameMember:
+        - assignment: equip-bows
+        - assignment: two-handed
+    statement: Bows already require two hands and receive no benefit from Two-Handed, making this two-slot weapon pairing internally incompatible

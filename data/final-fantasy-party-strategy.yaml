@@ -5,20 +5,20 @@ rules:
     when:
       not:
         sizeAtLeast: 2
-    statement: A solo party concentrates its equipment, consumables, and tactical plan on one character.
+    statement: A solo party concentrates its equipment, consumables, and tactical plan on one character
 
   - id: full-roster
     kind: strength
     when:
       sizeAtLeast: 4
-    statement: Four members provide the most actions and the most room for complementary roles.
+    statement: Four members provide the most actions and the most room for complementary roles
 
   - id: solo-fragility
     kind: weakness
     when:
       not:
         sizeAtLeast: 2
-    statement: A solo party has no backup action when its only member is disabled or defeated.
+    statement: A solo party has no backup action when its only member is disabled or defeated
 
   # Capability counts and interactions
   - id: physical-core
@@ -26,33 +26,33 @@ rules:
     when:
       capability: physical-damage
       atLeast: 2
-    statement: Multiple physical attackers provide dependable damage without consuming spell resources.
+    statement: Multiple physical attackers provide dependable damage without consuming spell resources
 
   - id: recovery
     kind: strength
     when:
       capability: healing
-    statement: Access to healing makes the party resilient across long stretches of exploration.
+    statement: Access to healing makes the party resilient across long stretches of exploration
 
   - id: recovery-redundancy
     kind: strength
     when:
       capability: healing
       atLeast: 2
-    statement: Multiple potential healers provide recovery redundancy and flexible turn allocation.
+    statement: Multiple potential healers provide recovery redundancy and flexible turn allocation
 
   - id: magical-offense
     kind: strength
     when:
       capability: offensive-magic
-    statement: Offensive magic gives the party an alternative to conventional weapon damage.
+    statement: Offensive magic gives the party an alternative to conventional weapon damage
 
   - id: magical-depth
     kind: strength
     when:
       capability: offensive-magic
       atLeast: 2
-    statement: Multiple offensive casters provide deeper magical reserves across repeated encounters.
+    statement: Multiple offensive casters provide deeper magical reserves across repeated encounters
 
   - id: mixed-offense
     kind: strength
@@ -60,14 +60,14 @@ rules:
       all:
         - capability: physical-damage
         - capability: offensive-magic
-    statement: Physical and magical offense give the party answers to different enemy defenses.
+    statement: Physical and magical offense give the party answers to different enemy defenses
 
   - id: no-physical-offense
     kind: weakness
     when:
       not:
         capability: physical-damage
-    statement: Without a conventional physical attacker, routine damage leans heavily on spell resources.
+    statement: Without a conventional physical attacker, routine damage leans heavily on spell resources
 
   - id: single-physical-attacker
     kind: weakness
@@ -78,14 +78,14 @@ rules:
         - not:
             capability: physical-damage
             atLeast: 2
-    statement: Physical pressure depends on one member remaining effective.
+    statement: Physical pressure depends on one member remaining effective
 
   - id: no-recovery
     kind: weakness
     when:
       not:
         capability: healing
-    statement: Without a conventional healer, attrition and recovery items are persistent concerns.
+    statement: Without a conventional healer, attrition and recovery items are persistent concerns
 
   - id: single-healer
     kind: weakness
@@ -96,7 +96,7 @@ rules:
         - not:
             capability: healing
             atLeast: 2
-    statement: Recovery depends on one member remaining able to act.
+    statement: Recovery depends on one member remaining able to act
 
   - id: unsupported-physical-core
     kind: weakness
@@ -107,7 +107,7 @@ rules:
           atLeast: 2
         - not:
             capability: healing
-    statement: A physical core without recovery support must end difficult stretches before attrition takes over.
+    statement: A physical core without recovery support must end difficult stretches before attrition takes over
 
   - id: no-front-line-specialist
     kind: weakness
@@ -116,36 +116,36 @@ rules:
         - sizeAtLeast: 2
         - not:
             job: warrior
-    statement: No durable front-line specialist means fragile members will take more pressure.
+    statement: No durable front-line specialist means fragile members will take more pressure
 
   - id: no-magical-offense
     kind: weakness
     when:
       not:
         capability: offensive-magic
-    statement: The party has few conventional answers when physical damage is ineffective.
+    statement: The party has few conventional answers when physical damage is ineffective
 
   # Diversity and specialization tradeoffs
   - id: diverse-roster
     kind: strength
     when:
       distinctJobsAtLeast: 3
-    statement: Three or more distinct classes broaden the party's equipment access and tactical options.
+    statement: Three or more distinct classes broaden the party's equipment access and tactical options
 
   - id: diverse-investment
     kind: weakness
     when:
       distinctJobsAtLeast: 3
-    statement: A broad roster spreads equipment and spell purchases across several competing priorities.
+    statement: A broad roster spreads equipment and spell purchases across several competing priorities
 
   - id: repeated-specialty
     kind: strength
     when:
       repeatedJobAtLeast: 2
-    statement: Repeated classes create a clear specialty and interchangeable members for that role.
+    statement: Repeated classes create a clear specialty and interchangeable members for that role
 
   - id: repeated-role-overlap
     kind: weakness
     when:
       repeatedJobAtLeast: 2
-    statement: Repeated classes also duplicate blind spots and reduce the breadth gained from another role.
+    statement: Repeated classes also duplicate blind spots and reduce the breadth gained from another role
