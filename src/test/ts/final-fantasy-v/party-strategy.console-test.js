@@ -3,16 +3,20 @@ import { readFile } from "node:fs/promises"
 import { parse } from "yaml"
 
 import {
+  buildFinalFantasyVBossCatalog,
   buildFinalFantasyVStrategyCatalog,
+  createRandomFinalFantasyVParty,
+  createRandomFinalFantasyVStoryParty,
+  decodeFinalFantasyVBosses,
+  decodeFinalFantasyVBossStrategy,
   decodeFinalFantasyVJobs,
   decodeFinalFantasyVPartyStrategy,
+  FinalFantasyVBossStrategyEngine,
   FinalFantasyVPartyStrategyEngine,
-  finalFantasyVSlotCount,
+  finalFantasyVStoryAvailability,
   finalFantasyVStrategyYamlFiles,
   validateFinalFantasyVLoadout,
 } from "../../../main/ts/final-fantasy-v/index.ts"
-
-const characterSlots = ["bartz", "lenna", "faris", "galuf-or-krile"]
 
 const [occurrencesText, ...extraArgs] = process.argv.slice(2)
 const occurrences = Number(occurrencesText)
@@ -29,71 +33,87 @@ if (
   const jobsYaml = await readFile(finalFantasyVStrategyYamlFiles.jobs, "utf8")
   const catalog = buildFinalFantasyVStrategyCatalog(decodeFinalFantasyVJobs(parse(jobsYaml)))
   const strategyYaml = await readFile(finalFantasyVStrategyYamlFiles.partyStrategy, "utf8")
-  const rules = decodeFinalFantasyVPartyStrategy(parse(strategyYaml))
-  const engine = new FinalFantasyVPartyStrategyEngine(catalog, rules)
-  const jobIds = [...catalog.jobs.keys()]
-  const abilityIds = [...catalog.abilities.keys()]
-  const learningState = {
-    learnedAbilities: [...catalog.abilities.values()].map((ability) => ability.kind === "flat"
-      ? { kind: "flat", abilityId: ability.id }
-      : { kind: "ranked", abilityId: ability.id, rank: ability.ranks.at(-1).rank }),
-    masteredJobIds: new Set(),
-  }
-  let analyzedCount = 0
+  const partyEngine = new FinalFantasyVPartyStrategyEngine(
+    catalog,
+    decodeFinalFantasyVPartyStrategy(parse(strategyYaml)),
+  )
+  const bossesYaml = await readFile(finalFantasyVStrategyYamlFiles.bosses, "utf8")
+  const bossCatalog = buildFinalFantasyVBossCatalog(decodeFinalFantasyVBosses(parse(bossesYaml)))
+  const bossStrategyYaml = await readFile(finalFantasyVStrategyYamlFiles.bossStrategy, "utf8")
+  const bossEngine = new FinalFantasyVBossStrategyEngine(
+    catalog,
+    bossCatalog,
+    decodeFinalFantasyVBossStrategy(parse(bossStrategyYaml)),
+  )
+  const allAbilityIds = [...catalog.abilities.keys()]
+  const allLearningState = learningStateFor(allAbilityIds)
+  let randomPartyAnalyzed = 0
+  let randomStoryPartyAnalyzed = 0
 
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {
-    const candidate = createRandomPartyCandidate(jobIds, abilityIds)
-
     console.log(`\n=== FFV run ${occurrence + 1} ===`)
-    const strategy = runStrategy(candidate, occurrence + 1)
-    if (strategy === undefined) {
-      continue
+
+    console.log("\nRandom party")
+    const randomParty = createRandomFinalFantasyVParty(catalog)
+    const randomPartyResult = runStrategy(
+      "Random party",
+      randomParty.members,
+      allLearningState,
+      occurrence + 1,
+    )
+    if (randomPartyResult !== undefined) {
+      randomPartyAnalyzed += 1
+      printResult(randomParty.members, randomPartyResult)
     }
 
-    analyzedCount += 1
-    console.log(`Party: ${formatCandidate(candidate)}`)
-    console.log("Strategy:")
-    console.log(strategy.observations.length === 0
-      ? "- No interactions identified by the current rules."
-      : strategy.observations.map((observation) => {
-        const kind = observation.kind === "setup" ? "Setup" : "Tradeoff"
-        const members = observation.memberIds.join(", ")
-
-        return `- ${kind} (${members}): ${observation.statement}`
-      }).join("\n"))
+    console.log("\nRandom story party")
+    const randomStoryParty = createRandomFinalFantasyVStoryParty(catalog, bossCatalog)
+    const availability = finalFantasyVStoryAvailability(catalog, randomStoryParty.boss)
+    const storyLearningState = learningStateFor(availability.abilityIds)
+    const randomStoryPartyResult = runStrategy(
+      "Random story party",
+      randomStoryParty.members,
+      storyLearningState,
+      occurrence + 1,
+      randomStoryParty.boss,
+    )
+    if (randomStoryPartyResult !== undefined) {
+      randomStoryPartyAnalyzed += 1
+      printResult(
+        randomStoryParty.members,
+        randomStoryPartyResult,
+        randomStoryParty.boss,
+      )
+    }
   }
 
-  console.log(`\nCompleted ${occurrences} random FFV candidates: ${analyzedCount} analyzed, ${occurrences - analyzedCount} invalid.`)
+  console.log([
+    `\nCompleted ${occurrences} FFV runs with 2 parts each.`,
+    `Random party: ${randomPartyAnalyzed} analyzed, ${occurrences - randomPartyAnalyzed} invalid.`,
+    `Random story party: ${randomStoryPartyAnalyzed} analyzed, ${occurrences - randomStoryPartyAnalyzed} invalid.`,
+  ].join("\n"))
 
-  // This generator chooses from four narrative character slots, resolving the shared Galuf/Krile
-  // slot with a final coin flip. It deliberately knows nothing about valid loadout rules, so excess
-  // slots, repeated abilities, and other illegal combinations remain expected random output and are
-  // validated only at the strategy boundary below.
-  function createRandomPartyCandidate(availableJobIds, availableAbilityIds) {
-    const partySize = randomIndex(4) + 1
-    const selectedCharacterSlots = sampleWithoutReplacement(characterSlots, partySize)
+  function learningStateFor(abilityIds) {
+    return {
+      learnedAbilities: abilityIds.map((abilityId) => {
+        const ability = catalog.abilities.get(abilityId)
+        if (ability === undefined) {
+          throw new Error(`Unknown generated Final Fantasy V ability: ${abilityId}`)
+        }
 
-    return selectedCharacterSlots.map((characterSlot) => {
-      const jobId = randomItem(availableJobIds)
-
-      return {
-        characterId: characterSlot === "galuf-or-krile"
-          ? randomItem(["galuf", "krile"])
-          : characterSlot,
-        jobId,
-        assignmentIds: Array.from(
-          { length: randomIndex(finalFantasyVSlotCount(jobId) + 1) },
-          () => randomItem(availableAbilityIds),
-        ),
-      }
-    })
+        return ability.kind === "flat"
+          ? { kind: "flat", abilityId: ability.id }
+          : { kind: "ranked", abilityId: ability.id, rank: ability.ranks.at(-1).rank }
+      }),
+      masteredJobIds: new Set(),
+    }
   }
 
-  function runStrategy(candidate, occurrence) {
+  function runStrategy(label, candidate, learningState, occurrence, boss) {
     const members = []
 
-    // Random candidates may be invalid. Validate loadouts here because the strategy engine accepts
-    // only branded legal loadouts; log invalid outcomes and return without strategy output.
+    // Both random generators deliberately allow nonsensical ability assignments. Validate those
+    // candidates here so the legal-loadout boundary remains part of the stress test.
     for (const candidateMember of candidate) {
       const validation = validateFinalFantasyVLoadout(
         {
@@ -105,6 +125,7 @@ if (
       )
       if (validation.kind === "invalid") {
         logInvalid(
+          label,
           occurrence,
           candidate,
           validation.errors.map(({ kind }) => kind),
@@ -116,44 +137,53 @@ if (
     }
 
     try {
-      // Party-level validity (unique characters and the Galuf/Krile timeline) is asserted here.
-      return engine.analyze(members)
+      return {
+        partyStrategy: partyEngine.analyze(members),
+        bossStrategy: boss !== undefined && bossEngine.hasProfile(boss.key)
+          ? bossEngine.evaluate(boss.key, members)
+          : undefined,
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       const reason = message.startsWith("Duplicate Final Fantasy V party member")
         ? "duplicate-party-member"
         : message.startsWith("Galuf and Krile") ? "galuf-krile-overlap" : message
-      logInvalid(occurrence, candidate, [reason])
+      logInvalid(label, occurrence, candidate, [reason])
 
       return undefined
     }
   }
 
-  function logInvalid(occurrence, candidate, reasons) {
+  function printResult(candidate, result, boss) {
+    if (boss !== undefined) {
+      console.log(`Boss: ${boss.name} (${boss.jobsUnlocked})`)
+    }
+    console.log(`Party: ${formatCandidate(candidate)}`)
+    console.log("Party strategy:")
+    console.log(result.partyStrategy.observations.length === 0
+      ? "- No interactions identified by the current rules."
+      : result.partyStrategy.observations.map((observation) => {
+        const kind = observation.kind === "setup" ? "Setup" : "Tradeoff"
+        const members = observation.memberIds.join(", ")
+
+        return `- ${kind} (${members}): ${observation.statement}`
+      }).join("\n"))
+
+    if (boss !== undefined && result.bossStrategy === undefined) {
+      console.log("Boss strategy: No encoded profile for this encounter.")
+    } else if (result.bossStrategy !== undefined) {
+      const score = result.bossStrategy.score
+      console.log(`Boss score: tempo ${score.tempo}, safety ${score.safety}, reliability ${score.reliability}`)
+      console.log(result.bossStrategy.matchedRules.length === 0
+        ? "- No boss rules matched."
+        : result.bossStrategy.matchedRules.map((rule) => `- ${rule.statement}`).join("\n"))
+    }
+  }
+
+  function logInvalid(label, occurrence, candidate, reasons) {
     const uniqueReasons = [...new Set(reasons)]
-    console.log(`Skipped invalid candidate ${occurrence}: ${formatCandidate(candidate)}; ${uniqueReasons.join(", ")}`)
+    console.log(`Skipped invalid ${label} ${occurrence}: ${formatCandidate(candidate)}; ${uniqueReasons.join(", ")}`)
   }
-}
-
-function randomIndex(length) {
-  return Math.floor(Math.random() * length)
-}
-
-function randomItem(values) {
-  return values[randomIndex(values.length)]
-}
-
-function sampleWithoutReplacement(values, count) {
-  const shuffled = [...values]
-
-  for (let index = 0; index < count; index += 1) {
-    const swapIndex = index + randomIndex(shuffled.length - index)
-    const selected = shuffled[index]
-    shuffled[index] = shuffled[swapIndex]
-    shuffled[swapIndex] = selected
-  }
-
-  return shuffled.slice(0, count)
 }
 
 function formatCandidate(candidate) {

@@ -77,6 +77,10 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
 
     expect(html.contains("<h1>Party strategy, built around your lineup</h1>")) &&
     expect(html.split("data-party-slot").length == 5) &&
+    expect(html.contains("Slot 1 is front")) &&
+    expect(html.contains("Front member")) &&
+    expect(html.contains("29 party rules")) &&
+    expect(html.contains("69 boss rules")) &&
     expect(html.contains("data-party-strengths")) &&
     expect(html.contains("data-party-weaknesses")) &&
     expect(html.contains("data-boss-select")) &&

@@ -190,7 +190,7 @@
 
 - key: berserker
   name: Berserker
-  crystal: water
+  crystal: water-1
   innates:
     - berserk
   abilities:
@@ -199,7 +199,7 @@
 
 - key: mystic-knight
   name: Mystic Knight
-  crystal: water
+  crystal: water-1
   innates:
     - magic-shell
     - spellblade
@@ -219,7 +219,7 @@
 
 - key: time-mage
   name: Time Mage
-  crystal: water
+  crystal: water-1
   innates:
     - time-magic
   abilities:
@@ -238,7 +238,7 @@
 
 - key: summoner
   name: Summoner
-  crystal: water
+  crystal: water-1
   innates:
     - summon
   abilities:
@@ -256,7 +256,7 @@
 
 - key: red-mage
   name: Red Mage
-  crystal: water
+  crystal: water-1
   innates:
     - red-magic
   abilities:
@@ -272,7 +272,7 @@
 
 - key: mime
   name: Mime
-  crystal: water
+  crystal: water-2
   innates:
     - mimic
   abilities:
@@ -282,7 +282,7 @@
 
 - key: beastmaster
   name: Beastmaster
-  crystal: fire
+  crystal: fire-1
   innates:
     - catch-release
   abilities:
@@ -293,7 +293,7 @@
 
 - key: geomancer
   name: Geomancer
-  crystal: fire
+  crystal: fire-1
   innates:
     - gaia
     - find-pits
@@ -305,7 +305,7 @@
 
 - key: ninja
   name: Ninja
-  crystal: fire
+  crystal: fire-1
   innates:
     - first-strike
     - throw
@@ -319,7 +319,7 @@
 
 - key: bard
   name: Bard
-  crystal: fire
+  crystal: fire-2
   innates:
     - sing
   abilities:
@@ -329,7 +329,7 @@
 
 - key: ranger
   name: Ranger
-  crystal: fire
+  crystal: fire-2
   innates:
     - aim
   abilities:

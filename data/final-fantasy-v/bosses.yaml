@@ -1,0 +1,66 @@
+scope:
+  startsAfterEncounter: wing-raptor
+  optionalEncounters: listed-separately
+  progressionTiming: before-encounter
+
+encounters:
+  - ordinal: 1
+    key: karlabos
+    name: Karlabos
+    jobsUnlocked: wind
+
+  - ordinal: 2
+    key: siren
+    name: Siren
+    jobsUnlocked: wind
+
+  - ordinal: 3
+    key: magissa-and-forza
+    name: Magissa and Forza
+    jobsUnlocked: wind
+
+  - ordinal: 4
+    key: garula
+    name: Garula
+    jobsUnlocked: wind
+
+  - ordinal: 5
+    key: liquid-flame
+    name: Liquid Flame
+    jobsUnlocked: water-1
+
+  - ordinal: 6
+    key: iron-claw
+    name: Iron Claw
+    jobsUnlocked: water-1
+
+  - ordinal: 7
+    key: ifrit
+    name: Ifrit
+    jobsUnlocked: fire-1
+
+  - ordinal: 8
+    key: byblos
+    name: Byblos
+    jobsUnlocked: fire-1
+
+  - ordinal: 9
+    key: sandworm
+    name: Sandworm
+    jobsUnlocked: fire-2
+
+  - ordinal: 10
+    key: cray-claw
+    name: Cray Claw
+    jobsUnlocked: fire-2
+
+optionalEncounters:
+  - key: shiva-and-ice-commanders
+    name: Shiva and Ice Commanders
+    earliestAfterEncounter: magissa-and-forza
+    jobsUnlocked: wind
+
+  - key: ramuh
+    name: Ramuh
+    earliestAfterEncounter: cray-claw
+    jobsUnlocked: fire-2

@@ -1,9 +1,40 @@
 export const finalFantasyVStrategyYamlFiles = Object.freeze({
+  bossStrategy: "data/final-fantasy-v/boss-strategy.yaml",
+  bosses: "data/final-fantasy-v/bosses.yaml",
   jobs: "data/final-fantasy-v-jobs.yaml",
   partyStrategy: "data/final-fantasy-v-party-strategy.yaml",
 })
 
-export type FinalFantasyVCrystalId = "none" | "wind" | "water" | "fire" | "earth"
+export type FinalFantasyVCrystalId =
+  | "none"
+  | "wind"
+  | "water-1"
+  | "fire-1"
+  | "fire-2"
+  | "earth"
+  | "water-2"
+
+export const finalFantasyVCrystalUnlockOrdinal = Object.freeze({
+  none: 0,
+  wind: 1,
+  "water-1": 2,
+  "fire-1": 3,
+  "fire-2": 4,
+  earth: 5,
+  "water-2": 6,
+} satisfies Readonly<Record<FinalFantasyVCrystalId, number>>)
+
+export type FinalFantasyVGalufAvailability = "must" | "can" | "cannot"
+
+export const finalFantasyVGalufAvailabilityByCrystal = Object.freeze({
+  none: "must",
+  wind: "must",
+  "water-1": "must",
+  "fire-1": "must",
+  "fire-2": "must",
+  earth: "can",
+  "water-2": "cannot",
+} satisfies Readonly<Record<FinalFantasyVCrystalId, FinalFantasyVGalufAvailability>>)
 
 export type FinalFantasyVAbilityType = "active" | "passive"
 
@@ -85,7 +116,23 @@ export interface FinalFantasyVStrategyCatalog {
   abilities: ReadonlyMap<string, FinalFantasyVAbility>
 }
 
-const crystals = new Set<FinalFantasyVCrystalId>(["none", "wind", "water", "fire", "earth"])
+export function finalFantasyVJobIsAvailableThroughCrystal(
+  job: FinalFantasyVJob,
+  availableThroughCrystal: FinalFantasyVCrystalId,
+): boolean {
+  return finalFantasyVCrystalUnlockOrdinal[job.crystal]
+    <= finalFantasyVCrystalUnlockOrdinal[availableThroughCrystal]
+}
+
+const crystals = new Set<FinalFantasyVCrystalId>([
+  "none",
+  "wind",
+  "water-1",
+  "fire-1",
+  "fire-2",
+  "earth",
+  "water-2",
+])
 const abilityTypes = new Set<FinalFantasyVAbilityType>(["active", "passive"])
 
 export function buildFinalFantasyVStrategyCatalog(

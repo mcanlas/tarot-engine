@@ -1,0 +1,330 @@
+bosses:
+  - boss: karlabos
+    targetCount: 1
+    vulnerabilities: [lightning]
+    traits: [status-vulnerable]
+    threats:
+      - { source: physical-attack, kind: physical-damage }
+      - { source: tail-screw, kind: hp-collapse }
+      - { source: tentacle, kind: paralysis }
+
+  - boss: siren
+    targetCount: 1
+    vulnerabilities: [fire]
+    traits: [form-shifting, status-vulnerable]
+    threats:
+      - { source: human-form-spells, kind: magical-damage }
+      - { source: undead-form-attacks, kind: physical-damage }
+      - { source: silence, kind: silence }
+      - { source: sleep, kind: sleep }
+      - { source: venomous-clasp, kind: poison }
+
+  - boss: magissa-and-forza
+    targetCount: 2
+    vulnerabilities: []
+    traits: [multiple-targets, reinforcement, status-vulnerable]
+    threats:
+      - { source: magissa-spells, kind: magical-damage }
+      - { source: forza-attacks, kind: physical-damage }
+
+  - boss: garula
+    targetCount: 1
+    vulnerabilities: []
+    traits: [counterattacks, status-vulnerable]
+    threats:
+      - { source: physical-attacks, kind: physical-damage }
+      - { source: rush, kind: sap }
+
+  - boss: liquid-flame
+    targetCount: 1
+    vulnerabilities: [ice]
+    traits: [form-shifting, counterattacks, elemental-absorption, self-healing]
+    threats:
+      - { source: blaze-and-fira, kind: magical-damage }
+      - { source: physical-attacks, kind: physical-damage }
+      - { source: hand-form, kind: paralysis }
+
+  - boss: iron-claw
+    targetCount: 4
+    vulnerabilities: []
+    traits: [form-shifting, multiple-targets, timed-encounter, status-vulnerable]
+    threats:
+      - { source: physical-attacks, kind: physical-damage }
+      - { source: death-claw, kind: hp-collapse }
+      - { source: death-claw, kind: paralysis }
+
+  - boss: ifrit
+    targetCount: 1
+    vulnerabilities: [ice, water]
+    traits: [elemental-absorption, status-vulnerable]
+    threats:
+      - { source: fira-and-blaze, kind: magical-damage }
+      - { source: physical-attacks, kind: physical-damage }
+      - { source: physical-special, kind: paralysis }
+
+  - boss: byblos
+    targetCount: 1
+    vulnerabilities: [fire]
+    traits: [counterattacks, elemental-absorption, self-healing, status-vulnerable]
+    threats:
+      - { source: wind-slash, kind: magical-damage }
+      - { source: magic-hammer, kind: mp-pressure }
+      - { source: discord, kind: level-reduction }
+      - { source: confuse, kind: confusion }
+      - { source: thread, kind: slow }
+
+  - boss: sandworm
+    targetCount: 1
+    vulnerabilities: []
+    traits: [counterattacks, target-decoys]
+    threats:
+      - { source: physical-attacks, kind: physical-damage }
+      - { source: quicksand, kind: sap }
+
+  - boss: cray-claw
+    targetCount: 1
+    vulnerabilities: [lightning]
+    traits: [elemental-absorption, status-vulnerable]
+    threats:
+      - { source: physical-attacks, kind: physical-damage }
+      - { source: tail-screw, kind: hp-collapse }
+      - { source: mucus, kind: slow }
+
+  - boss: shiva-and-ice-commanders
+    targetCount: 4
+    vulnerabilities: [fire]
+    traits: [multiple-targets, elemental-absorption, status-vulnerable]
+    threats:
+      - { source: shiva-ice-magic, kind: magical-damage }
+      - { source: ice-commander-attacks, kind: physical-damage }
+
+  - boss: ramuh
+    targetCount: 1
+    vulnerabilities: []
+    traits: [elemental-absorption, status-vulnerable]
+    threats:
+      - { source: lightning-magic, kind: magical-damage }
+      - { source: physical-attacks, kind: physical-damage }
+      - { source: flash, kind: darkness }
+
+assumptions:
+  - id: available-ranked-spells-owned
+    statement: A ranked magic command is evaluated as though encounter-relevant spells available by this milestone have been acquired
+
+capabilities:
+  - key: fire-offense
+    providers:
+      - { ability: black-magic, atLeastRank: 1 }
+      - { ability: red-magic, atLeastRank: 1 }
+      - { ability: spellblade, atLeastRank: 1 }
+
+  - key: ice-offense
+    providers:
+      - { ability: black-magic, atLeastRank: 1 }
+      - { ability: red-magic, atLeastRank: 1 }
+      - { ability: spellblade, atLeastRank: 1 }
+
+  - key: lightning-offense
+    providers:
+      - { ability: black-magic, atLeastRank: 1 }
+      - { ability: red-magic, atLeastRank: 1 }
+      - { ability: spellblade, atLeastRank: 1 }
+
+  - key: recovery
+    providers:
+      - { ability: white-magic, atLeastRank: 1 }
+      - { ability: red-magic, atLeastRank: 1 }
+
+  - key: physical-mitigation
+    providers:
+      - { ability: guard }
+      - { ability: cover }
+      - { ability: image }
+
+  - key: group-offense
+    providers:
+      - { ability: kick }
+      - { ability: black-magic, atLeastRank: 1 }
+      - { ability: red-magic, atLeastRank: 1 }
+      - { ability: summon, atLeastRank: 1 }
+      - { ability: gaia }
+
+  - key: burst-offense
+    providers:
+      - { ability: focus }
+      - { ability: two-handed }
+      - { ability: black-magic, atLeastRank: 1 }
+      - { ability: red-magic, atLeastRank: 1 }
+      - { ability: spellblade, atLeastRank: 1 }
+
+  - key: measured-offense
+    providers:
+      - { ability: focus }
+      - { ability: two-handed }
+      - { ability: aim }
+
+  - key: uncontrolled-offense
+    providers:
+      - { ability: berserk }
+
+  - key: status-control
+    providers:
+      - { ability: black-magic, atLeastRank: 2 }
+      - { ability: white-magic, atLeastRank: 2 }
+      - { ability: time-magic, atLeastRank: 2 }
+
+  - key: mp-independent-offense
+    providers:
+      - { ability: barehanded }
+      - { ability: focus }
+      - { ability: two-handed }
+      - { ability: dual-wield }
+      - { ability: aim }
+
+rules:
+  - id: exploit-fire-weakness
+    when:
+      boss: { vulnerability: fire }
+      party: { capability: fire-offense, atLeastMembers: 1 }
+    score: { tempo: 2 }
+    statement: Fire offense can exploit an encounter phase's elemental weakness
+
+  - id: exploit-ice-weakness
+    when:
+      boss: { vulnerability: ice }
+      party: { capability: ice-offense, atLeastMembers: 1 }
+    score: { tempo: 2 }
+    statement: Ice offense can exploit the encounter's elemental weakness
+
+  - id: exploit-lightning-weakness
+    when:
+      boss: { vulnerability: lightning }
+      party: { capability: lightning-offense, atLeastMembers: 1 }
+    score: { tempo: 2 }
+    statement: Lightning offense can exploit the encounter's elemental weakness
+
+  - id: concentrated-lightning-offense
+    when:
+      boss: { vulnerability: lightning }
+      party: { capability: lightning-offense, atLeastMembers: 2 }
+    score: { tempo: 1, reliability: 1 }
+    statement: Multiple lightning users preserve fast offense if one attacker loses a turn
+
+  - id: physical-mitigation-answers-attacks
+    when:
+      boss: { threat: physical-damage }
+      party: { capability: physical-mitigation, atLeastMembers: 1 }
+    score: { safety: 1 }
+    statement: Guarding, covering, or images reduce exposure to physical pressure
+
+  - id: recovery-answers-magic-damage
+    when:
+      boss: { threat: magical-damage }
+      party: { capability: recovery, atLeastMembers: 1 }
+    score: { safety: 1 }
+    statement: Recovery magic helps the party sustain repeated magical damage
+
+  - id: recovery-answers-hp-collapse
+    when:
+      boss: { threat: hp-collapse }
+      party: { capability: recovery, atLeastMembers: 1 }
+    score: { safety: 2 }
+    statement: In-command recovery can restore a member immediately after severe HP reduction
+
+  - id: item-only-hp-collapse-response
+    when:
+      boss: { threat: hp-collapse }
+      party: { capability: recovery, atMostMembers: 0 }
+    score: { safety: -1 }
+    statement: Without recovery magic, the party depends on its shared item command after severe HP reduction
+
+  - id: recovery-answers-sap
+    when:
+      boss: { threat: sap }
+      party: { capability: recovery, atLeastMembers: 1 }
+    score: { safety: 1 }
+    statement: Recovery offsets the continuing HP pressure caused by sap
+
+  - id: redundant-recovery-against-paralysis
+    when:
+      boss: { threat: paralysis }
+      party: { capability: recovery, atLeastMembers: 2 }
+    score: { reliability: 2 }
+    statement: A second recovery user keeps healing available when paralysis disables the first
+
+  - id: single-recovery-paralysis-risk
+    when:
+      boss: { threat: paralysis }
+      party: { capability: recovery, atLeastMembers: 1, atMostMembers: 1 }
+    score: { reliability: -1 }
+    statement: A sole recovery user is a single point of failure against paralysis
+
+  - id: group-offense-answers-multiple-targets
+    when:
+      boss: { trait: multiple-targets }
+      party: { capability: group-offense, atLeastMembers: 1 }
+    score: { tempo: 1 }
+    statement: Group offense can clear accompanying enemies without spending one action per target
+
+  - id: burst-offense-contains-reinforcement
+    when:
+      boss: { trait: reinforcement }
+      party: { capability: burst-offense, atLeastMembers: 1 }
+    score: { tempo: 1, reliability: 1 }
+    statement: Burst damage can shorten or skip the reinforcement phase
+
+  - id: burst-offense-beats-the-clock
+    when:
+      boss: { trait: timed-encounter }
+      party: { capability: burst-offense, atLeastMembers: 1 }
+    score: { tempo: 1 }
+    statement: Burst damage creates more margin in a timed encounter
+
+  - id: burst-offense-outpaces-healing
+    when:
+      boss: { trait: self-healing }
+      party: { capability: burst-offense, atLeastMembers: 1 }
+    score: { tempo: 1 }
+    statement: Burst damage reduces the value of the boss's self-healing
+
+  - id: measured-offense-limits-counters
+    when:
+      boss: { trait: counterattacks }
+      party: { capability: measured-offense, atLeastMembers: 1 }
+    score: { reliability: 1 }
+    statement: Deliberate high-value attacks limit the number of counter opportunities
+
+  - id: uncontrolled-offense-risks-counters
+    when:
+      boss: { trait: counterattacks }
+      party: { capability: uncontrolled-offense, atLeastMembers: 1 }
+    score: { reliability: -2 }
+    statement: Uncontrolled attacks can repeatedly trigger encounter counters
+
+  - id: uncontrolled-offense-risks-form-shifts
+    when:
+      boss: { trait: form-shifting }
+      party: { capability: uncontrolled-offense, atLeastMembers: 1 }
+    score: { reliability: -2 }
+    statement: Uncontrolled attacks cannot adapt to form-specific defenses and behavior
+
+  - id: uncontrolled-offense-risks-decoys
+    when:
+      boss: { trait: target-decoys }
+      party: { capability: uncontrolled-offense, atLeastMembers: 1 }
+    score: { safety: -1, reliability: -3 }
+    statement: Uncontrolled targeting can strike decoys and trigger their punishment
+
+  - id: status-control-exploits-susceptibility
+    when:
+      boss: { trait: status-vulnerable }
+      party: { capability: status-control, atLeastMembers: 1 }
+    score: { tempo: 1, reliability: 1 }
+    statement: Available status magic can suppress mechanics the encounter does not resist
+
+  - id: mp-independent-offense-answers-magic-hammer
+    when:
+      boss: { threat: mp-pressure }
+      party: { capability: mp-independent-offense, atLeastMembers: 1 }
+    score: { reliability: 1 }
+    statement: A non-MP offense remains available after Magic Hammer reduces a caster's MP
