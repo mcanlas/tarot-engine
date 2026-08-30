@@ -93,6 +93,10 @@ function decodeClass(value: unknown, index: number): ClassDefinition {
     name: requireString(record.name, `classes[${index}].name`),
     plural: requireString(record.plural, `classes[${index}].plural`),
     attackerPriority: requireNumber(record.attackerPriority, `classes[${index}].attackerPriority`),
+    frontlineSuitability: requireString(
+      record.frontlineSuitability,
+      `classes[${index}].frontlineSuitability`,
+    ),
     promotion: {
       class: requireString(promotion.class, `classes[${index}].promotion.class`),
       name: requireString(promotion.name, `classes[${index}].promotion.name`),
@@ -162,7 +166,17 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
   }
 
   const record = requireRecord(value, path)
-  const operations = ["job", "capability", "spell", "spellAttribute", "item", "all", "not"]
+  const operations = [
+    "job",
+    "capability",
+    "spell",
+    "spellAttribute",
+    "item",
+    "front",
+    "frontSpell",
+    "all",
+    "not",
+  ]
     .filter((key) => record[key] !== undefined)
 
   if (operations.length !== 1) {
@@ -186,6 +200,16 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
   if (operation === "item") {
 
     return { item: requireString(record.item, `${path}.item`) }
+  }
+
+  if (operation === "front") {
+
+    return { front: requireString(record.front, `${path}.front`) }
+  }
+
+  if (operation === "frontSpell") {
+
+    return { frontSpell: requireString(record.frontSpell, `${path}.frontSpell`) }
   }
 
   const atLeast = record.atLeast === undefined

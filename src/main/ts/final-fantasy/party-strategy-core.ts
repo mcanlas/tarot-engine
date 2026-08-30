@@ -1,6 +1,7 @@
 import type {
   CapabilityId,
   FinalFantasyCatalog,
+  FrontlineSuitabilityId,
   Job,
 } from "./strategy-core.ts"
 
@@ -25,6 +26,8 @@ export type PartyStrategyConditionDefinition =
   | { distinctJobsAtLeast: number }
   | { repeatedJobAtLeast: number }
   | { sameMemberCapabilities: string[] }
+  | { front: string }
+  | { behindFront: string }
   | { all: PartyStrategyConditionDefinition[] }
   | { not: PartyStrategyConditionDefinition }
 
@@ -93,7 +96,9 @@ export class FinalFantasyPartyStrategyEngine {
   }
 
   render(strategy: PartyStrategy): string {
-    const lines = [`Party: ${strategy.party.map((id) => this.#requireStartingJob(id).name).join(" / ")}`]
+    const lines = [
+      `Party (front first): ${strategy.party.map((id) => this.#requireStartingJob(id).name).join(" / ")}`,
+    ]
 
     for (const kind of ["strength", "weakness"] as const) {
       const statements = strategy.observations.filter((observation) => observation.kind === kind)
@@ -215,6 +220,17 @@ function buildCondition(
     return (party) => party.some((member) =>
       required.every((capability) => member.capabilities.has(capability)))
   }
+  if ("front" in definition) {
+    const suitability = requireFrontlineSuitability(definition.front)
+
+    return (party) => party[0]?.job.frontlineSuitability === suitability
+  }
+  if ("behindFront" in definition) {
+    const suitability = requireFrontlineSuitability(definition.behindFront)
+
+    return (party) => party.slice(1)
+      .some((member) => member.job.frontlineSuitability === suitability)
+  }
   if ("all" in definition) {
     const conditions = definition.all.map((condition) => buildCondition(condition, catalog))
 
@@ -237,6 +253,14 @@ function requireCapability(value: string): CapabilityId {
     && value !== "anti-undead"
   ) {
     throw new Error(`Unknown party strategy capability: ${value}`)
+  }
+
+  return value
+}
+
+function requireFrontlineSuitability(value: string): FrontlineSuitabilityId {
+  if (value !== "primary" && value !== "fallback" && value !== "fragile") {
+    throw new Error(`Unknown party strategy front-line suitability: ${value}`)
   }
 
   return value

@@ -17,23 +17,23 @@ const loadProjectFile = (path: string): Promise<string> =>
 const engine = await loadFinalFantasyPartyStrategyEngine(loadProjectFile)
 const bossEngine = await loadFinalFantasyStrategyEngine(loadProjectFile)
 
-function partiesWithReplacement(classIds: readonly string[]): string[][] {
+function orderedPartyFormations(classIds: readonly string[]): string[][] {
   const parties: string[][] = []
 
-  const appendParty = (party: string[], firstIndex: number, remaining: number): void => {
+  const appendParty = (party: string[], remaining: number): void => {
     if (remaining === 0) {
       parties.push(party)
 
       return
     }
 
-    for (let index = firstIndex; index < classIds.length; index += 1) {
-      appendParty([...party, classIds[index] ?? ""], index, remaining - 1)
+    for (const classId of classIds) {
+      appendParty([...party, classId], remaining - 1)
     }
   }
 
   for (let size = 1; size <= 4; size += 1) {
-    appendParty([], 0, size)
+    appendParty([], size)
   }
 
   return parties
@@ -48,7 +48,7 @@ test("loads class facts from existing catalogs and party rules from their own YA
     "white-mage",
     "black-mage",
   ])
-  assert.equal(engine.ruleCount, 25)
+  assert.equal(engine.ruleCount, 29)
   assert.equal(partyStrategyYamlFile, "data/final-fantasy-party-strategy.yaml")
 })
 
@@ -93,17 +93,16 @@ test("applies YAML-authored tradeoff rules to a small physical party", () => {
   assert(matchedRules.includes("no-front-line-specialist"))
 })
 
-test("covers all 209 class combinations and activates every authored rule", () => {
-  const parties = partiesWithReplacement(engine.classIds)
+test("covers all 1,554 ordered party formations and activates every authored rule", () => {
+  const parties = orderedPartyFormations(engine.classIds)
   const activatedRules = new Set<string>()
 
-  assert.equal(parties.length, 209)
+  assert.equal(parties.length, 1_554)
 
   for (const party of parties) {
     const strategy = engine.analyze(party)
     const strengths = strategy.observations.filter((observation) => observation.kind === "strength")
     const weaknesses = strategy.observations.filter((observation) => observation.kind === "weakness")
-    const reversed = engine.analyze([...party].reverse())
 
     assert(strengths.length > 0, `${party.join("/")} has no strength`)
     assert(weaknesses.length > 0, `${party.join("/")} has no weakness`)
@@ -112,12 +111,31 @@ test("covers all 209 class combinations and activates every authored rule", () =
       strategy.observations.length,
       `${party.join("/")} repeats a statement`,
     )
-    assert.deepEqual(reversed.observations, strategy.observations)
     strategy.observations.forEach((observation) => activatedRules.add(observation.ruleId))
   }
 
   assert.deepEqual([...activatedRules].sort(), [...engine.ruleIds].sort())
 })
+
+test("treats the first member as an immutable front position", () => {
+  const protectedFront = engine.analyze(["warrior", "white-mage"])
+  const exposedCaster = engine.analyze(["white-mage", "warrior"])
+  const protectedRules = protectedFront.observations.map((observation) => observation.ruleId)
+  const exposedRules = exposedCaster.observations.map((observation) => observation.ruleId)
+
+  assert(protectedRules.includes("primary-frontline"))
+  assert(!protectedRules.includes("fragile-front"))
+  assert(exposedRules.includes("primary-frontliner-behind"))
+  assert(exposedRules.includes("fragile-front"))
+  assert(exposedRules.includes("fragile-front-support"))
+  assert.notDeepEqual(exposedFrontFormation(exposedCaster), exposedFrontFormation(protectedFront))
+})
+
+function exposedFrontFormation(strategy: ReturnType<typeof engine.analyze>): readonly string[] {
+  return strategy.observations
+    .filter((observation) => observation.ruleId.includes("front"))
+    .map((observation) => observation.ruleId)
+}
 
 test("accepts every supported party size and rejects invalid input", () => {
   for (const party of [
@@ -183,7 +201,7 @@ test("pairs each random party with a random boss and a party-specific guide", ()
 test("renders console output without exposing rule mechanics", () => {
   const rendered = engine.render(engine.analyze(["red-mage"]))
 
-  assert.match(rendered, /^Party: Red Mage\nStrengths:/)
+  assert.match(rendered, /^Party \(front first\): Red Mage\nStrengths:/)
   assert.match(rendered, /Physical and magical offense/)
   assert.match(rendered, /Weaknesses:/)
   assert.match(rendered, /no backup action/)
@@ -191,7 +209,7 @@ test("renders console output without exposing rule mechanics", () => {
 
   const output: string[] = []
   runConsole(engine, ["black-mage"], (line) => output.push(line))
-  assert.match(output[0], /^Party: Black Mage\nStrengths:/)
+  assert.match(output[0], /^Party \(front first\): Black Mage\nStrengths:/)
   assert.match(output[0], /Without a conventional healer/)
   assert.match(output[0], /no backup action/)
 })
@@ -244,5 +262,15 @@ test("rejects invalid or unreachable YAML rule definitions", async () => {
     statement: Invalid.
 `),
     /sameMemberCapabilities must combine at least two distinct capabilities/,
+  )
+  await assert.rejects(
+    loadWithStrategy(`rules:
+  - id: impossible-front
+    kind: strength
+    when:
+      front: invincible
+    statement: Invalid.
+`),
+    /Unknown party strategy front-line suitability: invincible/,
   )
 })

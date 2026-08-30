@@ -40,6 +40,10 @@ function decodeClass(value: unknown, index: number): ClassDefinition {
     name: requireString(record.name, `classes[${index}].name`),
     plural: requireString(record.plural, `classes[${index}].plural`),
     attackerPriority: requireNumber(record.attackerPriority, `classes[${index}].attackerPriority`),
+    frontlineSuitability: requireString(
+      record.frontlineSuitability,
+      `classes[${index}].frontlineSuitability`,
+    ),
     promotion: {
       class: requireString(promotion.class, `classes[${index}].promotion.class`),
       name: requireString(promotion.name, `classes[${index}].promotion.name`),
@@ -105,7 +109,17 @@ function decodeBossCondition(value: unknown, path: string): PartyConditionDefini
     return value
   }
   const record = requireRecord(value, path)
-  const operations = ["job", "capability", "spell", "spellAttribute", "item", "all", "not"]
+  const operations = [
+    "job",
+    "capability",
+    "spell",
+    "spellAttribute",
+    "item",
+    "front",
+    "frontSpell",
+    "all",
+    "not",
+  ]
     .filter((key) => record[key] !== undefined)
   requireSingleOperation(operations, path)
   const operation = operations[0]
@@ -118,6 +132,12 @@ function decodeBossCondition(value: unknown, path: string): PartyConditionDefini
   }
   if (operation === "item") {
     return { item: requireString(record.item, `${path}.item`) }
+  }
+  if (operation === "front") {
+    return { front: requireString(record.front, `${path}.front`) }
+  }
+  if (operation === "frontSpell") {
+    return { frontSpell: requireString(record.frontSpell, `${path}.frontSpell`) }
   }
   const atLeast = record.atLeast === undefined ? {} : { atLeast: requireNumber(record.atLeast, `${path}.atLeast`) }
 
@@ -153,7 +173,18 @@ function decodePartyCondition(value: unknown, path: string): PartyStrategyCondit
     return value
   }
   const record = requireRecord(value, path)
-  const operations = ["job", "capability", "sizeAtLeast", "distinctJobsAtLeast", "repeatedJobAtLeast", "all", "not"]
+  const operations = [
+    "job",
+    "capability",
+    "sizeAtLeast",
+    "distinctJobsAtLeast",
+    "repeatedJobAtLeast",
+    "sameMemberCapabilities",
+    "front",
+    "behindFront",
+    "all",
+    "not",
+  ]
     .filter((key) => record[key] !== undefined)
   requireSingleOperation(operations, path)
   const operation = operations[0]
@@ -167,6 +198,18 @@ function decodePartyCondition(value: unknown, path: string): PartyStrategyCondit
   if (operation === "sizeAtLeast") return { sizeAtLeast: requireNumber(record.sizeAtLeast, `${path}.sizeAtLeast`) }
   if (operation === "distinctJobsAtLeast") return { distinctJobsAtLeast: requireNumber(record.distinctJobsAtLeast, `${path}.distinctJobsAtLeast`) }
   if (operation === "repeatedJobAtLeast") return { repeatedJobAtLeast: requireNumber(record.repeatedJobAtLeast, `${path}.repeatedJobAtLeast`) }
+  if (operation === "sameMemberCapabilities") {
+    return {
+      sameMemberCapabilities: requireStringArray(
+        record.sameMemberCapabilities,
+        `${path}.sameMemberCapabilities`,
+      ),
+    }
+  }
+  if (operation === "front") return { front: requireString(record.front, `${path}.front`) }
+  if (operation === "behindFront") {
+    return { behindFront: requireString(record.behindFront, `${path}.behindFront`) }
+  }
 
   const atLeast = record.atLeast === undefined ? {} : { atLeast: requireNumber(record.atLeast, `${path}.atLeast`) }
 

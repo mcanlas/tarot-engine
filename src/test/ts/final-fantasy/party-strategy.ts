@@ -117,6 +117,8 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
     "distinctJobsAtLeast",
     "repeatedJobAtLeast",
     "sameMemberCapabilities",
+    "front",
+    "behindFront",
     "all",
     "not",
   ]
@@ -157,6 +159,12 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
         `${path}.sameMemberCapabilities[${index}]`,
       )),
     }
+  }
+  if (operations[0] === "front") {
+    return { front: requireString(record.front, `${path}.front`) }
+  }
+  if (operations[0] === "behindFront") {
+    return { behindFront: requireString(record.behindFront, `${path}.behindFront`) }
   }
 
   const atLeast = record.atLeast === undefined

@@ -37,7 +37,7 @@ test("loads and validates the complete YAML strategy catalog", () => {
   assert.equal(engine.catalog.jobs.size, 12)
   assert.equal(engine.catalog.spells.size, 22)
   assert.equal(engine.bosses.length, 18)
-  assert.equal(engine.ruleCount, 66)
+  assert.equal(engine.ruleCount, 69)
   assert.deepEqual(
     engine.bosses.filter((boss) => boss.tags.includes("undead")).map((boss) => boss.key),
     ["vampire", "lich"],
@@ -70,6 +70,9 @@ test("catalog metadata owns capabilities, spell permissions, and every promotion
   assert.equal(redMage?.name, "Red Mage")
   assert.equal(redMage?.plural, "Red Mages")
   assert(redMage?.capabilities.has("physical-damage"))
+  assert.equal(redMage?.frontlineSuitability, "fallback")
+  assert.equal(engine.catalog.jobs.get("warrior")?.frontlineSuitability, "primary")
+  assert.equal(engine.catalog.jobs.get("white-mage")?.frontlineSuitability, "fragile")
   assert.deepEqual(
     [...(cure?.learnableBy ?? [])],
     ["white-mage", "red-mage", "knight", "white-wizard", "red-wizard"],
@@ -210,6 +213,25 @@ test("Lich combines spell-specific defenses with its no-healer fallback", () => 
   assert(!damageRace.some((line) => line.includes("reserve enough healing")))
 })
 
+test("repeated physical pressure adapts to the immutable front member", () => {
+  const warriorFront = adviceFor("kraken", [
+    member("warrior"), member("white-mage", "protect", "blink"),
+  ])
+  const whiteMageFront = adviceFor("kraken", [
+    member("white-mage", "protect", "blink"), member("warrior"),
+  ])
+  const unsupportedBlackMageFront = adviceFor("kraken", [
+    member("black-mage"), member("warrior"),
+  ])
+
+  assert(warriorFront.some((line) => line.includes("use Protect to blunt repeated physical hits")))
+  assert(!warriorFront.some((line) => line.includes("fixed slot 1")))
+  assert(whiteMageFront.some((line) => line.includes("cast Protect on the White Mage")))
+  assert(whiteMageFront.some((line) => line.includes("White Mage cast Blink early")))
+  assert(unsupportedBlackMageFront.some((line) =>
+    line.includes("Black Mage as the survival bottleneck")))
+})
+
 test("boss-specific, trait, and rematch rules stay distinct", () => {
   const members = [
     member("warrior"),
@@ -312,6 +334,13 @@ test("closed vocabularies reject unknown attributes, tags, spells, and bosses", 
   invalidTag.bosses[0]!.tags = ["dragon"]
   assert.throws(() => buildFinalFantasyStrategyEngine(invalidTag), /Unknown enemy tag: dragon/)
 
+  const invalidFrontlineSuitability = structuredClone(definitions)
+  invalidFrontlineSuitability.classes[0]!.frontlineSuitability = "invincible"
+  assert.throws(
+    () => buildFinalFantasyStrategyEngine(invalidFrontlineSuitability),
+    /Unknown front-line suitability: invincible/,
+  )
+
   const invalidTrait = structuredClone(definitions)
   invalidTrait.bosses[0]!.traits = ["dramatic-entrance"]
   assert.throws(() => buildFinalFantasyStrategyEngine(invalidTrait), /Unknown boss trait: dramatic-entrance/)
@@ -323,6 +352,13 @@ test("closed vocabularies reject unknown attributes, tags, spells, and bosses", 
   const invalidBoss = structuredClone(definitions)
   invalidBoss.strategy.rules[0]!.boss = "missing boss"
   assert.throws(() => buildFinalFantasyStrategyEngine(invalidBoss), /Unknown rule boss: missing boss/)
+
+  const invalidFrontSpell = structuredClone(definitions)
+  invalidFrontSpell.strategy.rules.at(-1)!.when = { frontSpell: "ultima" }
+  assert.throws(
+    () => buildFinalFantasyStrategyEngine(invalidFrontSpell),
+    /Unknown front-slot rule spell: ultima/,
+  )
 })
 
 test("YAML decoding reports empty, malformed, and structurally invalid documents", async () => {

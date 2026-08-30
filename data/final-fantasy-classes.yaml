@@ -2,6 +2,7 @@
   name: Warrior
   plural: Warriors
   attackerPriority: 0
+  frontlineSuitability: primary
   promotion:
     class: knight
     name: Knight
@@ -13,6 +14,7 @@
   name: Thief
   plural: Thieves
   attackerPriority: 2
+  frontlineSuitability: fallback
   promotion:
     class: ninja
     name: Ninja
@@ -24,6 +26,7 @@
   name: Monk
   plural: Monks
   attackerPriority: 1
+  frontlineSuitability: fallback
   promotion:
     class: master
     name: Master
@@ -35,6 +38,7 @@
   name: Red Mage
   plural: Red Mages
   attackerPriority: 3
+  frontlineSuitability: fallback
   promotion:
     class: red-wizard
     name: Red Wizard
@@ -46,6 +50,7 @@
   name: White Mage
   plural: White Mages
   attackerPriority: 4
+  frontlineSuitability: fragile
   promotion:
     class: white-wizard
     name: White Wizard
@@ -56,6 +61,7 @@
   name: Black Mage
   plural: Black Mages
   attackerPriority: 4
+  frontlineSuitability: fragile
   promotion:
     class: black-wizard
     name: Black Wizard

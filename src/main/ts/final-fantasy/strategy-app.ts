@@ -75,7 +75,7 @@ function renderPartySignature(party: Party): void {
   const container = requireElement<HTMLElement>("[data-party-signature]")
   const label = document.createElement("span")
   label.className = "signature-label"
-  label.textContent = "Current lineup"
+  label.textContent = "Fixed order · front first"
   const members = party.members.map((member, index) => {
     const badge = document.createElement("span")
     badge.className = `job-badge job-${member.job.id}`

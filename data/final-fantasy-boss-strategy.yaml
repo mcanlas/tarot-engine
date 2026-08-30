@@ -304,8 +304,36 @@ rules:
 
   - bossTrait: repeated-physical-damage
     section: safety
-    when: { spell: protect }
+    when:
+      all:
+        - spell: protect
+        - front: primary
     advice: "Have {{members:knows:protect}} use Protect to blunt repeated physical hits from {{boss}}"
+
+  - bossTrait: repeated-physical-damage
+    section: safety
+    when:
+      all:
+        - spell: protect
+        - not: { front: primary }
+    advice: "Have {{members:first-knows:protect}} cast Protect on {{members:front}}; fixed slot 1 needs the party's first defensive investment against {{boss}}"
+
+  - bossTrait: repeated-physical-damage
+    section: safety
+    when:
+      all:
+        - front: fragile
+        - frontSpell: blink
+    advice: "Have {{members:front}} cast Blink early; personal evasion helps the exposed caster survive {{boss}}'s repeated physical turns"
+
+  - bossTrait: repeated-physical-damage
+    section: safety
+    when:
+      all:
+        - not: { front: primary }
+        - not: { spell: protect }
+        - not: { frontSpell: blink }
+    advice: "Treat {{members:front}} as the survival bottleneck: commit the best available armor and recovery there, then shorten the physical exchange with focused damage"
 
   - bossTrait: endurance
     section: safety

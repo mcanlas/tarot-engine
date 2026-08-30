@@ -27,6 +27,8 @@ export type ItemId = "potion"
 
 export type EnemyTagId = "undead"
 
+export type FrontlineSuitabilityId = "primary" | "fallback" | "fragile"
+
 export type BossTraitId =
   | "physical-buffs-effective"
   | "repeated-physical-damage"
@@ -50,6 +52,7 @@ export interface ClassDefinition {
   name: string
   plural: string
   attackerPriority: number
+  frontlineSuitability: string
   promotion: PromotionDefinition
   attributes: string[]
 }
@@ -76,6 +79,8 @@ export type PartyConditionDefinition =
   | { spell: string; atLeast?: number }
   | { spellAttribute: string; atLeast?: number }
   | { item: string }
+  | { front: string }
+  | { frontSpell: string }
   | { all: PartyConditionDefinition[] }
   | { not: PartyConditionDefinition }
 
@@ -104,6 +109,7 @@ export interface Job {
   name: string
   plural: string
   attackerPriority: number
+  frontlineSuitability: FrontlineSuitabilityId
   capabilities: ReadonlySet<CapabilityId>
   promotion?: string
 }
@@ -190,6 +196,11 @@ const spellCapabilityAttributes = [
 ] as const
 const items = new Set<ItemId>(["potion"])
 const enemyTags = new Set<EnemyTagId>(["undead"])
+const frontlineSuitabilities = new Set<FrontlineSuitabilityId>([
+  "primary",
+  "fallback",
+  "fragile",
+])
 const bossTraits = new Set<BossTraitId>([
   "physical-buffs-effective",
   "repeated-physical-damage",
@@ -346,6 +357,7 @@ export function buildFinalFantasyCatalog(
       name: definition.name,
       plural: definition.plural,
       attackerPriority: definition.attackerPriority,
+      frontlineSuitability: requireFrontlineSuitability(definition.frontlineSuitability),
       capabilities: jobCapabilities,
       promotion: definition.promotion.class,
     })
@@ -354,6 +366,7 @@ export function buildFinalFantasyCatalog(
       name: definition.promotion.name,
       plural: definition.promotion.plural,
       attackerPriority: definition.attackerPriority,
+      frontlineSuitability: requireFrontlineSuitability(definition.frontlineSuitability),
       capabilities: jobCapabilities,
     })
   }
@@ -445,7 +458,17 @@ function buildPartyCondition(
     return () => true
   }
 
-  const operations = ["job", "capability", "spell", "spellAttribute", "item", "all", "not"]
+  const operations = [
+    "job",
+    "capability",
+    "spell",
+    "spellAttribute",
+    "item",
+    "front",
+    "frontSpell",
+    "all",
+    "not",
+  ]
     .filter((key) => key in definition)
 
   if (operations.length !== 1) {
@@ -486,6 +509,18 @@ function buildPartyCondition(
     const item = requireItem(definition.item)
 
     return (party) => party.inventory.has(item)
+  }
+
+  if ("front" in definition) {
+    const suitability = requireFrontlineSuitability(definition.front)
+
+    return (party) => party.members[0]?.job.frontlineSuitability === suitability
+  }
+
+  if ("frontSpell" in definition) {
+    const spell = requireSpell(catalog, definition.frontSpell, "Unknown front-slot rule spell")
+
+    return (party) => party.members[0]?.learnedSpells.has(spell) ?? false
   }
 
   if ("all" in definition) {
@@ -541,6 +576,11 @@ function buildMemberSelector(parts: readonly string[], catalog: FinalFantasyCata
   if (parts.length === 1 && parts[0] === "all") {
 
     return { select: (party) => party.members }
+  }
+
+  if (parts.length === 1 && parts[0] === "front") {
+
+    return { select: (party) => party.members.slice(0, 1) }
   }
 
   if (parts.length === 1 && parts[0] === "preferred-physical-attacker") {
@@ -721,6 +761,13 @@ function requireEnemyTag(id: string): EnemyTagId {
   }
 
   return id as EnemyTagId
+}
+function requireFrontlineSuitability(id: string): FrontlineSuitabilityId {
+  if (!frontlineSuitabilities.has(id as FrontlineSuitabilityId)) {
+    throw new Error(`Unknown front-line suitability: ${id}`)
+  }
+
+  return id as FrontlineSuitabilityId
 }
 function requireBossTrait(id: string): BossTraitId {
   if (!bossTraits.has(id as BossTraitId)) {

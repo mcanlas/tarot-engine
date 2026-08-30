@@ -20,6 +20,40 @@ rules:
         sizeAtLeast: 2
     statement: A solo party has no backup action when its only member is disabled or defeated
 
+  # Fixed formation
+  - id: primary-frontline
+    kind: strength
+    when:
+      front: primary
+    statement: Slot 1 puts the party's primary front-line specialist where concentrated enemy attacks are easiest to absorb
+
+  - id: primary-frontliner-behind
+    kind: weakness
+    when:
+      all:
+        - not:
+            front: primary
+        - behindFront: primary
+    statement: Fixed order leaves the primary front-line specialist behind another member, so that durability cannot absorb slot 1's concentrated pressure
+
+  - id: fragile-front
+    kind: weakness
+    when:
+      all:
+        - sizeAtLeast: 2
+        - front: fragile
+    statement: A fragile caster in slot 1 needs the party's strongest defensive equipment, mitigation, and recovery support to remain functional
+
+  - id: fragile-front-support
+    kind: strength
+    when:
+      all:
+        - sizeAtLeast: 2
+        - front: fragile
+        - capability: defensive-magic
+        - capability: healing
+    statement: Defensive and recovery magic give the party tools to compensate for a fragile caster's unavoidable slot 1 exposure
+
   # Capability counts and interactions
   - id: physical-core
     kind: strength
@@ -143,7 +177,7 @@ rules:
         - sizeAtLeast: 2
         - not:
             job: warrior
-    statement: No durable front-line specialist means fragile members will take more pressure
+    statement: Without a primary front-line specialist, fixed slot 1 depends more heavily on equipment, mitigation, and recovery
 
   - id: no-magical-offense
     kind: weakness
