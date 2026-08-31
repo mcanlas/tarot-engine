@@ -5,18 +5,18 @@ import test from "node:test"
 import { parse } from "yaml"
 
 import {
-  decodeFinalFantasyTowns,
-  finalFantasyTownsYamlFile,
-  loadFinalFantasyTowns,
+  decodeTowns,
+  townsYamlFile,
+  loadTowns,
 } from "../../../main/ts/final-fantasy/towns.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
 test("loads Cornelia's four seeded shops", async () => {
-  const definitions = await loadFinalFantasyTowns(loadProjectFile)
+  const definitions = await loadTowns(loadProjectFile)
 
-  assert.equal(finalFantasyTownsYamlFile, "data/final-fantasy/towns.yaml")
+  assert.equal(townsYamlFile, "data/final-fantasy/towns.yaml")
   assert.deepEqual(definitions, {
     towns: [{
       key: "cornelia",
@@ -45,7 +45,7 @@ test("loads Cornelia's four seeded shops", async () => {
 
 test("seeds catalog records for every Cornelia ware key", async () => {
   const [definitions, itemDocument, magicDocument] = await Promise.all([
-    loadFinalFantasyTowns(loadProjectFile),
+    loadTowns(loadProjectFile),
     loadProjectFile("data/final-fantasy/items.yaml").then(parse),
     loadProjectFile("data/final-fantasy/magic.yaml").then(parse),
   ])
@@ -81,29 +81,29 @@ test("seeds catalog records for every Cornelia ware key", async () => {
 
 test("rejects malformed town, shop, and ware fields", () => {
   assert.throws(
-    () => decodeFinalFantasyTowns([]),
+    () => decodeTowns([]),
     /Final Fantasy towns must be an object/,
   )
   assert.throws(
-    () => decodeFinalFantasyTowns({ towns: {} }),
+    () => decodeTowns({ towns: {} }),
     /Final Fantasy towns.towns must be an array/,
   )
   assert.throws(
-    () => decodeFinalFantasyTowns({ towns: [{ key: "", name: "Cornelia", shops: [] }] }),
+    () => decodeTowns({ towns: [{ key: "", name: "Cornelia", shops: [] }] }),
     /towns\[0\]\.key must be a non-empty string/,
   )
   assert.throws(
-    () => decodeFinalFantasyTowns({ towns: [{ key: "cornelia", name: "Cornelia", shops: [{}] }] }),
+    () => decodeTowns({ towns: [{ key: "cornelia", name: "Cornelia", shops: [{}] }] }),
     /shops\[0\]\.type must be a non-empty string/,
   )
   assert.throws(
-    () => decodeFinalFantasyTowns({
+    () => decodeTowns({
       towns: [{ key: "cornelia", name: "Cornelia", shops: [{ type: "items", wares: [] }] }],
     }),
     /shops\[0\]\.type must be a known Final Fantasy shop type/,
   )
   assert.throws(
-    () => decodeFinalFantasyTowns({
+    () => decodeTowns({
       towns: [{
         key: "cornelia",
         name: "Cornelia",
@@ -116,11 +116,11 @@ test("rejects malformed town, shop, and ware fields", () => {
 
 test("reports empty and invalid town YAML", async () => {
   await assert.rejects(
-    loadFinalFantasyTowns(async () => "  "),
+    loadTowns(async () => "  "),
     /YAML data is empty: data\/final-fantasy\/towns.yaml/,
   )
   await assert.rejects(
-    loadFinalFantasyTowns(async () => "towns: ["),
+    loadTowns(async () => "towns: ["),
     /Invalid data\/final-fantasy\/towns.yaml/,
   )
 })

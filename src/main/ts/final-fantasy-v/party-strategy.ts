@@ -1,81 +1,81 @@
 import type {
-  FinalFantasyVAbilityType,
-  FinalFantasyVStrategyCatalog,
+  AbilityType,
+  StrategyCatalog,
 } from "./catalog.ts"
-import type { FinalFantasyVLegalLoadout, FinalFantasyVResolvedAbility } from "./loadouts.ts"
+import type { LegalLoadout, ResolvedAbility } from "./loadouts.ts"
 
-export const finalFantasyVCharacterIds = ["bartz", "lenna", "galuf", "faris", "krile"] as const
+export const characterIds = ["bartz", "lenna", "galuf", "faris", "krile"] as const
 
-export type FinalFantasyVCharacterId = typeof finalFantasyVCharacterIds[number]
+export type CharacterId = typeof characterIds[number]
 
-export interface FinalFantasyVPartyMember {
-  readonly characterId: FinalFantasyVCharacterId
-  readonly loadout: FinalFantasyVLegalLoadout
+export interface PartyMember {
+  readonly characterId: CharacterId
+  readonly loadout: LegalLoadout
 }
 
-export type FinalFantasyVPartyObservationKind = "setup" | "tradeoff"
+export type PartyObservationKind = "setup" | "tradeoff"
 
-export interface FinalFantasyVPartyObservation {
+export interface PartyObservation {
   readonly ruleId: string
-  readonly kind: FinalFantasyVPartyObservationKind
+  readonly kind: PartyObservationKind
   readonly statement: string
-  readonly memberIds: readonly FinalFantasyVCharacterId[]
+  readonly memberIds: readonly CharacterId[]
 }
 
-export interface FinalFantasyVPartyStrategy {
+export interface PartyStrategy {
   readonly members: readonly {
-    readonly characterId: FinalFantasyVCharacterId
+    readonly characterId: CharacterId
     readonly jobId: string
   }[]
-  readonly observations: readonly FinalFantasyVPartyObservation[]
+  readonly observations: readonly PartyObservation[]
 }
 
-export type FinalFantasyVMemberSelectorDefinition =
+export type MemberSelectorDefinition =
   | { readonly job: string }
   | { readonly assignment: string; readonly atLeastRank?: number }
   | { readonly assignmentOneOf: readonly string[] }
   | { readonly innate: string; readonly atLeastRank?: number }
-  | { readonly assignmentType: FinalFantasyVAbilityType }
+  | { readonly assignmentType: AbilityType }
 
-export type FinalFantasyVPartyStrategyConditionDefinition =
-  | { readonly sameMember: readonly FinalFantasyVMemberSelectorDefinition[] }
-  | { readonly distinctMembers: readonly FinalFantasyVMemberSelectorDefinition[] }
+export type PartyStrategyConditionDefinition =
+  | { readonly sameMember: readonly MemberSelectorDefinition[] }
+  | { readonly distinctMembers: readonly MemberSelectorDefinition[] }
 
-export interface FinalFantasyVPartyStrategyRuleDefinition {
+export interface PartyStrategyRuleDefinition {
   readonly id: string
-  readonly kind: FinalFantasyVPartyObservationKind
-  readonly when: FinalFantasyVPartyStrategyConditionDefinition
+  readonly kind: PartyObservationKind
+  readonly when: PartyStrategyConditionDefinition
   readonly statement: string
 }
 
 interface CompiledRule {
   readonly id: string
-  readonly kind: FinalFantasyVPartyObservationKind
+  readonly kind: PartyObservationKind
   readonly statement: string
   readonly match: (
-    members: readonly FinalFantasyVPartyMember[],
-  ) => readonly FinalFantasyVPartyMember[] | undefined
+    members: readonly PartyMember[],
+  ) => readonly PartyMember[] | undefined
 }
 
-type MemberSelector = (member: FinalFantasyVPartyMember) => boolean
+type MemberSelector = (member: PartyMember) => boolean
 
-export class FinalFantasyVPartyStrategyEngine {
+export class PartyStrategyEngine {
   readonly ruleIds: readonly string[]
   readonly #rules: readonly CompiledRule[]
 
   constructor(
-    catalog: FinalFantasyVStrategyCatalog,
-    definitions: readonly FinalFantasyVPartyStrategyRuleDefinition[],
+    catalog: StrategyCatalog,
+    definitions: readonly PartyStrategyRuleDefinition[],
   ) {
     rejectDuplicateRuleIds(definitions)
     this.#rules = definitions.map((rule) => compileRule(rule, catalog))
     this.ruleIds = this.#rules.map((rule) => rule.id)
   }
 
-  analyze(members: readonly FinalFantasyVPartyMember[]): FinalFantasyVPartyStrategy {
+  analyze(members: readonly PartyMember[]): PartyStrategy {
     validateParty(members)
 
-    const observations = this.#rules.flatMap((rule): FinalFantasyVPartyObservation[] => {
+    const observations = this.#rules.flatMap((rule): PartyObservation[] => {
       const witnesses = rule.match(members)
       if (witnesses === undefined) {
         return []
@@ -100,8 +100,8 @@ export class FinalFantasyVPartyStrategyEngine {
 }
 
 function compileRule(
-  definition: FinalFantasyVPartyStrategyRuleDefinition,
-  catalog: FinalFantasyVStrategyCatalog,
+  definition: PartyStrategyRuleDefinition,
+  catalog: StrategyCatalog,
 ): CompiledRule {
   if (definition.kind !== "setup" && definition.kind !== "tradeoff") {
     throw new Error(`Unknown Final Fantasy V party strategy kind: ${definition.kind}`)
@@ -137,8 +137,8 @@ function compileRule(
 }
 
 function compileSelector(
-  definition: FinalFantasyVMemberSelectorDefinition,
-  catalog: FinalFantasyVStrategyCatalog,
+  definition: MemberSelectorDefinition,
+  catalog: StrategyCatalog,
 ): MemberSelector {
   if ("job" in definition) {
     const job = catalog.jobs.get(definition.job)
@@ -182,10 +182,10 @@ function compileSelector(
 }
 
 function matchDistinctMembers(
-  members: readonly FinalFantasyVPartyMember[],
+  members: readonly PartyMember[],
   selectors: readonly MemberSelector[],
-): readonly FinalFantasyVPartyMember[] | undefined {
-  const chosen: FinalFantasyVPartyMember[] = []
+): readonly PartyMember[] | undefined {
+  const chosen: PartyMember[] = []
 
   function visit(selectorIndex: number): boolean {
     if (selectorIndex === selectors.length) {
@@ -209,7 +209,7 @@ function matchDistinctMembers(
   return visit(0) ? chosen : undefined
 }
 
-function hasRank(ability: FinalFantasyVResolvedAbility, atLeastRank: number | undefined): boolean {
+function hasRank(ability: ResolvedAbility, atLeastRank: number | undefined): boolean {
   return atLeastRank === undefined
     || (ability.kind === "ranked" && ability.rank >= atLeastRank)
 }
@@ -223,7 +223,7 @@ function requireRank(value: number | undefined, abilityId: string): number | und
 }
 
 function rejectDuplicateRuleIds(
-  definitions: readonly FinalFantasyVPartyStrategyRuleDefinition[],
+  definitions: readonly PartyStrategyRuleDefinition[],
 ): void {
   const duplicates = definitions
     .map((definition) => definition.id)
@@ -235,13 +235,13 @@ function rejectDuplicateRuleIds(
   }
 }
 
-function validateParty(members: readonly FinalFantasyVPartyMember[]): void {
+function validateParty(members: readonly PartyMember[]): void {
   if (members.length < 1 || members.length > 4) {
     throw new Error("Expected 1 to 4 Final Fantasy V party members")
   }
   const characterIds = members.map((member) => member.characterId)
   const unknown = characterIds.find((id) =>
-    !finalFantasyVCharacterIds.includes(id as FinalFantasyVCharacterId))
+    !characterIds.includes(id as CharacterId))
   if (unknown !== undefined) {
     throw new Error(`Unknown Final Fantasy V character: ${unknown}`)
   }

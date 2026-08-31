@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url"
 import { parse } from "yaml"
 
 import {
-  FinalFantasyPartyStrategyEngine,
+  PartyStrategyEngine,
   type PartyStrategy,
   type PartyStrategyConditionDefinition as PartyConditionDefinition,
   type PartyStrategyRuleDefinition as PartyRuleDefinition,
@@ -13,11 +13,11 @@ import {
   createFullToolkitParty,
   type BossDefinition,
   type BossGuide,
-  type FinalFantasyStrategyEngine,
+  type StrategyEngine,
   type GuideSectionId,
 } from "../../../main/ts/final-fantasy/strategy-core.ts"
 import {
-  loadFinalFantasyCatalog,
+  loadStrategyCatalog,
   type YamlTextLoader,
 } from "../../../main/ts/final-fantasy/strategy-data.ts"
 
@@ -29,20 +29,20 @@ export interface RandomPartyBossStrategy {
   bossGuide: BossGuide
 }
 
-export async function loadFinalFantasyPartyStrategyEngine(
+export async function loadPartyStrategyEngine(
   loadText: YamlTextLoader,
-): Promise<FinalFantasyPartyStrategyEngine> {
+): Promise<PartyStrategyEngine> {
   const [catalog, strategyText] = await Promise.all([
-    loadFinalFantasyCatalog(loadText),
+    loadStrategyCatalog(loadText),
     loadText(partyStrategyYamlFile),
   ])
   const document = parse(strategyText)
 
-  return new FinalFantasyPartyStrategyEngine(catalog, decodeRules(document))
+  return new PartyStrategyEngine(catalog, decodeRules(document))
 }
 
 export function runConsole(
-  engine: FinalFantasyPartyStrategyEngine,
+  engine: PartyStrategyEngine,
   args: readonly string[],
   write: (line: string) => void = console.log,
 ): void {
@@ -50,8 +50,8 @@ export function runConsole(
 }
 
 export function createRandomPartyBossStrategy(
-  partyEngine: FinalFantasyPartyStrategyEngine,
-  bossEngine: FinalFantasyStrategyEngine,
+  partyEngine: PartyStrategyEngine,
+  bossEngine: StrategyEngine,
   random: () => number = Math.random,
 ): RandomPartyBossStrategy {
   const classIds = partyEngine.createRandomParty(random)
@@ -213,7 +213,7 @@ const loadProjectFile = (path: string): Promise<string> =>
 
 if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const engine = await loadFinalFantasyPartyStrategyEngine(loadProjectFile)
+    const engine = await loadPartyStrategyEngine(loadProjectFile)
     runConsole(engine, process.argv.slice(2))
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)

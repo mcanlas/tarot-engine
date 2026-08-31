@@ -3,19 +3,19 @@ import { readFile } from "node:fs/promises"
 import { parse } from "yaml"
 
 import {
-  buildFinalFantasyVBossCatalog,
-  buildFinalFantasyVStrategyCatalog,
-  createRandomFinalFantasyVParty,
-  createRandomFinalFantasyVStoryParty,
-  decodeFinalFantasyVBosses,
-  decodeFinalFantasyVBossStrategy,
-  decodeFinalFantasyVJobs,
-  decodeFinalFantasyVPartyStrategy,
-  FinalFantasyVBossStrategyEngine,
-  FinalFantasyVPartyStrategyEngine,
-  finalFantasyVStoryAvailability,
-  finalFantasyVStrategyYamlFiles,
-  validateFinalFantasyVLoadout,
+  buildBossCatalog,
+  buildStrategyCatalog,
+  createRandomParty,
+  createRandomStoryParty,
+  decodeBosses,
+  decodeBossStrategy,
+  decodeJobs,
+  decodePartyStrategy,
+  BossStrategyEngine,
+  PartyStrategyEngine,
+  storyAvailability,
+  strategyYamlFiles,
+  validateLoadout,
 } from "../../../main/ts/final-fantasy-v/index.ts"
 
 const [occurrencesText, ...extraArgs] = process.argv.slice(2)
@@ -30,20 +30,20 @@ if (
   console.error("Usage: node src/test/ts/final-fantasy-v/party-strategy.console-test.js <positive integer occurrences>")
   process.exitCode = 1
 } else {
-  const jobsYaml = await readFile(finalFantasyVStrategyYamlFiles.jobs, "utf8")
-  const catalog = buildFinalFantasyVStrategyCatalog(decodeFinalFantasyVJobs(parse(jobsYaml)))
-  const strategyYaml = await readFile(finalFantasyVStrategyYamlFiles.partyStrategy, "utf8")
-  const partyEngine = new FinalFantasyVPartyStrategyEngine(
+  const jobsYaml = await readFile(strategyYamlFiles.jobs, "utf8")
+  const catalog = buildStrategyCatalog(decodeJobs(parse(jobsYaml)))
+  const strategyYaml = await readFile(strategyYamlFiles.partyStrategy, "utf8")
+  const partyEngine = new PartyStrategyEngine(
     catalog,
-    decodeFinalFantasyVPartyStrategy(parse(strategyYaml)),
+    decodePartyStrategy(parse(strategyYaml)),
   )
-  const bossesYaml = await readFile(finalFantasyVStrategyYamlFiles.bosses, "utf8")
-  const bossCatalog = buildFinalFantasyVBossCatalog(decodeFinalFantasyVBosses(parse(bossesYaml)))
-  const bossStrategyYaml = await readFile(finalFantasyVStrategyYamlFiles.bossStrategy, "utf8")
-  const bossEngine = new FinalFantasyVBossStrategyEngine(
+  const bossesYaml = await readFile(strategyYamlFiles.bosses, "utf8")
+  const bossCatalog = buildBossCatalog(decodeBosses(parse(bossesYaml)))
+  const bossStrategyYaml = await readFile(strategyYamlFiles.bossStrategy, "utf8")
+  const bossEngine = new BossStrategyEngine(
     catalog,
     bossCatalog,
-    decodeFinalFantasyVBossStrategy(parse(bossStrategyYaml)),
+    decodeBossStrategy(parse(bossStrategyYaml)),
   )
   const allAbilityIds = [...catalog.abilities.keys()]
   const allLearningState = learningStateFor(allAbilityIds)
@@ -54,7 +54,7 @@ if (
     console.log(`\n=== FFV run ${occurrence + 1} ===`)
 
     console.log("\nRandom party")
-    const randomParty = createRandomFinalFantasyVParty(catalog)
+    const randomParty = createRandomParty(catalog)
     const randomPartyResult = runStrategy(
       "Random party",
       randomParty.members,
@@ -67,8 +67,8 @@ if (
     }
 
     console.log("\nRandom story party")
-    const randomStoryParty = createRandomFinalFantasyVStoryParty(catalog, bossCatalog)
-    const availability = finalFantasyVStoryAvailability(catalog, randomStoryParty.boss)
+    const randomStoryParty = createRandomStoryParty(catalog, bossCatalog)
+    const availability = storyAvailability(catalog, randomStoryParty.boss)
     const storyLearningState = learningStateFor(availability.abilityIds)
     const randomStoryPartyResult = runStrategy(
       "Random story party",
@@ -115,7 +115,7 @@ if (
     // Both random generators deliberately allow nonsensical ability assignments. Validate those
     // candidates here so the legal-loadout boundary remains part of the stress test.
     for (const candidateMember of candidate) {
-      const validation = validateFinalFantasyVLoadout(
+      const validation = validateLoadout(
         {
           jobId: candidateMember.jobId,
           assignments: candidateMember.assignmentIds.map((abilityId) => ({ abilityId })),

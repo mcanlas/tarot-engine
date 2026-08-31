@@ -1,14 +1,14 @@
 import type {
-  FinalFantasyVAbilityDefinition,
-  FinalFantasyVAbilityRankDefinition,
-  FinalFantasyVJobDefinition,
+  AbilityDefinition,
+  AbilityRankDefinition,
+  JobDefinition,
 } from "./catalog.ts"
 
-export function decodeFinalFantasyVJobs(value: unknown): FinalFantasyVJobDefinition[] {
+export function decodeJobs(value: unknown): JobDefinition[] {
   return requireArray(value, "Final Fantasy V jobs").map(decodeJob)
 }
 
-function decodeJob(value: unknown, index: number): FinalFantasyVJobDefinition {
+function decodeJob(value: unknown, index: number): JobDefinition {
   const path = `Final Fantasy V jobs[${index}]`
   const record = requireRecord(value, path)
 
@@ -22,7 +22,7 @@ function decodeJob(value: unknown, index: number): FinalFantasyVJobDefinition {
   }
 }
 
-function decodeAbility(value: unknown, path: string): FinalFantasyVAbilityDefinition {
+function decodeAbility(value: unknown, path: string): AbilityDefinition {
   const record = requireRecord(value, path)
   const common = {
     key: requireString(record.key, `${path}.key`),
@@ -57,7 +57,7 @@ function decodeAbility(value: unknown, path: string): FinalFantasyVAbilityDefini
   }
 }
 
-function decodeRank(value: unknown, path: string): FinalFantasyVAbilityRankDefinition {
+function decodeRank(value: unknown, path: string): AbilityRankDefinition {
   const record = requireRecord(value, path)
 
   return {

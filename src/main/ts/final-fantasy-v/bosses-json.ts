@@ -1,12 +1,12 @@
-import { finalFantasyVCrystalUnlockOrdinal } from "./catalog.ts"
+import { crystalUnlockOrdinal } from "./catalog.ts"
 import type {
-  FinalFantasyVBossDefinitions,
-  FinalFantasyVMainStoryBossDefinition,
-  FinalFantasyVOptionalBossDefinition,
+  BossDefinitions,
+  MainStoryBossDefinition,
+  OptionalBossDefinition,
 } from "./bosses.ts"
-import type { FinalFantasyVCrystalId } from "./catalog.ts"
+import type { CrystalId } from "./catalog.ts"
 
-export function decodeFinalFantasyVBosses(value: unknown): FinalFantasyVBossDefinitions {
+export function decodeBosses(value: unknown): BossDefinitions {
   const document = requireRecord(value, "Final Fantasy V bosses")
 
   return {
@@ -22,7 +22,7 @@ export function decodeFinalFantasyVBosses(value: unknown): FinalFantasyVBossDefi
 function decodeMainStoryBoss(
   value: unknown,
   index: number,
-): FinalFantasyVMainStoryBossDefinition {
+): MainStoryBossDefinition {
   const path = `Final Fantasy V bosses.encounters[${index}]`
   const record = requireRecord(value, path)
 
@@ -37,7 +37,7 @@ function decodeMainStoryBoss(
 function decodeOptionalBoss(
   value: unknown,
   index: number,
-): FinalFantasyVOptionalBossDefinition {
+): OptionalBossDefinition {
   const path = `Final Fantasy V bosses.optionalEncounters[${index}]`
   const record = requireRecord(value, path)
 
@@ -52,13 +52,13 @@ function decodeOptionalBoss(
   }
 }
 
-function requireCrystal(value: unknown, path: string): FinalFantasyVCrystalId {
+function requireCrystal(value: unknown, path: string): CrystalId {
   const crystal = requireString(value, path)
-  if (!(crystal in finalFantasyVCrystalUnlockOrdinal)) {
+  if (!(crystal in crystalUnlockOrdinal)) {
     throw new Error(`${path} must be a known Final Fantasy V crystal unlock`)
   }
 
-  return crystal as FinalFantasyVCrystalId
+  return crystal as CrystalId
 }
 
 function requireRecord(value: unknown, path: string): Record<string, unknown> {

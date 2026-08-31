@@ -4,37 +4,37 @@ import test from "node:test"
 import { parse } from "yaml"
 
 import {
-  buildFinalFantasyVBossCatalog,
-  buildFinalFantasyVStrategyCatalog,
-  currentFinalFantasyVBossSelection,
-  decodeFinalFantasyVBosses,
-  decodeFinalFantasyVBossStrategy,
-  decodeFinalFantasyVJobs,
-  FinalFantasyVBossStrategyEngine,
-  finalFantasyVJobIsAvailableThroughCrystal,
-  finalFantasyVStrategyYamlFiles,
-  selectFinalFantasyVBoss,
-  validateFinalFantasyVLoadout,
-  type FinalFantasyVBossStrategyDefinitions,
-  type FinalFantasyVCharacterId,
-  type FinalFantasyVPartyMember,
+  buildBossCatalog,
+  buildStrategyCatalog,
+  currentBossSelection,
+  decodeBosses,
+  decodeBossStrategy,
+  decodeJobs,
+  BossStrategyEngine,
+  jobIsAvailableThroughCrystal,
+  strategyYamlFiles,
+  selectBoss,
+  validateLoadout,
+  type BossStrategyDefinitions,
+  type CharacterId,
+  type PartyMember,
 } from "../../../main/ts/final-fantasy-v/index.ts"
 
-const jobs = decodeFinalFantasyVJobs(parse(await readFile(
-  finalFantasyVStrategyYamlFiles.jobs,
+const jobs = decodeJobs(parse(await readFile(
+  strategyYamlFiles.jobs,
   "utf8",
 )))
-const strategyCatalog = buildFinalFantasyVStrategyCatalog(jobs)
-const bossDefinitions = decodeFinalFantasyVBosses(parse(await readFile(
-  finalFantasyVStrategyYamlFiles.bosses,
+const strategyCatalog = buildStrategyCatalog(jobs)
+const bossDefinitions = decodeBosses(parse(await readFile(
+  strategyYamlFiles.bosses,
   "utf8",
 )))
-const bossCatalog = buildFinalFantasyVBossCatalog(bossDefinitions)
-const bossStrategyDefinitions = decodeFinalFantasyVBossStrategy(parse(await readFile(
-  finalFantasyVStrategyYamlFiles.bossStrategy,
+const bossCatalog = buildBossCatalog(bossDefinitions)
+const bossStrategyDefinitions = decodeBossStrategy(parse(await readFile(
+  strategyYamlFiles.bossStrategy,
   "utf8",
 )))
-const engine = new FinalFantasyVBossStrategyEngine(
+const engine = new BossStrategyEngine(
   strategyCatalog,
   bossCatalog,
   bossStrategyDefinitions,
@@ -51,7 +51,7 @@ const learningState = {
 }
 
 test("loads ten main-story and two optional boss encounters", () => {
-  assert.equal(finalFantasyVStrategyYamlFiles.bosses, "data/final-fantasy-v/bosses.yaml")
+  assert.equal(strategyYamlFiles.bosses, "data/final-fantasy-v/bosses.yaml")
   assert.equal(bossDefinitions.mainStory.length, 10)
   assert.equal(bossDefinitions.optional.length, 2)
   assert.deepEqual(bossCatalog.encounters.map((boss) => boss.key), [
@@ -71,22 +71,22 @@ test("loads ten main-story and two optional boss encounters", () => {
 })
 
 test("pins current boss selection to Karlabos while retaining a random policy", () => {
-  assert.deepEqual(currentFinalFantasyVBossSelection, { kind: "fixed", bossId: "karlabos" })
-  assert.equal(selectFinalFantasyVBoss(bossCatalog).key, "karlabos")
-  assert.equal(selectFinalFantasyVBoss(
+  assert.deepEqual(currentBossSelection, { kind: "fixed", bossId: "karlabos" })
+  assert.equal(selectBoss(bossCatalog).key, "karlabos")
+  assert.equal(selectBoss(
     bossCatalog,
     { kind: "random", random: () => 0 },
   ).key, "karlabos")
-  assert.equal(selectFinalFantasyVBoss(
+  assert.equal(selectBoss(
     bossCatalog,
     { kind: "random", random: () => 0.9999 },
   ).key, "ramuh")
 })
 
 test("uses Karlabos progression to expose only Freelancer and Wind jobs", () => {
-  const karlabos = selectFinalFantasyVBoss(bossCatalog)
+  const karlabos = selectBoss(bossCatalog)
   const availableJobs = [...strategyCatalog.jobs.values()]
-    .filter((job) => finalFantasyVJobIsAvailableThroughCrystal(job, karlabos.jobsUnlocked))
+    .filter((job) => jobIsAvailableThroughCrystal(job, karlabos.jobsUnlocked))
     .map((job) => job.id)
 
   assert.deepEqual(availableJobs, [
@@ -178,22 +178,22 @@ test("uses encounter traits to differentiate all current boss profiles", () => {
 
 test("rejects invalid boss selection and catalog relationships", () => {
   assert.throws(
-    () => selectFinalFantasyVBoss(bossCatalog, { kind: "fixed", bossId: "missing" }),
+    () => selectBoss(bossCatalog, { kind: "fixed", bossId: "missing" }),
     /Unknown Final Fantasy V selected boss: missing/,
   )
   assert.throws(
-    () => selectFinalFantasyVBoss(bossCatalog, { kind: "random", random: () => 1 }),
+    () => selectBoss(bossCatalog, { kind: "random", random: () => 1 }),
     /random source must return a number from 0 through 1/,
   )
   assert.throws(
-    () => buildFinalFantasyVBossCatalog({
+    () => buildBossCatalog({
       ...bossDefinitions,
       mainStory: [{ ...bossDefinitions.mainStory[0]!, ordinal: 2 }],
     }),
     /ordinals must be contiguous/,
   )
   assert.throws(
-    () => buildFinalFantasyVBossCatalog({
+    () => buildBossCatalog({
       ...bossDefinitions,
       optional: [{
         ...bossDefinitions.optional[0]!,
@@ -203,7 +203,7 @@ test("rejects invalid boss selection and catalog relationships", () => {
     /optional boss predecessors: missing/,
   )
   assert.throws(
-    () => buildFinalFantasyVBossCatalog({
+    () => buildBossCatalog({
       mainStory: bossDefinitions.mainStory,
       optional: [{
         ...bossDefinitions.optional[0]!,
@@ -215,21 +215,21 @@ test("rejects invalid boss selection and catalog relationships", () => {
 })
 
 test("defensively validates boss and boss-strategy YAML", () => {
-  assert.throws(() => decodeFinalFantasyVBosses({}), /encounters must be an array/)
+  assert.throws(() => decodeBosses({}), /encounters must be an array/)
   assert.throws(
-    () => decodeFinalFantasyVBosses({ encounters: [{}], optionalEncounters: [] }),
+    () => decodeBosses({ encounters: [{}], optionalEncounters: [] }),
     /ordinal must be a positive integer/,
   )
   assert.throws(
-    () => decodeFinalFantasyVBosses({
+    () => decodeBosses({
       encounters: [{ ordinal: 1, key: "boss", name: "Boss", jobsUnlocked: "unknown" }],
       optionalEncounters: [],
     }),
     /known Final Fantasy V crystal unlock/,
   )
-  assert.throws(() => decodeFinalFantasyVBossStrategy({}), /bosses must be an array/)
+  assert.throws(() => decodeBossStrategy({}), /bosses must be an array/)
   assert.throws(
-    () => decodeFinalFantasyVBossStrategy({
+    () => decodeBossStrategy({
       bosses: [{
         boss: "karlabos",
         targetCount: 1,
@@ -244,7 +244,7 @@ test("defensively validates boss and boss-strategy YAML", () => {
     /must be a known element/,
   )
   assert.throws(
-    () => decodeFinalFantasyVBossStrategy({
+    () => decodeBossStrategy({
       bosses: [{
         boss: "karlabos",
         targetCount: 1,
@@ -259,7 +259,7 @@ test("defensively validates boss and boss-strategy YAML", () => {
     /must be a known boss trait/,
   )
   assert.throws(
-    () => decodeFinalFantasyVBossStrategy({
+    () => decodeBossStrategy({
       bosses: [],
       assumptions: [],
       capabilities: [],
@@ -279,7 +279,7 @@ test("defensively validates boss and boss-strategy YAML", () => {
 
 test("validates compiled boss strategy references and bounds", () => {
   assert.throws(
-    () => new FinalFantasyVBossStrategyEngine(
+    () => new BossStrategyEngine(
       strategyCatalog,
       bossCatalog,
       patchStrategy({ bosses: [{ ...bossStrategyDefinitions.bosses[0]!, boss: "missing" }] }),
@@ -287,7 +287,7 @@ test("validates compiled boss strategy references and bounds", () => {
     /Unknown Final Fantasy V boss strategy profile: missing/,
   )
   assert.throws(
-    () => new FinalFantasyVBossStrategyEngine(
+    () => new BossStrategyEngine(
       strategyCatalog,
       bossCatalog,
       patchStrategy({ capabilities: [{ key: "bad", providers: [{ ability: "missing" }] }] }),
@@ -295,7 +295,7 @@ test("validates compiled boss strategy references and bounds", () => {
     /Unknown Final Fantasy V boss capability ability: missing/,
   )
   assert.throws(
-    () => new FinalFantasyVBossStrategyEngine(
+    () => new BossStrategyEngine(
       strategyCatalog,
       bossCatalog,
       patchStrategy({ rules: [{
@@ -309,7 +309,7 @@ test("validates compiled boss strategy references and bounds", () => {
     /Unknown Final Fantasy V boss capability: missing/,
   )
   assert.throws(
-    () => new FinalFantasyVBossStrategyEngine(
+    () => new BossStrategyEngine(
       strategyCatalog,
       bossCatalog,
       patchStrategy({ rules: [{
@@ -326,10 +326,10 @@ test("validates compiled boss strategy references and bounds", () => {
 })
 
 function member(
-  characterId: FinalFantasyVCharacterId,
+  characterId: CharacterId,
   jobId: string,
-): FinalFantasyVPartyMember {
-  const result = validateFinalFantasyVLoadout({ jobId, assignments: [] }, learningState, strategyCatalog)
+): PartyMember {
+  const result = validateLoadout({ jobId, assignments: [] }, learningState, strategyCatalog)
   assert.equal(result.kind, "valid")
   if (result.kind === "invalid") {
     throw new Error("Expected test loadout to be valid")
@@ -339,7 +339,7 @@ function member(
 }
 
 function patchStrategy(
-  patch: Partial<FinalFantasyVBossStrategyDefinitions>,
-): FinalFantasyVBossStrategyDefinitions {
+  patch: Partial<BossStrategyDefinitions>,
+): BossStrategyDefinitions {
   return { ...bossStrategyDefinitions, ...patch }
 }

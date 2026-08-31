@@ -4,9 +4,9 @@ import test from "node:test"
 
 import { parse } from "yaml"
 
-import { FinalFantasyPartyStrategyEngine } from "../../../main/ts/final-fantasy/party-strategy-core.ts"
+import { PartyStrategyEngine } from "../../../main/ts/final-fantasy/party-strategy-core.ts"
 import {
-  buildFinalFantasyStrategyEngine,
+  buildStrategyEngine,
   createFullToolkitParty,
 } from "../../../main/ts/final-fantasy/strategy-core.ts"
 import { decodeStrategyPayload } from "../../../main/ts/final-fantasy/strategy-json.ts"
@@ -23,8 +23,8 @@ test("browser payload preserves ordered party and boss-position rules", async ()
     loadYaml("data/final-fantasy/party-strategy.yaml"),
   ])
   const payload = decodeStrategyPayload({ classes, spells, bosses, strategy, partyStrategy })
-  const bossEngine = buildFinalFantasyStrategyEngine(payload.definitions)
-  const partyEngine = new FinalFantasyPartyStrategyEngine(bossEngine.catalog, payload.partyRules)
+  const bossEngine = buildStrategyEngine(payload.definitions)
+  const partyEngine = new PartyStrategyEngine(bossEngine.catalog, payload.partyRules)
   const classIds = ["white-mage", "warrior"]
   const partyRules = partyEngine.analyze(classIds).observations
     .map((observation) => observation.ruleId)

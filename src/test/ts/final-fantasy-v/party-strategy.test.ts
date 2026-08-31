@@ -4,27 +4,27 @@ import test from "node:test"
 import { parse } from "yaml"
 
 import {
-  buildFinalFantasyVStrategyCatalog,
-  decodeFinalFantasyVJobs,
-  decodeFinalFantasyVPartyStrategy,
-  FinalFantasyVPartyStrategyEngine,
-  finalFantasyVStrategyYamlFiles,
-  validateFinalFantasyVLoadout,
-  type FinalFantasyVCharacterId,
-  type FinalFantasyVLearnedAbility,
-  type FinalFantasyVMemberSelectorDefinition,
-  type FinalFantasyVPartyMember,
-  type FinalFantasyVPartyStrategyRuleDefinition,
+  buildStrategyCatalog,
+  decodeJobs,
+  decodePartyStrategy,
+  PartyStrategyEngine,
+  strategyYamlFiles,
+  validateLoadout,
+  type CharacterId,
+  type LearnedAbility,
+  type MemberSelectorDefinition,
+  type PartyMember,
+  type PartyStrategyRuleDefinition,
 } from "../../../main/ts/final-fantasy-v/index.ts"
 
 const jobsYaml = await readFile("data/final-fantasy-v-jobs.yaml", "utf8")
-const catalog = buildFinalFantasyVStrategyCatalog(decodeFinalFantasyVJobs(parse(jobsYaml)))
-const strategyYaml = await readFile(finalFantasyVStrategyYamlFiles.partyStrategy, "utf8")
-const rules = decodeFinalFantasyVPartyStrategy(parse(strategyYaml))
-const engine = new FinalFantasyVPartyStrategyEngine(catalog, rules)
+const catalog = buildStrategyCatalog(decodeJobs(parse(jobsYaml)))
+const strategyYaml = await readFile(strategyYamlFiles.partyStrategy, "utf8")
+const rules = decodePartyStrategy(parse(strategyYaml))
+const engine = new PartyStrategyEngine(catalog, rules)
 
 test("loads party strategy rules from YAML", () => {
-  assert.equal(finalFantasyVStrategyYamlFiles.partyStrategy, "data/final-fantasy-v-party-strategy.yaml")
+  assert.equal(strategyYamlFiles.partyStrategy, "data/final-fantasy-v-party-strategy.yaml")
   assert.equal(rules.length, 57)
   assert.deepEqual(engine.ruleIds, rules.map((rule) => rule.id))
 })
@@ -179,7 +179,7 @@ test("accounts for interaction-worthy abilities without forcing filler or versio
 })
 
 test("keeps every authored rule reachable with legal loadouts", () => {
-  const parties: FinalFantasyVPartyMember[][] = [
+  const parties: PartyMember[][] = [
     [member("bartz", "white-mage", [ranked("black-magic", 3)])],
     [member("bartz", "black-mage", [ranked("white-magic", 3)])],
     [member("bartz", "monk", [ranked("white-magic", 3)])],
@@ -277,25 +277,25 @@ test("rejects impossible or ambiguous party membership", () => {
 
 test("validates the intentionally interaction-only vocabulary", () => {
   assert.throws(
-    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+    () => new PartyStrategyEngine(catalog, [
       rule("trivial", { sameMember: [{ job: "white-mage" }] }),
     ]),
     /must combine at least two same-member selectors/,
   )
   assert.throws(
-    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+    () => new PartyStrategyEngine(catalog, [
       rule("trivial", { distinctMembers: [{ job: "white-mage" }] }),
     ]),
     /must combine at least two distinct-member selectors/,
   )
   assert.throws(
-    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+    () => new PartyStrategyEngine(catalog, [
       rule("unknown", { sameMember: [{ job: "missing" }, { assignment: "white-magic" }] }),
     ]),
     /Unknown Final Fantasy V strategy job: missing/,
   )
   assert.throws(
-    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+    () => new PartyStrategyEngine(catalog, [
       rule("bad-rank", {
         sameMember: [{ job: "white-mage" }, { assignment: "black-magic", atLeastRank: 0 }],
       }),
@@ -303,14 +303,14 @@ test("validates the intentionally interaction-only vocabulary", () => {
     /rank for black-magic must be a positive integer/,
   )
   assert.throws(
-    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+    () => new PartyStrategyEngine(catalog, [
       rule("duplicate", { distinctMembers: [{ job: "white-mage" }, { job: "black-mage" }] }),
       rule("duplicate", { distinctMembers: [{ job: "knight" }, { job: "monk" }] }),
     ]),
     /Duplicate Final Fantasy V party strategy rule ids: duplicate/,
   )
   assert.throws(
-    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+    () => new PartyStrategyEngine(catalog, [
       rule("empty-one-of", {
         sameMember: [{ job: "freelancer" }, { assignmentOneOf: [] }],
       }),
@@ -318,7 +318,7 @@ test("validates the intentionally interaction-only vocabulary", () => {
     /assignmentOneOf must not be empty/,
   )
   assert.throws(
-    () => new FinalFantasyVPartyStrategyEngine(catalog, [
+    () => new PartyStrategyEngine(catalog, [
       rule("unknown-one-of", {
         sameMember: [{ job: "freelancer" }, { assignmentOneOf: ["missing"] }],
       }),
@@ -329,11 +329,11 @@ test("validates the intentionally interaction-only vocabulary", () => {
 
 test("defensively decodes YAML rule structure", () => {
   assert.throws(
-    () => decodeFinalFantasyVPartyStrategy({}),
+    () => decodePartyStrategy({}),
     /party strategy.rules must be an array/,
   )
   assert.throws(
-    () => decodeFinalFantasyVPartyStrategy({ rules: [{
+    () => decodePartyStrategy({ rules: [{
       id: "both",
       kind: "setup",
       when: { sameMember: [], distinctMembers: [] },
@@ -342,7 +342,7 @@ test("defensively decodes YAML rule structure", () => {
     /must have exactly one operation/,
   )
   assert.throws(
-    () => decodeFinalFantasyVPartyStrategy({ rules: [{
+    () => decodePartyStrategy({ rules: [{
       id: "both",
       kind: "setup",
       when: { sameMember: [{ job: "knight", assignment: "guard" }] },
@@ -351,7 +351,7 @@ test("defensively decodes YAML rule structure", () => {
     /must have exactly one selector/,
   )
   assert.throws(
-    () => decodeFinalFantasyVPartyStrategy({ rules: [{
+    () => decodePartyStrategy({ rules: [{
       id: "type",
       kind: "setup",
       when: { sameMember: [{ assignmentType: "magic" }, { job: "knight" }] },
@@ -360,7 +360,7 @@ test("defensively decodes YAML rule structure", () => {
     /must be active or passive/,
   )
   assert.throws(
-    () => decodeFinalFantasyVPartyStrategy({ rules: [{
+    () => decodePartyStrategy({ rules: [{
       id: "rank",
       kind: "setup",
       when: { sameMember: [{ job: "knight", atLeastRank: 2 }, { job: "monk" }] },
@@ -369,7 +369,7 @@ test("defensively decodes YAML rule structure", () => {
     /atLeastRank requires an assignment or innate selector/,
   )
   assert.throws(
-    () => decodeFinalFantasyVPartyStrategy({ rules: [{
+    () => decodePartyStrategy({ rules: [{
       id: "one-of",
       kind: "tradeoff",
       when: {
@@ -382,12 +382,12 @@ test("defensively decodes YAML rule structure", () => {
 })
 
 function member(
-  characterId: FinalFantasyVCharacterId,
+  characterId: CharacterId,
   jobId: string,
-  learnedAbilities: readonly FinalFantasyVLearnedAbility[] = [],
+  learnedAbilities: readonly LearnedAbility[] = [],
   masteredJobIds: readonly string[] = [],
-): FinalFantasyVPartyMember {
-  const validation = validateFinalFantasyVLoadout(
+): PartyMember {
+  const validation = validateLoadout(
     { jobId, assignments: learnedAbilities.map(({ abilityId }) => ({ abilityId })) },
     { learnedAbilities, masteredJobIds: new Set(masteredJobIds) },
     catalog,
@@ -397,23 +397,23 @@ function member(
   return { characterId, loadout: validation.value }
 }
 
-function ranked(abilityId: string, rank: number): FinalFantasyVLearnedAbility {
+function ranked(abilityId: string, rank: number): LearnedAbility {
   return { kind: "ranked", abilityId, rank }
 }
 
-function flat(abilityId: string): FinalFantasyVLearnedAbility {
+function flat(abilityId: string): LearnedAbility {
   return { kind: "flat", abilityId }
 }
 
 function selectors(
-  when: FinalFantasyVPartyStrategyRuleDefinition["when"],
-): readonly FinalFantasyVMemberSelectorDefinition[] {
+  when: PartyStrategyRuleDefinition["when"],
+): readonly MemberSelectorDefinition[] {
   return "sameMember" in when ? when.sameMember : when.distinctMembers
 }
 
 function rule(
   id: string,
-  when: FinalFantasyVPartyStrategyRuleDefinition["when"],
-): FinalFantasyVPartyStrategyRuleDefinition {
+  when: PartyStrategyRuleDefinition["when"],
+): PartyStrategyRuleDefinition {
   return { id, kind: "setup", when, statement: "Test statement." }
 }

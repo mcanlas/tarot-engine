@@ -5,23 +5,23 @@ import test from "node:test"
 import { parse } from "yaml"
 
 import {
-  FinalFantasyNextActionProvider,
-  type FinalFantasyCharacterState,
-  type FinalFantasyEquipmentDefinition,
-  type FinalFantasyMagicDefinition,
-  type FinalFantasyNextAction,
-  type FinalFantasyNextActionCatalog,
-  type FinalFantasyPartyState,
+  NextActionProvider,
+  type CharacterState,
+  type EquipmentDefinition,
+  type MagicDefinition,
+  type NextAction,
+  type NextActionCatalog,
+  type PartyState,
 } from "../../../main/ts/final-fantasy/next-action-provider.ts"
 import {
-  type FinalFantasyCatalog,
+  type StrategyCatalog,
 } from "../../../main/ts/final-fantasy/strategy-core.ts"
 import {
-  loadFinalFantasyCatalog,
+  loadStrategyCatalog,
 } from "../../../main/ts/final-fantasy/strategy-data.ts"
 import {
-  loadFinalFantasyTowns,
-  type FinalFantasyTownDefinition,
+  loadTowns,
+  type TownDefinition,
 } from "../../../main/ts/final-fantasy/towns.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
@@ -30,8 +30,8 @@ const loadProjectFile = (path: string): Promise<string> =>
 const character = (
   id: string,
   baseClass: string,
-  overrides: Partial<FinalFantasyCharacterState> = {},
-): FinalFantasyCharacterState => ({
+  overrides: Partial<CharacterState> = {},
+): CharacterState => ({
   id,
   baseClass,
   promoted: false,
@@ -41,26 +41,26 @@ const character = (
 })
 
 const party = (
-  characters: readonly FinalFantasyCharacterState[],
+  characters: readonly CharacterState[],
   gil = 100,
-): FinalFantasyPartyState => ({ characters, gil })
+): PartyState => ({ characters, gil })
 
 interface LoadedProvider {
-  readonly catalog: FinalFantasyCatalog
-  readonly actionCatalog: FinalFantasyNextActionCatalog
-  readonly cornelia: FinalFantasyTownDefinition
-  readonly provider: FinalFantasyNextActionProvider
+  readonly catalog: StrategyCatalog
+  readonly actionCatalog: NextActionCatalog
+  readonly cornelia: TownDefinition
+  readonly provider: NextActionProvider
 }
 
 async function loadProvider(): Promise<LoadedProvider> {
   const [catalog, towns, itemText, magicText] = await Promise.all([
-    loadFinalFantasyCatalog(loadProjectFile),
-    loadFinalFantasyTowns(loadProjectFile),
+    loadStrategyCatalog(loadProjectFile),
+    loadTowns(loadProjectFile),
     loadProjectFile("data/final-fantasy/items.yaml"),
     loadProjectFile("data/final-fantasy/magic.yaml"),
   ])
-  const equipment = (parse(itemText) as { items: FinalFantasyEquipmentDefinition[] }).items
-  const magic = (parse(magicText) as { magic: FinalFantasyMagicDefinition[] }).magic
+  const equipment = (parse(itemText) as { items: EquipmentDefinition[] }).items
+  const magic = (parse(magicText) as { magic: MagicDefinition[] }).magic
   const actionCatalog = { equipment, magic }
   const cornelia = towns.towns[0]!
 
@@ -68,11 +68,11 @@ async function loadProvider(): Promise<LoadedProvider> {
     catalog,
     actionCatalog,
     cornelia,
-    provider: new FinalFantasyNextActionProvider(catalog, actionCatalog),
+    provider: new NextActionProvider(catalog, actionCatalog),
   }
 }
 
-const actionKey = (action: FinalFantasyNextAction): string =>
+const actionKey = (action: NextAction): string =>
   action.kind === "learn-spell"
     ? `${action.characterId}:learn:${action.spell}`
     : `${action.characterId}:bind:${action.item}`
@@ -221,7 +221,7 @@ test("rejects invalid party state", async () => {
     ...catalog,
     jobs: new Map([...catalog.jobs].filter(([key]) => key !== "ninja")),
   }
-  const missingPromotionProvider = new FinalFantasyNextActionProvider(
+  const missingPromotionProvider = new NextActionProvider(
     catalogWithoutNinja,
     actionCatalog,
   )
@@ -238,14 +238,14 @@ test("rejects inconsistent action catalogs and town wares", async () => {
   const { catalog, actionCatalog, cornelia } = await loadProvider()
 
   assert.throws(
-    () => new FinalFantasyNextActionProvider(catalog, {
+    () => new NextActionProvider(catalog, {
       ...actionCatalog,
       equipment: [actionCatalog.equipment[0]!, actionCatalog.equipment[0]!],
     }),
     /Duplicate Final Fantasy equipment key: nunchaku/,
   )
   assert.throws(
-    () => new FinalFantasyNextActionProvider(catalog, {
+    () => new NextActionProvider(catalog, {
       ...actionCatalog,
       magic: [actionCatalog.magic[0]!, actionCatalog.magic[0]!],
     }),
@@ -253,7 +253,7 @@ test("rejects inconsistent action catalogs and town wares", async () => {
   )
 
   const warrior = party([character("garland", "warrior")])
-  const equipmentProvider = new FinalFantasyNextActionProvider(catalog, {
+  const equipmentProvider = new NextActionProvider(catalog, {
     ...actionCatalog,
     equipment: actionCatalog.equipment.filter((item) => item.key !== "nunchaku"),
   })
@@ -262,7 +262,7 @@ test("rejects inconsistent action catalogs and town wares", async () => {
     /weapons ware nunchaku is missing matching equipment data/,
   )
 
-  const magicProvider = new FinalFantasyNextActionProvider(catalog, {
+  const magicProvider = new NextActionProvider(catalog, {
     ...actionCatalog,
     magic: actionCatalog.magic.map((magic) =>
       magic.key === "cure" ? { ...magic, school: "black" as const } : magic,
@@ -277,7 +277,7 @@ test("rejects inconsistent action catalogs and town wares", async () => {
     ...catalog,
     spells: new Map([...catalog.spells].filter(([key]) => key !== "focus")),
   }
-  const spellProvider = new FinalFantasyNextActionProvider(catalogWithoutFocus, actionCatalog)
+  const spellProvider = new NextActionProvider(catalogWithoutFocus, actionCatalog)
   assert.throws(
     () => spellProvider.availableActions(warrior, cornelia),
     /Magic focus is missing from the Final Fantasy spell catalog/,

@@ -4,18 +4,18 @@ import test from "node:test"
 
 import {
   createRandomPartyBossStrategy,
-  loadFinalFantasyPartyStrategyEngine,
+  loadPartyStrategyEngine,
   partyStrategyYamlFile,
   renderBossStrategy,
   runConsole,
 } from "./party-strategy.ts"
-import { loadFinalFantasyStrategyEngine } from "../../../main/ts/final-fantasy/strategy-data.ts"
+import { loadStrategyEngine } from "../../../main/ts/final-fantasy/strategy-data.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
-const engine = await loadFinalFantasyPartyStrategyEngine(loadProjectFile)
-const bossEngine = await loadFinalFantasyStrategyEngine(loadProjectFile)
+const engine = await loadPartyStrategyEngine(loadProjectFile)
+const bossEngine = await loadStrategyEngine(loadProjectFile)
 
 function orderedPartyFormations(classIds: readonly string[]): string[][] {
   const parties: string[][] = []
@@ -215,7 +215,7 @@ test("renders console output without exposing rule mechanics", () => {
 })
 
 test("rejects invalid or unreachable YAML rule definitions", async () => {
-  const loadWithStrategy = (strategy: string) => loadFinalFantasyPartyStrategyEngine(
+  const loadWithStrategy = (strategy: string) => loadPartyStrategyEngine(
     (path) => path === partyStrategyYamlFile ? Promise.resolve(strategy) : loadProjectFile(path),
   )
 

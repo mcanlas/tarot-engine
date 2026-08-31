@@ -3,17 +3,17 @@ import { readFileSync } from "node:fs"
 import test from "node:test"
 import { parse } from "yaml"
 import {
-  buildFinalFantasyVStrategyCatalog,
-  decodeFinalFantasyVJobs,
-  finalFantasyVCrystalUnlockOrdinal,
-  finalFantasyVJobIsAvailableThroughCrystal,
+  buildStrategyCatalog,
+  decodeJobs,
+  crystalUnlockOrdinal,
+  jobIsAvailableThroughCrystal,
 } from "../../../main/ts/final-fantasy-v/index.ts"
 
 const jobsYaml = readFileSync("data/final-fantasy-v-jobs.yaml", "utf8")
-const catalog = buildFinalFantasyVStrategyCatalog(decodeFinalFantasyVJobs(parse(jobsYaml)))
+const catalog = buildStrategyCatalog(decodeJobs(parse(jobsYaml)))
 
 test("orders FFV crystal job unlocks", () => {
-  assert.deepEqual(finalFantasyVCrystalUnlockOrdinal, {
+  assert.deepEqual(crystalUnlockOrdinal, {
     none: 0,
     wind: 1,
     "water-1": 2,
@@ -26,7 +26,7 @@ test("orders FFV crystal job unlocks", () => {
 
 test("queries jobs available through a crystal unlock batch", () => {
   const availableAtWater = [...catalog.jobs.values()]
-    .filter((job) => finalFantasyVJobIsAvailableThroughCrystal(job, "water-1"))
+    .filter((job) => jobIsAvailableThroughCrystal(job, "water-1"))
     .map((job) => job.id)
 
   assert.deepEqual(availableAtWater, [
@@ -45,7 +45,7 @@ test("queries jobs available through a crystal unlock batch", () => {
   ])
 
   const availableAtInitialFire = [...catalog.jobs.values()]
-    .filter((job) => finalFantasyVJobIsAvailableThroughCrystal(job, "fire-1"))
+    .filter((job) => jobIsAvailableThroughCrystal(job, "fire-1"))
     .map((job) => job.id)
   assert.equal(availableAtInitialFire.includes("beastmaster"), true)
   assert.equal(availableAtInitialFire.includes("bard"), false)
@@ -53,7 +53,7 @@ test("queries jobs available through a crystal unlock batch", () => {
   assert.equal(availableAtInitialFire.includes("mime"), false)
 
   const availableAtBlackChocobo = [...catalog.jobs.values()]
-    .filter((job) => finalFantasyVJobIsAvailableThroughCrystal(job, "fire-2"))
+    .filter((job) => jobIsAvailableThroughCrystal(job, "fire-2"))
     .map((job) => job.id)
   assert.equal(availableAtBlackChocobo.includes("bard"), true)
   assert.equal(availableAtBlackChocobo.includes("ranger"), true)

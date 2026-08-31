@@ -1,20 +1,20 @@
 import {
   bossScoreDimensions,
-  type FinalFantasyVBossCapabilityDefinition,
-  type FinalFantasyVBossCapabilityProviderDefinition,
-  type FinalFantasyVBossFactDefinition,
-  type FinalFantasyVBossPartyConditionDefinition,
-  type FinalFantasyVBossProfileDefinition,
-  type FinalFantasyVBossRuleDefinition,
-  type FinalFantasyVBossScoreDimension,
-  type FinalFantasyVBossStrategyAssumptionDefinition,
-  type FinalFantasyVBossStrategyDefinitions,
-  type FinalFantasyVBossTrait,
-  type FinalFantasyVBossThreat,
-  type FinalFantasyVElement,
+  type BossCapabilityDefinition,
+  type BossCapabilityProviderDefinition,
+  type BossFactDefinition,
+  type BossPartyConditionDefinition,
+  type BossProfileDefinition,
+  type BossRuleDefinition,
+  type BossScoreDimension,
+  type BossStrategyAssumptionDefinition,
+  type BossStrategyDefinitions,
+  type BossTrait,
+  type BossThreat,
+  type Element,
 } from "./boss-strategy.ts"
 
-const elements = new Set<FinalFantasyVElement>([
+const elements = new Set<Element>([
   "fire",
   "ice",
   "lightning",
@@ -24,7 +24,7 @@ const elements = new Set<FinalFantasyVElement>([
   "poison",
   "holy",
 ])
-const threats = new Set<FinalFantasyVBossThreat>([
+const threats = new Set<BossThreat>([
   "physical-damage",
   "magical-damage",
   "hp-collapse",
@@ -40,7 +40,7 @@ const threats = new Set<FinalFantasyVBossThreat>([
   "mp-pressure",
   "level-reduction",
 ])
-const traits = new Set<FinalFantasyVBossTrait>([
+const traits = new Set<BossTrait>([
   "form-shifting",
   "counterattacks",
   "multiple-targets",
@@ -52,9 +52,9 @@ const traits = new Set<FinalFantasyVBossTrait>([
   "self-healing",
 ])
 
-export function decodeFinalFantasyVBossStrategy(
+export function decodeBossStrategy(
   value: unknown,
-): FinalFantasyVBossStrategyDefinitions {
+): BossStrategyDefinitions {
   const document = requireRecord(value, "Final Fantasy V boss strategy")
 
   return {
@@ -72,7 +72,7 @@ export function decodeFinalFantasyVBossStrategy(
   }
 }
 
-function decodeBoss(value: unknown, index: number): FinalFantasyVBossProfileDefinition {
+function decodeBoss(value: unknown, index: number): BossProfileDefinition {
   const path = `Final Fantasy V boss strategy.bosses[${index}]`
   const record = requireRecord(value, path)
 
@@ -97,7 +97,7 @@ function decodeBoss(value: unknown, index: number): FinalFantasyVBossProfileDefi
 function decodeThreat(
   value: unknown,
   path: string,
-): FinalFantasyVBossProfileDefinition["threats"][number] {
+): BossProfileDefinition["threats"][number] {
   const record = requireRecord(value, path)
 
   return {
@@ -109,7 +109,7 @@ function decodeThreat(
 function decodeAssumption(
   value: unknown,
   index: number,
-): FinalFantasyVBossStrategyAssumptionDefinition {
+): BossStrategyAssumptionDefinition {
   const path = `Final Fantasy V boss strategy.assumptions[${index}]`
   const record = requireRecord(value, path)
 
@@ -122,7 +122,7 @@ function decodeAssumption(
 function decodeCapability(
   value: unknown,
   index: number,
-): FinalFantasyVBossCapabilityDefinition {
+): BossCapabilityDefinition {
   const path = `Final Fantasy V boss strategy.capabilities[${index}]`
   const record = requireRecord(value, path)
 
@@ -139,7 +139,7 @@ function decodeCapability(
 function decodeProvider(
   value: unknown,
   path: string,
-): FinalFantasyVBossCapabilityProviderDefinition {
+): BossCapabilityProviderDefinition {
   const record = requireRecord(value, path)
 
   return {
@@ -150,7 +150,7 @@ function decodeProvider(
   }
 }
 
-function decodeRule(value: unknown, index: number): FinalFantasyVBossRuleDefinition {
+function decodeRule(value: unknown, index: number): BossRuleDefinition {
   const path = `Final Fantasy V boss strategy.rules[${index}]`
   const record = requireRecord(value, path)
   const when = requireRecord(record.when, `${path}.when`)
@@ -166,7 +166,7 @@ function decodeRule(value: unknown, index: number): FinalFantasyVBossRuleDefinit
   }
 }
 
-function decodeBossFact(value: unknown, path: string): FinalFantasyVBossFactDefinition {
+function decodeBossFact(value: unknown, path: string): BossFactDefinition {
   const record = requireRecord(value, path)
   const operations = ["vulnerability", "threat", "trait"]
     .filter((operation) => record[operation] !== undefined)
@@ -187,7 +187,7 @@ function decodeBossFact(value: unknown, path: string): FinalFantasyVBossFactDefi
 function decodePartyCondition(
   value: unknown,
   path: string,
-): FinalFantasyVBossPartyConditionDefinition {
+): BossPartyConditionDefinition {
   const record = requireRecord(value, path)
 
   return {
@@ -204,10 +204,10 @@ function decodePartyCondition(
 function decodeScore(
   value: unknown,
   path: string,
-): Readonly<Partial<Record<FinalFantasyVBossScoreDimension, number>>> {
+): Readonly<Partial<Record<BossScoreDimension, number>>> {
   const record = requireRecord(value, path)
   const unknown = Object.keys(record).filter((key) =>
-    !bossScoreDimensions.includes(key as FinalFantasyVBossScoreDimension))
+    !bossScoreDimensions.includes(key as BossScoreDimension))
   if (unknown.length > 0) {
     throw new Error(`${path} has unknown dimensions: ${unknown.join(", ")}`)
   }
@@ -218,31 +218,31 @@ function decodeScore(
   ]))
 }
 
-function requireElement(value: unknown, path: string): FinalFantasyVElement {
+function requireElement(value: unknown, path: string): Element {
   const element = requireString(value, path)
-  if (!elements.has(element as FinalFantasyVElement)) {
+  if (!elements.has(element as Element)) {
     throw new Error(`${path} must be a known element`)
   }
 
-  return element as FinalFantasyVElement
+  return element as Element
 }
 
-function requireThreat(value: unknown, path: string): FinalFantasyVBossThreat {
+function requireThreat(value: unknown, path: string): BossThreat {
   const threat = requireString(value, path)
-  if (!threats.has(threat as FinalFantasyVBossThreat)) {
+  if (!threats.has(threat as BossThreat)) {
     throw new Error(`${path} must be a known boss threat`)
   }
 
-  return threat as FinalFantasyVBossThreat
+  return threat as BossThreat
 }
 
-function requireTrait(value: unknown, path: string): FinalFantasyVBossTrait {
+function requireTrait(value: unknown, path: string): BossTrait {
   const trait = requireString(value, path)
-  if (!traits.has(trait as FinalFantasyVBossTrait)) {
+  if (!traits.has(trait as BossTrait)) {
     throw new Error(`${path} must be a known boss trait`)
   }
 
-  return trait as FinalFantasyVBossTrait
+  return trait as BossTrait
 }
 
 function requireRecord(value: unknown, path: string): Record<string, unknown> {

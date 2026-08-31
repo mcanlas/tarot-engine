@@ -1,6 +1,6 @@
 import type {
   CapabilityId,
-  FinalFantasyCatalog,
+  StrategyCatalog,
   FrontlineSuitabilityId,
   Job,
 } from "./strategy-core.ts"
@@ -50,14 +50,14 @@ interface PartyRule {
   statement: string
 }
 
-export class FinalFantasyPartyStrategyEngine {
+export class PartyStrategyEngine {
   readonly classIds: readonly string[]
   readonly ruleIds: readonly string[]
   readonly ruleCount: number
-  readonly #catalog: FinalFantasyCatalog
+  readonly #catalog: StrategyCatalog
   readonly #rules: readonly PartyRule[]
 
-  constructor(catalog: FinalFantasyCatalog, definitions: readonly PartyStrategyRuleDefinition[]) {
+  constructor(catalog: StrategyCatalog, definitions: readonly PartyStrategyRuleDefinition[]) {
     this.#catalog = catalog
     this.classIds = [...catalog.jobs.values()]
       .filter((job) => job.promotion !== undefined)
@@ -158,7 +158,7 @@ function randomIndex(length: number, random: () => number): number {
 
 function buildRule(
   definition: PartyStrategyRuleDefinition,
-  catalog: FinalFantasyCatalog,
+  catalog: StrategyCatalog,
 ): PartyRule {
   if (definition.kind !== "strength" && definition.kind !== "weakness") {
     throw new Error(`Unknown party strategy kind: ${definition.kind}`)
@@ -174,7 +174,7 @@ function buildRule(
 
 function buildCondition(
   definition: PartyStrategyConditionDefinition,
-  catalog: FinalFantasyCatalog,
+  catalog: StrategyCatalog,
 ): (party: readonly PartyMemberProfile[]) => boolean {
   if (definition === "always") {
     return () => true

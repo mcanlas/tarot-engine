@@ -1,4 +1,4 @@
-export const finalFantasyStrategyYamlFiles = Object.freeze({
+export const strategyYamlFiles = Object.freeze({
   classes: "data/final-fantasy/classes.yaml",
   spells: "data/final-fantasy/spells.yaml",
   bosses: "data/final-fantasy/bosses.yaml",
@@ -100,7 +100,7 @@ export interface BossStrategyDefinition {
   rules: BossStrategyRuleDefinition[]
 }
 
-export interface FinalFantasyStrategyDefinitions {
+export interface StrategyDefinitions {
   classes: ClassDefinition[]
   spells: SpellDefinition[]
   bosses: BossDefinition[]
@@ -124,7 +124,7 @@ export interface Spell {
   attributes: ReadonlySet<SpellAttributeId>
 }
 
-export interface FinalFantasyCatalog {
+export interface StrategyCatalog {
   jobs: ReadonlyMap<string, Job>
   spells: ReadonlyMap<string, Spell>
 }
@@ -219,20 +219,20 @@ const bossTraits = new Set<BossTraitId>([
 ])
 const guideSections = new Set<GuideSectionId>(["opening", "party-edge", "safety"])
 
-export function describeFinalFantasyStrategyCatalog(): string {
+export function describeStrategyCatalog(): string {
 
-  return `TypeScript connected; ${Object.keys(finalFantasyStrategyYamlFiles).length} YAML catalogs configured.`
+  return `TypeScript connected; ${Object.keys(strategyYamlFiles).length} YAML catalogs configured.`
 }
 
-export class FinalFantasyStrategyEngine {
-  readonly catalog: FinalFantasyCatalog
+export class StrategyEngine {
+  readonly catalog: StrategyCatalog
   readonly bosses: readonly BossDefinition[]
   readonly ruleCount: number
   readonly #bossProfiles: ReadonlyMap<string, BossProfile>
   readonly #rules: readonly BossStrategyRule[]
 
   constructor(
-    catalog: FinalFantasyCatalog,
+    catalog: StrategyCatalog,
     bosses: readonly BossDefinition[],
     bossProfiles: ReadonlyMap<string, BossProfile>,
     rules: readonly BossStrategyRule[],
@@ -271,20 +271,20 @@ export class FinalFantasyStrategyEngine {
   }
 }
 
-export function buildFinalFantasyStrategyEngine(
-  definitions: FinalFantasyStrategyDefinitions,
-): FinalFantasyStrategyEngine {
-  const catalog = buildFinalFantasyCatalog(definitions.classes, definitions.spells)
+export function buildStrategyEngine(
+  definitions: StrategyDefinitions,
+): StrategyEngine {
+  const catalog = buildStrategyCatalog(definitions.classes, definitions.spells)
   const bossProfiles = buildBossProfiles(definitions.bosses)
   const rules = definitions.strategy.rules.map((rule, index) =>
     buildRule(rule, index, catalog, bossProfiles),
   )
 
-  return new FinalFantasyStrategyEngine(catalog, definitions.bosses, bossProfiles, rules)
+  return new StrategyEngine(catalog, definitions.bosses, bossProfiles, rules)
 }
 
 export function createPartyMember(
-  catalog: FinalFantasyCatalog,
+  catalog: StrategyCatalog,
   jobId: string,
   learnedSpellIds: readonly string[] = [],
 ): PartyMember {
@@ -299,7 +299,7 @@ export function createPartyMember(
 }
 
 export function promotePartyMember(
-  catalog: FinalFantasyCatalog,
+  catalog: StrategyCatalog,
   member: PartyMember,
 ): PartyMember {
   if (member.job.promotion === undefined) {
@@ -319,7 +319,7 @@ export function createParty(
 }
 
 export function createFullToolkitParty(
-  catalog: FinalFantasyCatalog,
+  catalog: StrategyCatalog,
   classIds: readonly string[],
 ): Party {
   const members = classIds.map((classId) => {
@@ -349,10 +349,10 @@ export function canUseItem(party: Party, member: PartyMember, item: ItemId): boo
   return party.members.includes(member) && party.inventory.has(item)
 }
 
-export function buildFinalFantasyCatalog(
+export function buildStrategyCatalog(
   classDefinitions: readonly ClassDefinition[],
   spellDefinitions: readonly SpellDefinition[],
-): FinalFantasyCatalog {
+): StrategyCatalog {
   rejectDuplicates("class", classDefinitions.flatMap((definition) => [definition.class, definition.promotion.class]))
   rejectDuplicates("spell", spellDefinitions.map((definition) => definition.spell))
   const jobs = new Map<string, Job>()
@@ -411,7 +411,7 @@ function buildBossProfiles(definitions: readonly BossDefinition[]): ReadonlyMap<
 function buildRule(
   definition: BossStrategyRuleDefinition,
   index: number,
-  catalog: FinalFantasyCatalog,
+  catalog: StrategyCatalog,
   bossProfiles: ReadonlyMap<string, BossProfile>,
 ): BossStrategyRule {
 
@@ -457,7 +457,7 @@ function buildBossCondition(
 
 function buildPartyCondition(
   definition: PartyConditionDefinition,
-  catalog: FinalFantasyCatalog,
+  catalog: StrategyCatalog,
 ): PartyCondition {
   if (definition === "always") {
 
@@ -540,7 +540,7 @@ function buildPartyCondition(
   return (party) => !condition(party)
 }
 
-function parseAdvice(advice: string, catalog: FinalFantasyCatalog): readonly AdvicePart[] {
+function parseAdvice(advice: string, catalog: StrategyCatalog): readonly AdvicePart[] {
   const parts: AdvicePart[] = []
   let offset = 0
   for (const match of advice.matchAll(/\{\{([^{}]+)\}\}/g)) {
@@ -561,7 +561,7 @@ function parseAdvice(advice: string, catalog: FinalFantasyCatalog): readonly Adv
   return parts
 }
 
-function parseAdviceToken(token: string, catalog: FinalFantasyCatalog): Exclude<AdvicePart, string> {
+function parseAdviceToken(token: string, catalog: StrategyCatalog): Exclude<AdvicePart, string> {
   const parts = token.split(":")
 
   if (parts.length === 1 && parts[0] === "boss") {
@@ -578,7 +578,7 @@ function parseAdviceToken(token: string, catalog: FinalFantasyCatalog): Exclude<
   return (party) => formatMembers(party, selector)
 }
 
-function buildMemberSelector(parts: readonly string[], catalog: FinalFantasyCatalog): MemberSelector {
+function buildMemberSelector(parts: readonly string[], catalog: StrategyCatalog): MemberSelector {
   if (parts.length === 1 && parts[0] === "all") {
 
     return { select: (party) => party.members }
@@ -700,7 +700,7 @@ function memberCapabilities(member: PartyMember): ReadonlySet<CapabilityId> {
   return result
 }
 
-function spellsWithAttribute(catalog: FinalFantasyCatalog, attribute: SpellAttributeId): ReadonlySet<Spell> {
+function spellsWithAttribute(catalog: StrategyCatalog, attribute: SpellAttributeId): ReadonlySet<Spell> {
 
   return new Set([...catalog.spells.values()].filter((spell) => spell.attributes.has(attribute)))
 }
@@ -713,7 +713,7 @@ function rejectDuplicates(kind: string, ids: readonly string[]): void {
   }
 }
 
-function requireJob(catalog: FinalFantasyCatalog, id: string, prefix = "Unknown Final Fantasy class"): Job {
+function requireJob(catalog: StrategyCatalog, id: string, prefix = "Unknown Final Fantasy class"): Job {
   const job = catalog.jobs.get(id)
 
   if (job === undefined) {
@@ -722,7 +722,7 @@ function requireJob(catalog: FinalFantasyCatalog, id: string, prefix = "Unknown 
 
   return job
 }
-function requireSpell(catalog: FinalFantasyCatalog, id: string, prefix = "Unknown Final Fantasy spell"): Spell {
+function requireSpell(catalog: StrategyCatalog, id: string, prefix = "Unknown Final Fantasy spell"): Spell {
   const spell = catalog.spells.get(id)
 
   if (spell === undefined) {

@@ -3,7 +3,7 @@ import {
   type BossStrategyDefinition,
   type BossStrategyRuleDefinition,
   type ClassDefinition,
-  type FinalFantasyStrategyDefinitions,
+  type StrategyDefinitions,
   type PartyConditionDefinition,
   type SpellDefinition,
 } from "./strategy-core.ts"
@@ -12,12 +12,12 @@ import type {
   PartyStrategyRuleDefinition,
 } from "./party-strategy-core.ts"
 
-export interface FinalFantasyStrategyPayload {
-  definitions: FinalFantasyStrategyDefinitions
+export interface StrategyPayload {
+  definitions: StrategyDefinitions
   partyRules: PartyStrategyRuleDefinition[]
 }
 
-export function decodeStrategyPayload(value: unknown): FinalFantasyStrategyPayload {
+export function decodeStrategyPayload(value: unknown): StrategyPayload {
   const payload = requireRecord(value, "strategy payload")
 
   return {

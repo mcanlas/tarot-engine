@@ -1,21 +1,21 @@
-import type { FinalFantasyVAbilityType } from "./catalog.ts"
+import type { AbilityType } from "./catalog.ts"
 import type {
-  FinalFantasyVMemberSelectorDefinition,
-  FinalFantasyVPartyObservationKind,
-  FinalFantasyVPartyStrategyConditionDefinition,
-  FinalFantasyVPartyStrategyRuleDefinition,
+  MemberSelectorDefinition,
+  PartyObservationKind,
+  PartyStrategyConditionDefinition,
+  PartyStrategyRuleDefinition,
 } from "./party-strategy.ts"
 
-export function decodeFinalFantasyVPartyStrategy(
+export function decodePartyStrategy(
   value: unknown,
-): FinalFantasyVPartyStrategyRuleDefinition[] {
+): PartyStrategyRuleDefinition[] {
   const document = requireRecord(value, "Final Fantasy V party strategy")
 
   return requireArray(document.rules, "Final Fantasy V party strategy.rules")
     .map(decodeRule)
 }
 
-function decodeRule(value: unknown, index: number): FinalFantasyVPartyStrategyRuleDefinition {
+function decodeRule(value: unknown, index: number): PartyStrategyRuleDefinition {
   const path = `Final Fantasy V party strategy.rules[${index}]`
   const record = requireRecord(value, path)
 
@@ -30,7 +30,7 @@ function decodeRule(value: unknown, index: number): FinalFantasyVPartyStrategyRu
 function decodeCondition(
   value: unknown,
   path: string,
-): FinalFantasyVPartyStrategyConditionDefinition {
+): PartyStrategyConditionDefinition {
   const record = requireRecord(value, path)
   const operations = ["sameMember", "distinctMembers"]
     .filter((operation) => record[operation] !== undefined)
@@ -44,7 +44,7 @@ function decodeCondition(
   return operation === "sameMember" ? { sameMember: selectors } : { distinctMembers: selectors }
 }
 
-function decodeSelector(value: unknown, path: string): FinalFantasyVMemberSelectorDefinition {
+function decodeSelector(value: unknown, path: string): MemberSelectorDefinition {
   const record = requireRecord(value, path)
   const operations = ["job", "assignment", "assignmentOneOf", "innate", "assignmentType"]
     .filter((operation) => record[operation] !== undefined)
@@ -88,7 +88,7 @@ function rejectRank(record: Record<string, unknown>, path: string): void {
   }
 }
 
-function requireAbilityType(value: unknown, path: string): FinalFantasyVAbilityType {
+function requireAbilityType(value: unknown, path: string): AbilityType {
   const type = requireString(value, path)
   if (type !== "active" && type !== "passive") {
     throw new Error(`${path} must be active or passive`)
@@ -97,7 +97,7 @@ function requireAbilityType(value: unknown, path: string): FinalFantasyVAbilityT
   return type
 }
 
-function requireKind(value: unknown, path: string): FinalFantasyVPartyObservationKind {
+function requireKind(value: unknown, path: string): PartyObservationKind {
   const kind = requireString(value, path)
   if (kind !== "setup" && kind !== "tradeoff") {
     throw new Error(`${path} must be setup or tradeoff`)

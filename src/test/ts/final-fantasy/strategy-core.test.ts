@@ -3,24 +3,24 @@ import { readFile } from "node:fs/promises"
 import test from "node:test"
 
 import {
-  buildFinalFantasyStrategyEngine,
+  buildStrategyEngine,
   canUseItem,
   createParty,
   createPartyMember,
-  describeFinalFantasyStrategyCatalog,
+  describeStrategyCatalog,
   partyLabel,
   promotePartyMember,
 } from "../../../main/ts/final-fantasy/strategy-core.ts"
 import {
-  loadFinalFantasyStrategyDefinitions,
-  loadFinalFantasyStrategyEngine,
+  loadStrategyDefinitions,
+  loadStrategyEngine,
 } from "../../../main/ts/final-fantasy/strategy-data.ts"
 
 const loadProjectFile = (path: string): Promise<string> =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
-const definitions = await loadFinalFantasyStrategyDefinitions(loadProjectFile)
-const engine = await loadFinalFantasyStrategyEngine(loadProjectFile)
+const definitions = await loadStrategyDefinitions(loadProjectFile)
+const engine = await loadStrategyEngine(loadProjectFile)
 const member = (job: string, ...spells: string[]) =>
   createPartyMember(engine.catalog, job, spells)
 const party = (
@@ -58,7 +58,7 @@ test("loads and validates the complete YAML strategy catalog", () => {
     ],
   )
   assert.equal(
-    describeFinalFantasyStrategyCatalog(),
+    describeStrategyCatalog(),
     "TypeScript connected; 4 YAML catalogs configured.",
   )
 })
@@ -321,86 +321,86 @@ test("selects random bosses across the complete catalog and validates the source
 test("catalog validation rejects duplicate IDs and dangling references", () => {
   const duplicateClass = structuredClone(definitions)
   duplicateClass.classes[1]!.class = duplicateClass.classes[0]!.class
-  assert.throws(() => buildFinalFantasyStrategyEngine(duplicateClass), /Duplicate class ids/)
+  assert.throws(() => buildStrategyEngine(duplicateClass), /Duplicate class ids/)
 
   const danglingSpell = structuredClone(definitions)
   danglingSpell.spells[0]!.learnableBy.push("mime")
-  assert.throws(() => buildFinalFantasyStrategyEngine(danglingSpell), /references unknown classes: mime/)
+  assert.throws(() => buildStrategyEngine(danglingSpell), /references unknown classes: mime/)
 
   const danglingBoss = structuredClone(definitions)
   danglingBoss.strategy.rules[0]!.boss = "missing boss"
-  assert.throws(() => buildFinalFantasyStrategyEngine(danglingBoss), /Unknown rule boss/)
+  assert.throws(() => buildStrategyEngine(danglingBoss), /Unknown rule boss/)
 })
 
 test("rule validation rejects malformed targeting, conditions, sections, and templates", () => {
   const malformedTarget = structuredClone(definitions)
   malformedTarget.strategy.rules[0]!.bossTrait = "physical-buffs-effective"
-  assert.throws(() => buildFinalFantasyStrategyEngine(malformedTarget), /exactly one of boss/)
+  assert.throws(() => buildStrategyEngine(malformedTarget), /exactly one of boss/)
 
   const invalidCount = structuredClone(definitions)
   invalidCount.strategy.rules[1]!.when = { capability: "physical-damage", atLeast: 0 }
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidCount), /positive integer/)
+  assert.throws(() => buildStrategyEngine(invalidCount), /positive integer/)
 
   const invalidSection = structuredClone(definitions)
   invalidSection.strategy.rules[0]!.section = "victory"
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidSection), /Unknown guide section/)
+  assert.throws(() => buildStrategyEngine(invalidSection), /Unknown guide section/)
 
   const invalidToken = structuredClone(definitions)
   invalidToken.strategy.rules[0]!.advice = "Use {{members:telepathy}}"
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidToken), /Unknown member selector/)
+  assert.throws(() => buildStrategyEngine(invalidToken), /Unknown member selector/)
 })
 
 test("closed vocabularies reject unknown attributes, tags, spells, and bosses", () => {
   const invalidCapability = structuredClone(definitions)
   invalidCapability.classes[0]!.attributes = ["luck"]
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidCapability), /Unknown class attribute: luck/)
+  assert.throws(() => buildStrategyEngine(invalidCapability), /Unknown class attribute: luck/)
 
   const invalidSpellAttribute = structuredClone(definitions)
   invalidSpellAttribute.spells[0]!.attributes = ["holy"]
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidSpellAttribute), /Unknown spell attribute: holy/)
+  assert.throws(() => buildStrategyEngine(invalidSpellAttribute), /Unknown spell attribute: holy/)
 
   const invalidTag = structuredClone(definitions)
   invalidTag.bosses[0]!.tags = ["dragon"]
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidTag), /Unknown enemy tag: dragon/)
+  assert.throws(() => buildStrategyEngine(invalidTag), /Unknown enemy tag: dragon/)
 
   const invalidFrontlineSuitability = structuredClone(definitions)
   invalidFrontlineSuitability.classes[0]!.frontlineSuitability = "invincible"
   assert.throws(
-    () => buildFinalFantasyStrategyEngine(invalidFrontlineSuitability),
+    () => buildStrategyEngine(invalidFrontlineSuitability),
     /Unknown front-line suitability: invincible/,
   )
 
   const invalidTrait = structuredClone(definitions)
   invalidTrait.bosses[0]!.traits = ["dramatic-entrance"]
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidTrait), /Unknown boss trait: dramatic-entrance/)
+  assert.throws(() => buildStrategyEngine(invalidTrait), /Unknown boss trait: dramatic-entrance/)
 
   const invalidSpell = structuredClone(definitions)
   invalidSpell.strategy.rules[0]!.when = { spell: "ultima" }
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidSpell), /Unknown rule spell: ultima/)
+  assert.throws(() => buildStrategyEngine(invalidSpell), /Unknown rule spell: ultima/)
 
   const invalidBoss = structuredClone(definitions)
   invalidBoss.strategy.rules[0]!.boss = "missing boss"
-  assert.throws(() => buildFinalFantasyStrategyEngine(invalidBoss), /Unknown rule boss: missing boss/)
+  assert.throws(() => buildStrategyEngine(invalidBoss), /Unknown rule boss: missing boss/)
 
   const invalidFrontSpell = structuredClone(definitions)
   invalidFrontSpell.strategy.rules.at(-1)!.when = { frontSpell: "ultima" }
   assert.throws(
-    () => buildFinalFantasyStrategyEngine(invalidFrontSpell),
+    () => buildStrategyEngine(invalidFrontSpell),
     /Unknown front-slot rule spell: ultima/,
   )
 })
 
 test("YAML decoding reports empty, malformed, and structurally invalid documents", async () => {
   await assert.rejects(
-    loadFinalFantasyStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "" : loadProjectFile(path)),
+    loadStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "" : loadProjectFile(path)),
     /YAML data is empty/,
   )
   await assert.rejects(
-    loadFinalFantasyStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "[unterminated" : loadProjectFile(path)),
+    loadStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "[unterminated" : loadProjectFile(path)),
     /Invalid data\/final-fantasy\/classes.yaml/,
   )
   await assert.rejects(
-    loadFinalFantasyStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "classes: nope" : loadProjectFile(path)),
+    loadStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "classes: nope" : loadProjectFile(path)),
     /classes must be an array/,
   )
 })

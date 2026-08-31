@@ -1,17 +1,17 @@
-import type { FinalFantasyCatalog, Job } from "./strategy-core.ts"
-import type { FinalFantasyShopType, FinalFantasyTownDefinition } from "./towns.ts"
+import type { StrategyCatalog, Job } from "./strategy-core.ts"
+import type { ShopType, TownDefinition } from "./towns.ts"
 
-export type FinalFantasyEquipmentSlot = "weapon" | "body" | "shield" | "head" | "arms"
+export type EquipmentSlot = "weapon" | "body" | "shield" | "head" | "arms"
 
-export interface FinalFantasyEquipmentDefinition {
+export interface EquipmentDefinition {
   readonly key: string
   readonly name: string
-  readonly slot: FinalFantasyEquipmentSlot
+  readonly slot: EquipmentSlot
   readonly price: number
   readonly canEquip: readonly string[]
 }
 
-export interface FinalFantasyMagicDefinition {
+export interface MagicDefinition {
   readonly key: string
   readonly name: string
   readonly school: "white" | "black"
@@ -19,55 +19,55 @@ export interface FinalFantasyMagicDefinition {
   readonly price: number
 }
 
-export interface FinalFantasyNextActionCatalog {
-  readonly equipment: readonly FinalFantasyEquipmentDefinition[]
-  readonly magic: readonly FinalFantasyMagicDefinition[]
+export interface NextActionCatalog {
+  readonly equipment: readonly EquipmentDefinition[]
+  readonly magic: readonly MagicDefinition[]
 }
 
-export interface FinalFantasyCharacterState {
+export interface CharacterState {
   readonly id: string
   readonly baseClass: string
   readonly promoted: boolean
-  readonly equipment: Readonly<Partial<Record<FinalFantasyEquipmentSlot, string>>>
+  readonly equipment: Readonly<Partial<Record<EquipmentSlot, string>>>
   readonly learnedSpells: ReadonlySet<string>
 }
 
-export interface FinalFantasyPartyState {
-  readonly characters: readonly FinalFantasyCharacterState[]
+export interface PartyState {
+  readonly characters: readonly CharacterState[]
   readonly gil: number
 }
 
-export interface FinalFantasyLearnSpellAction {
+export interface LearnSpellAction {
   readonly kind: "learn-spell"
   readonly characterId: string
   readonly spell: string
   readonly price: number
 }
 
-export interface FinalFantasyBindEquipmentAction {
+export interface BindEquipmentAction {
   readonly kind: "bind-equipment"
   readonly characterId: string
   readonly item: string
-  readonly slot: FinalFantasyEquipmentSlot
+  readonly slot: EquipmentSlot
   readonly price: number
   readonly replaces?: string
 }
 
-export type FinalFantasyNextAction =
-  | FinalFantasyLearnSpellAction
-  | FinalFantasyBindEquipmentAction
+export type NextAction =
+  | LearnSpellAction
+  | BindEquipmentAction
 
 const maximumPartySize = 4
 const maximumSpellsPerLevel = 3
 
-export class FinalFantasyNextActionProvider {
-  readonly #strategyCatalog: FinalFantasyCatalog
-  readonly #equipment: ReadonlyMap<string, FinalFantasyEquipmentDefinition>
-  readonly #magic: ReadonlyMap<string, FinalFantasyMagicDefinition>
+export class NextActionProvider {
+  readonly #strategyCatalog: StrategyCatalog
+  readonly #equipment: ReadonlyMap<string, EquipmentDefinition>
+  readonly #magic: ReadonlyMap<string, MagicDefinition>
 
   constructor(
-    strategyCatalog: FinalFantasyCatalog,
-    actionCatalog: FinalFantasyNextActionCatalog,
+    strategyCatalog: StrategyCatalog,
+    actionCatalog: NextActionCatalog,
   ) {
     this.#strategyCatalog = strategyCatalog
     this.#equipment = uniqueByKey("equipment", actionCatalog.equipment)
@@ -75,9 +75,9 @@ export class FinalFantasyNextActionProvider {
   }
 
   availableActions(
-    party: FinalFantasyPartyState,
-    town: FinalFantasyTownDefinition,
-  ): readonly FinalFantasyNextAction[] {
+    party: PartyState,
+    town: TownDefinition,
+  ): readonly NextAction[] {
     validateParty(party)
     const characters = party.characters.map((character) => ({
       state: character,
@@ -87,7 +87,7 @@ export class FinalFantasyNextActionProvider {
     // TODO: Add a reached-town watermark to party state and derive which town catalogs are
     // unlocked. For now the caller provides the complete Cornelia catalog directly.
     return town.shops.flatMap((shop) => shop.wares.flatMap(
-      (ware): FinalFantasyNextAction[] => {
+      (ware): NextAction[] => {
         if (shop.type === "weapons" || shop.type === "armor") {
           const equipment = requireEquipment(this.#equipment, ware, shop.type)
 
@@ -127,9 +127,9 @@ export class FinalFantasyNextActionProvider {
 }
 
 function bindEquipment(
-  character: FinalFantasyCharacterState,
-  equipment: FinalFantasyEquipmentDefinition,
-): FinalFantasyBindEquipmentAction {
+  character: CharacterState,
+  equipment: EquipmentDefinition,
+): BindEquipmentAction {
   const replaced = character.equipment[equipment.slot]
 
   return {
@@ -143,9 +143,9 @@ function bindEquipment(
 }
 
 function learnedSpellCountAtLevel(
-  character: FinalFantasyCharacterState,
+  character: CharacterState,
   level: number,
-  magic: ReadonlyMap<string, FinalFantasyMagicDefinition>,
+  magic: ReadonlyMap<string, MagicDefinition>,
 ): number {
   return [...character.learnedSpells]
     .filter((spell) => magic.get(spell)?.level === level)
@@ -153,8 +153,8 @@ function learnedSpellCountAtLevel(
 }
 
 function resolveActiveJob(
-  catalog: FinalFantasyCatalog,
-  character: FinalFantasyCharacterState,
+  catalog: StrategyCatalog,
+  character: CharacterState,
 ): Job {
   const baseJob = catalog.jobs.get(character.baseClass)
   if (baseJob === undefined || baseJob.promotion === undefined) {
@@ -173,7 +173,7 @@ function resolveActiveJob(
   return promotedJob
 }
 
-function validateParty(party: FinalFantasyPartyState): void {
+function validateParty(party: PartyState): void {
   if (party.characters.length < 1 || party.characters.length > maximumPartySize) {
     throw new Error("Final Fantasy party state must contain 1 to 4 characters")
   }
@@ -187,10 +187,10 @@ function validateParty(party: FinalFantasyPartyState): void {
 }
 
 function requireEquipment(
-  equipment: ReadonlyMap<string, FinalFantasyEquipmentDefinition>,
+  equipment: ReadonlyMap<string, EquipmentDefinition>,
   key: string,
   shopType: "weapons" | "armor",
-): FinalFantasyEquipmentDefinition {
+): EquipmentDefinition {
   const item = equipment.get(key)
   const slotMatchesShop = item !== undefined
     && (shopType === "weapons" ? item.slot === "weapon" : item.slot !== "weapon")
@@ -202,10 +202,10 @@ function requireEquipment(
 }
 
 function requireMagic(
-  magic: ReadonlyMap<string, FinalFantasyMagicDefinition>,
+  magic: ReadonlyMap<string, MagicDefinition>,
   key: string,
-  shopType: Exclude<FinalFantasyShopType, "weapons" | "armor">,
-): FinalFantasyMagicDefinition {
+  shopType: Exclude<ShopType, "weapons" | "armor">,
+): MagicDefinition {
   const spell = magic.get(key)
   const expectedSchool = shopType === "white-magic" ? "white" : "black"
   if (spell === undefined || spell.school !== expectedSchool) {

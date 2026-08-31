@@ -1,11 +1,11 @@
 import {
-  FinalFantasyPartyStrategyEngine,
+  PartyStrategyEngine,
   type PartyObservation,
 } from "./party-strategy-core.ts"
 import {
-  buildFinalFantasyStrategyEngine,
+  buildStrategyEngine,
   createFullToolkitParty,
-  type FinalFantasyStrategyEngine,
+  type StrategyEngine,
   type GuideSectionId,
   type Party,
 } from "./strategy-core.ts"
@@ -26,8 +26,8 @@ async function loadStrategy(): Promise<void> {
   }
 
   const payload = decodeStrategyPayload(await response.json())
-  const bossEngine = buildFinalFantasyStrategyEngine(payload.definitions)
-  const partyEngine = new FinalFantasyPartyStrategyEngine(bossEngine.catalog, payload.partyRules)
+  const bossEngine = buildStrategyEngine(payload.definitions)
+  const partyEngine = new PartyStrategyEngine(bossEngine.catalog, payload.partyRules)
   const controls = requireElement<HTMLFormElement>("#strategy-controls")
   const selects = [...controls.querySelectorAll<HTMLSelectElement>("[data-party-slot]")]
   const bossSelect = requireElement<HTMLSelectElement>("[data-boss-select]")
@@ -57,7 +57,7 @@ async function loadStrategy(): Promise<void> {
 
 function populatePartySelects(
   selects: readonly HTMLSelectElement[],
-  engine: FinalFantasyStrategyEngine,
+  engine: StrategyEngine,
 ): void {
   const jobs = [...engine.catalog.jobs.values()].filter((job) => job.promotion !== undefined)
 
@@ -67,7 +67,7 @@ function populatePartySelects(
   })
 }
 
-function populateBossSelect(select: HTMLSelectElement, engine: FinalFantasyStrategyEngine): void {
+function populateBossSelect(select: HTMLSelectElement, engine: StrategyEngine): void {
   select.replaceChildren(...engine.bosses.map((boss) => option(boss.key, boss.name)))
 }
 
@@ -119,7 +119,7 @@ function renderObservationList(
 function renderBossGuide(
   party: Party,
   bossKey: string,
-  engine: FinalFantasyStrategyEngine,
+  engine: StrategyEngine,
 ): void {
   const guide = engine.guideFor(party, bossKey)
   const boss = engine.bosses.find((candidate) => candidate.key === bossKey)

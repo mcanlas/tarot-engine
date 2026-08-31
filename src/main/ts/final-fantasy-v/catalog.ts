@@ -1,11 +1,11 @@
-export const finalFantasyVStrategyYamlFiles = Object.freeze({
+export const strategyYamlFiles = Object.freeze({
   bossStrategy: "data/final-fantasy-v/boss-strategy.yaml",
   bosses: "data/final-fantasy-v/bosses.yaml",
   jobs: "data/final-fantasy-v-jobs.yaml",
   partyStrategy: "data/final-fantasy-v-party-strategy.yaml",
 })
 
-export type FinalFantasyVCrystalId =
+export type CrystalId =
   | "none"
   | "wind"
   | "water-1"
@@ -14,7 +14,7 @@ export type FinalFantasyVCrystalId =
   | "earth"
   | "water-2"
 
-export const finalFantasyVCrystalUnlockOrdinal = Object.freeze({
+export const crystalUnlockOrdinal = Object.freeze({
   none: 0,
   wind: 1,
   "water-1": 2,
@@ -22,11 +22,11 @@ export const finalFantasyVCrystalUnlockOrdinal = Object.freeze({
   "fire-2": 4,
   earth: 5,
   "water-2": 6,
-} satisfies Readonly<Record<FinalFantasyVCrystalId, number>>)
+} satisfies Readonly<Record<CrystalId, number>>)
 
-export type FinalFantasyVGalufAvailability = "must" | "can" | "cannot"
+export type GalufAvailability = "must" | "can" | "cannot"
 
-export const finalFantasyVGalufAvailabilityByCrystal = Object.freeze({
+export const galufAvailabilityByCrystal = Object.freeze({
   none: "must",
   wind: "must",
   "water-1": "must",
@@ -34,97 +34,97 @@ export const finalFantasyVGalufAvailabilityByCrystal = Object.freeze({
   "fire-2": "must",
   earth: "can",
   "water-2": "cannot",
-} satisfies Readonly<Record<FinalFantasyVCrystalId, FinalFantasyVGalufAvailability>>)
+} satisfies Readonly<Record<CrystalId, GalufAvailability>>)
 
-export type FinalFantasyVAbilityType = "active" | "passive"
+export type AbilityType = "active" | "passive"
 
-export type FinalFantasyVAssignmentPolicy = "learned" | "mime-only" | "never"
+export type AssignmentPolicy = "learned" | "mime-only" | "never"
 
-export interface FinalFantasyVAbilityRankDefinition {
+export interface AbilityRankDefinition {
   rank: number
   jobLevel: number
   abp: number
 }
 
-interface FinalFantasyVAbilityDefinitionBase {
+interface AbilityDefinitionBase {
   key: string
   name: string
   type: string
   assignment?: string
 }
 
-export interface FinalFantasyVFlatAbilityDefinition extends FinalFantasyVAbilityDefinitionBase {
+export interface FlatAbilityDefinition extends AbilityDefinitionBase {
   level: number
   abp: number
 }
 
-export interface FinalFantasyVRankedAbilityDefinition extends FinalFantasyVAbilityDefinitionBase {
+export interface RankedAbilityDefinition extends AbilityDefinitionBase {
   innateRank: number
-  ranks: FinalFantasyVAbilityRankDefinition[]
+  ranks: AbilityRankDefinition[]
 }
 
-export type FinalFantasyVAbilityDefinition =
-  | FinalFantasyVFlatAbilityDefinition
-  | FinalFantasyVRankedAbilityDefinition
+export type AbilityDefinition =
+  | FlatAbilityDefinition
+  | RankedAbilityDefinition
 
-export interface FinalFantasyVJobDefinition {
+export interface JobDefinition {
   key: string
   name: string
   crystal: string
   innates: string[]
-  abilities: FinalFantasyVAbilityDefinition[]
+  abilities: AbilityDefinition[]
 }
 
-export interface FinalFantasyVAbilityRank {
+export interface AbilityRank {
   rank: number
   jobLevel: number
   abp: number
 }
 
-interface FinalFantasyVAbilityBase {
+interface AbilityBase {
   id: string
   name: string
-  type: FinalFantasyVAbilityType
+  type: AbilityType
   jobId: string
-  assignment: FinalFantasyVAssignmentPolicy
+  assignment: AssignmentPolicy
 }
 
-export interface FinalFantasyVFlatAbility extends FinalFantasyVAbilityBase {
+export interface FlatAbility extends AbilityBase {
   kind: "flat"
   level: number
   abp: number
 }
 
-export interface FinalFantasyVRankedAbility extends FinalFantasyVAbilityBase {
+export interface RankedAbility extends AbilityBase {
   kind: "ranked"
   innateRank: number
-  ranks: readonly FinalFantasyVAbilityRank[]
+  ranks: readonly AbilityRank[]
 }
 
-export type FinalFantasyVAbility = FinalFantasyVFlatAbility | FinalFantasyVRankedAbility
+export type Ability = FlatAbility | RankedAbility
 
-export interface FinalFantasyVJob {
+export interface Job {
   id: string
   name: string
-  crystal: FinalFantasyVCrystalId
-  innates: ReadonlySet<FinalFantasyVAbility>
-  abilities: readonly FinalFantasyVAbility[]
+  crystal: CrystalId
+  innates: ReadonlySet<Ability>
+  abilities: readonly Ability[]
 }
 
-export interface FinalFantasyVStrategyCatalog {
-  jobs: ReadonlyMap<string, FinalFantasyVJob>
-  abilities: ReadonlyMap<string, FinalFantasyVAbility>
+export interface StrategyCatalog {
+  jobs: ReadonlyMap<string, Job>
+  abilities: ReadonlyMap<string, Ability>
 }
 
-export function finalFantasyVJobIsAvailableThroughCrystal(
-  job: FinalFantasyVJob,
-  availableThroughCrystal: FinalFantasyVCrystalId,
+export function jobIsAvailableThroughCrystal(
+  job: Job,
+  availableThroughCrystal: CrystalId,
 ): boolean {
-  return finalFantasyVCrystalUnlockOrdinal[job.crystal]
-    <= finalFantasyVCrystalUnlockOrdinal[availableThroughCrystal]
+  return crystalUnlockOrdinal[job.crystal]
+    <= crystalUnlockOrdinal[availableThroughCrystal]
 }
 
-const crystals = new Set<FinalFantasyVCrystalId>([
+const crystals = new Set<CrystalId>([
   "none",
   "wind",
   "water-1",
@@ -133,19 +133,19 @@ const crystals = new Set<FinalFantasyVCrystalId>([
   "earth",
   "water-2",
 ])
-const abilityTypes = new Set<FinalFantasyVAbilityType>(["active", "passive"])
+const abilityTypes = new Set<AbilityType>(["active", "passive"])
 
-export function buildFinalFantasyVStrategyCatalog(
-  definitions: readonly FinalFantasyVJobDefinition[],
-): FinalFantasyVStrategyCatalog {
+export function buildStrategyCatalog(
+  definitions: readonly JobDefinition[],
+): StrategyCatalog {
   rejectDuplicates("job", definitions.map((definition) => definition.key))
   rejectDuplicates(
     "ability",
     definitions.flatMap((definition) => definition.abilities.map((ability) => ability.key)),
   )
 
-  const abilities = new Map<string, FinalFantasyVAbility>()
-  const jobs = new Map<string, FinalFantasyVJob>()
+  const abilities = new Map<string, Ability>()
+  const jobs = new Map<string, Job>()
 
   for (const definition of definitions) {
     const jobAbilities = definition.abilities.map((ability) =>
@@ -179,8 +179,8 @@ export function buildFinalFantasyVStrategyCatalog(
   return { jobs, abilities }
 }
 
-export function describeFinalFantasyVStrategyCatalog(
-  catalog: FinalFantasyVStrategyCatalog,
+export function describeStrategyCatalog(
+  catalog: StrategyCatalog,
 ): string {
   const activeCount = [...catalog.abilities.values()]
     .filter((ability) => ability.type === "active").length
@@ -199,8 +199,8 @@ export function describeFinalFantasyVStrategyCatalog(
 
 function buildAbility(
   jobId: string,
-  definition: FinalFantasyVAbilityDefinition,
-): FinalFantasyVAbility {
+  definition: AbilityDefinition,
+): Ability {
   const common = {
     id: definition.key,
     name: definition.name,
@@ -231,7 +231,7 @@ function buildAbility(
   }
 }
 
-function validateRanks(definition: FinalFantasyVRankedAbilityDefinition): void {
+function validateRanks(definition: RankedAbilityDefinition): void {
   if (definition.ranks.length === 0) {
     throw new Error(`${definition.key}.ranks must not be empty`)
   }
@@ -259,23 +259,23 @@ function rejectDuplicates(kind: string, ids: readonly string[]): void {
   }
 }
 
-function requireCrystal(value: string): FinalFantasyVCrystalId {
-  if (!crystals.has(value as FinalFantasyVCrystalId)) {
+function requireCrystal(value: string): CrystalId {
+  if (!crystals.has(value as CrystalId)) {
     throw new Error(`Unknown Final Fantasy V crystal: ${value}`)
   }
 
-  return value as FinalFantasyVCrystalId
+  return value as CrystalId
 }
 
-function requireAbilityType(value: string): FinalFantasyVAbilityType {
-  if (!abilityTypes.has(value as FinalFantasyVAbilityType)) {
+function requireAbilityType(value: string): AbilityType {
+  if (!abilityTypes.has(value as AbilityType)) {
     throw new Error(`Unknown Final Fantasy V ability type: ${value}`)
   }
 
-  return value as FinalFantasyVAbilityType
+  return value as AbilityType
 }
 
-function requireAssignmentPolicy(value: string): FinalFantasyVAssignmentPolicy {
+function requireAssignmentPolicy(value: string): AssignmentPolicy {
   if (value !== "learned" && value !== "mime-only" && value !== "never") {
     throw new Error(`Unknown Final Fantasy V assignment policy: ${value}`)
   }

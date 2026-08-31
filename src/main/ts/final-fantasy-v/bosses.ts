@@ -1,52 +1,52 @@
-import type { FinalFantasyVCrystalId } from "./catalog.ts"
+import type { CrystalId } from "./catalog.ts"
 
-export interface FinalFantasyVMainStoryBossDefinition {
+export interface MainStoryBossDefinition {
   readonly ordinal: number
   readonly key: string
   readonly name: string
-  readonly jobsUnlocked: FinalFantasyVCrystalId
+  readonly jobsUnlocked: CrystalId
 }
 
-export interface FinalFantasyVOptionalBossDefinition {
+export interface OptionalBossDefinition {
   readonly key: string
   readonly name: string
   readonly earliestAfterEncounter: string
-  readonly jobsUnlocked: FinalFantasyVCrystalId
+  readonly jobsUnlocked: CrystalId
 }
 
-export interface FinalFantasyVBossDefinitions {
-  readonly mainStory: readonly FinalFantasyVMainStoryBossDefinition[]
-  readonly optional: readonly FinalFantasyVOptionalBossDefinition[]
+export interface BossDefinitions {
+  readonly mainStory: readonly MainStoryBossDefinition[]
+  readonly optional: readonly OptionalBossDefinition[]
 }
 
-export type FinalFantasyVBossEncounter =
-  | (FinalFantasyVMainStoryBossDefinition & { readonly kind: "main-story" })
-  | (FinalFantasyVOptionalBossDefinition & { readonly kind: "optional" })
+export type BossEncounter =
+  | (MainStoryBossDefinition & { readonly kind: "main-story" })
+  | (OptionalBossDefinition & { readonly kind: "optional" })
 
-export interface FinalFantasyVBossCatalog {
-  readonly encounters: readonly FinalFantasyVBossEncounter[]
-  readonly encountersById: ReadonlyMap<string, FinalFantasyVBossEncounter>
+export interface BossCatalog {
+  readonly encounters: readonly BossEncounter[]
+  readonly encountersById: ReadonlyMap<string, BossEncounter>
 }
 
-export type FinalFantasyVBossSelection =
+export type BossSelection =
   | { readonly kind: "fixed"; readonly bossId: string }
   | { readonly kind: "random"; readonly random: () => number }
 
-export const currentFinalFantasyVBossSelection = Object.freeze({
+export const currentBossSelection = Object.freeze({
   kind: "fixed",
   bossId: "karlabos",
-} satisfies FinalFantasyVBossSelection)
+} satisfies BossSelection)
 
-export function buildFinalFantasyVBossCatalog(
-  definitions: FinalFantasyVBossDefinitions,
-): FinalFantasyVBossCatalog {
+export function buildBossCatalog(
+  definitions: BossDefinitions,
+): BossCatalog {
   const expectedOrdinals = definitions.mainStory.map((_encounter, index) => index + 1)
   const actualOrdinals = definitions.mainStory.map((encounter) => encounter.ordinal)
   if (!actualOrdinals.every((ordinal, index) => ordinal === expectedOrdinals[index])) {
     throw new Error("Final Fantasy V main-story boss ordinals must be contiguous from 1")
   }
 
-  const encounters: FinalFantasyVBossEncounter[] = [
+  const encounters: BossEncounter[] = [
     ...definitions.mainStory.map((encounter) => ({ ...encounter, kind: "main-story" as const })),
     ...definitions.optional.map((encounter) => ({ ...encounter, kind: "optional" as const })),
   ]
@@ -72,10 +72,10 @@ export function buildFinalFantasyVBossCatalog(
   return { encounters, encountersById }
 }
 
-export function selectFinalFantasyVBoss(
-  catalog: FinalFantasyVBossCatalog,
-  selection: FinalFantasyVBossSelection = currentFinalFantasyVBossSelection,
-): FinalFantasyVBossEncounter {
+export function selectBoss(
+  catalog: BossCatalog,
+  selection: BossSelection = currentBossSelection,
+): BossEncounter {
   if (selection.kind === "fixed") {
     const encounter = catalog.encountersById.get(selection.bossId)
     if (encounter === undefined) {

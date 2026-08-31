@@ -4,43 +4,43 @@ import test from "node:test"
 import { parse } from "yaml"
 
 import {
-  buildFinalFantasyVBossCatalog,
-  buildFinalFantasyVStrategyCatalog,
-  createRandomFinalFantasyVParty,
-  createRandomFinalFantasyVStoryParty,
-  decodeFinalFantasyVBosses,
-  decodeFinalFantasyVJobs,
-  finalFantasyVCanonicalStoryCharacterIds,
-  finalFantasyVCrystalUnlockOrdinal,
-  finalFantasyVGalufAvailabilityByCrystal,
-  finalFantasyVStoryAvailability,
-  finalFantasyVStrategyYamlFiles,
+  buildBossCatalog,
+  buildStrategyCatalog,
+  createRandomParty,
+  createRandomStoryParty,
+  decodeBosses,
+  decodeJobs,
+  canonicalStoryCharacterIds,
+  crystalUnlockOrdinal,
+  galufAvailabilityByCrystal,
+  storyAvailability,
+  strategyYamlFiles,
 } from "../../../main/ts/final-fantasy-v/index.ts"
 
-const strategyCatalog = buildFinalFantasyVStrategyCatalog(decodeFinalFantasyVJobs(parse(
-  await readFile(finalFantasyVStrategyYamlFiles.jobs, "utf8"),
+const strategyCatalog = buildStrategyCatalog(decodeJobs(parse(
+  await readFile(strategyYamlFiles.jobs, "utf8"),
 )))
-const bossCatalog = buildFinalFantasyVBossCatalog(decodeFinalFantasyVBosses(parse(
-  await readFile(finalFantasyVStrategyYamlFiles.bosses, "utf8"),
+const bossCatalog = buildBossCatalog(decodeBosses(parse(
+  await readFile(strategyYamlFiles.bosses, "utf8"),
 )))
 
 test("random party preserves unconstrained catalog-wide generation", () => {
-  const party = createRandomFinalFantasyVParty(strategyCatalog, () => 0.9999)
+  const party = createRandomParty(strategyCatalog, () => 0.9999)
 
   assert.equal(party.members.length, 4)
   assert(party.members.some((member) => member.characterId === "krile"))
   assert(party.members.every((member) => strategyCatalog.jobs.has(member.jobId)))
   assert(party.members.some((member) =>
-    finalFantasyVCrystalUnlockOrdinal[
+    crystalUnlockOrdinal[
       strategyCatalog.jobs.get(member.jobId)!.crystal
-    ] > finalFantasyVCrystalUnlockOrdinal.wind))
+    ] > crystalUnlockOrdinal.wind))
 })
 
 test("random story party selects its boss before filtering its candidate pools", () => {
   const values = [0.4]
   const random = () => values.shift() ?? 0.9999
-  const story = createRandomFinalFantasyVStoryParty(strategyCatalog, bossCatalog, random)
-  const availability = finalFantasyVStoryAvailability(strategyCatalog, story.boss)
+  const story = createRandomStoryParty(strategyCatalog, bossCatalog, random)
+  const availability = storyAvailability(strategyCatalog, story.boss)
 
   assert.equal(story.boss.key, "liquid-flame")
   assert.equal(story.boss.jobsUnlocked, "water-1")
@@ -68,8 +68,8 @@ test("every current random story boss produces milestone-valid characters, jobs,
 
       return 0.75
     }
-    const story = createRandomFinalFantasyVStoryParty(strategyCatalog, bossCatalog, random)
-    const availability = finalFantasyVStoryAvailability(strategyCatalog, story.boss)
+    const story = createRandomStoryParty(strategyCatalog, bossCatalog, random)
+    const availability = storyAvailability(strategyCatalog, story.boss)
 
     assert.equal(story.boss.key, bossCatalog.encounters[index]!.key)
     assert.deepEqual(story.members.map((member) => member.characterId), [
@@ -87,7 +87,7 @@ test("every current random story boss produces milestone-valid characters, jobs,
 })
 
 test("crystal progression owns Galuf availability independently of bosses", () => {
-  assert.deepEqual(finalFantasyVGalufAvailabilityByCrystal, {
+  assert.deepEqual(galufAvailabilityByCrystal, {
     none: "must",
     wind: "must",
     "water-1": "must",
@@ -99,37 +99,37 @@ test("crystal progression owns Galuf availability independently of bosses", () =
 
   const template = bossCatalog.encounters[0]!
   assert.deepEqual(
-    finalFantasyVStoryAvailability(
+    storyAvailability(
       strategyCatalog,
       { ...template, jobsUnlocked: "earth" },
     ).characterIds,
     ["bartz", "lenna", "galuf", "krile", "faris"],
   )
   assert.deepEqual(
-    finalFantasyVStoryAvailability(
+    storyAvailability(
       strategyCatalog,
       { ...template, jobsUnlocked: "water-2" },
     ).characterIds,
     ["bartz", "lenna", "krile", "faris"],
   )
-  assert.deepEqual(finalFantasyVCanonicalStoryCharacterIds("must"), [
+  assert.deepEqual(canonicalStoryCharacterIds("must"), [
     "bartz", "lenna", "galuf", "faris",
   ])
-  assert.deepEqual(finalFantasyVCanonicalStoryCharacterIds("can"), [
+  assert.deepEqual(canonicalStoryCharacterIds("can"), [
     "bartz", "lenna", "galuf", "faris",
   ])
-  assert.deepEqual(finalFantasyVCanonicalStoryCharacterIds("cannot"), [
+  assert.deepEqual(canonicalStoryCharacterIds("cannot"), [
     "bartz", "lenna", "krile", "faris",
   ])
 })
 
 test("both random generators reject invalid random sources", () => {
   assert.throws(
-    () => createRandomFinalFantasyVParty(strategyCatalog, () => -0.1),
+    () => createRandomParty(strategyCatalog, () => -0.1),
     /party random source must return a number from 0 through 1/,
   )
   assert.throws(
-    () => createRandomFinalFantasyVStoryParty(strategyCatalog, bossCatalog, () => 1),
+    () => createRandomStoryParty(strategyCatalog, bossCatalog, () => 1),
     /boss random source must return a number from 0 through 1/,
   )
 })

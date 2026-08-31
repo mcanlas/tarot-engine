@@ -2,10 +2,10 @@ import { readFile } from "node:fs/promises"
 
 import {
   createRandomPartyBossStrategy,
-  loadFinalFantasyPartyStrategyEngine,
+  loadPartyStrategyEngine,
   renderBossStrategy,
 } from "./party-strategy.ts"
-import { loadFinalFantasyStrategyEngine } from "../../../main/ts/final-fantasy/strategy-data.ts"
+import { loadStrategyEngine } from "../../../main/ts/final-fantasy/strategy-data.ts"
 
 const loadProjectFile = (path) =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
@@ -23,8 +23,8 @@ if (
   process.exitCode = 1
 } else {
   const [partyEngine, bossEngine] = await Promise.all([
-    loadFinalFantasyPartyStrategyEngine(loadProjectFile),
-    loadFinalFantasyStrategyEngine(loadProjectFile),
+    loadPartyStrategyEngine(loadProjectFile),
+    loadStrategyEngine(loadProjectFile),
   ])
 
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {

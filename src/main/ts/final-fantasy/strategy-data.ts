@@ -1,53 +1,53 @@
 import { parse } from "yaml"
 
 import {
-  buildFinalFantasyCatalog,
-  buildFinalFantasyStrategyEngine,
-  finalFantasyStrategyYamlFiles,
+  buildStrategyCatalog,
+  buildStrategyEngine,
+  strategyYamlFiles,
   type BossDefinition,
   type BossStrategyDefinition,
   type BossStrategyRuleDefinition,
   type ClassDefinition,
-  type FinalFantasyStrategyDefinitions,
-  type FinalFantasyStrategyEngine,
-  type FinalFantasyCatalog,
+  type StrategyDefinitions,
+  type StrategyEngine,
+  type StrategyCatalog,
   type PartyConditionDefinition,
   type SpellDefinition,
 } from "./strategy-core.ts"
 
 export type YamlTextLoader = (path: string) => Promise<string>
 
-export async function loadFinalFantasyCatalog(
+export async function loadStrategyCatalog(
   loadText: YamlTextLoader,
-): Promise<FinalFantasyCatalog> {
+): Promise<StrategyCatalog> {
   const [classes, spells] = await Promise.all([
-    loadYaml(finalFantasyStrategyYamlFiles.classes, loadText),
-    loadYaml(finalFantasyStrategyYamlFiles.spells, loadText),
+    loadYaml(strategyYamlFiles.classes, loadText),
+    loadYaml(strategyYamlFiles.spells, loadText),
   ])
 
-  return buildFinalFantasyCatalog(
+  return buildStrategyCatalog(
     requireArray(classes, "classes").map(decodeClass),
     requireArray(spells, "spells").map(decodeSpell),
   )
 }
 
-export async function loadFinalFantasyStrategyEngine(
+export async function loadStrategyEngine(
   loadText: YamlTextLoader,
-): Promise<FinalFantasyStrategyEngine> {
+): Promise<StrategyEngine> {
 
-  return buildFinalFantasyStrategyEngine(
-    await loadFinalFantasyStrategyDefinitions(loadText),
+  return buildStrategyEngine(
+    await loadStrategyDefinitions(loadText),
   )
 }
 
-export async function loadFinalFantasyStrategyDefinitions(
+export async function loadStrategyDefinitions(
   loadText: YamlTextLoader,
-): Promise<FinalFantasyStrategyDefinitions> {
+): Promise<StrategyDefinitions> {
   const [classes, spells, bosses, strategy] = await Promise.all([
-    loadYaml(finalFantasyStrategyYamlFiles.classes, loadText),
-    loadYaml(finalFantasyStrategyYamlFiles.spells, loadText),
-    loadYaml(finalFantasyStrategyYamlFiles.bosses, loadText),
-    loadYaml(finalFantasyStrategyYamlFiles.bossStrategy, loadText),
+    loadYaml(strategyYamlFiles.classes, loadText),
+    loadYaml(strategyYamlFiles.spells, loadText),
+    loadYaml(strategyYamlFiles.bosses, loadText),
+    loadYaml(strategyYamlFiles.bossStrategy, loadText),
   ])
 
   return decodeDefinitions({ classes, spells, bosses, strategy })
@@ -58,7 +58,7 @@ export function decodeDefinitions(documents: {
   spells: unknown
   bosses: unknown
   strategy: unknown
-}): FinalFantasyStrategyDefinitions {
+}): StrategyDefinitions {
 
   return {
     classes: requireArray(documents.classes, "classes").map(decodeClass),

@@ -1,9 +1,9 @@
-import type { FinalFantasyVBossCatalog } from "./bosses.ts"
-import type { FinalFantasyVAbility, FinalFantasyVStrategyCatalog } from "./catalog.ts"
-import type { FinalFantasyVResolvedAbility } from "./loadouts.ts"
-import type { FinalFantasyVPartyMember } from "./party-strategy.ts"
+import type { BossCatalog } from "./bosses.ts"
+import type { Ability, StrategyCatalog } from "./catalog.ts"
+import type { ResolvedAbility } from "./loadouts.ts"
+import type { PartyMember } from "./party-strategy.ts"
 
-export type FinalFantasyVElement =
+export type Element =
   | "fire"
   | "ice"
   | "lightning"
@@ -13,7 +13,7 @@ export type FinalFantasyVElement =
   | "poison"
   | "holy"
 
-export type FinalFantasyVBossThreat =
+export type BossThreat =
   | "physical-damage"
   | "magical-damage"
   | "hp-collapse"
@@ -29,7 +29,7 @@ export type FinalFantasyVBossThreat =
   | "mp-pressure"
   | "level-reduction"
 
-export type FinalFantasyVBossTrait =
+export type BossTrait =
   | "form-shifting"
   | "counterattacks"
   | "multiple-targets"
@@ -40,94 +40,94 @@ export type FinalFantasyVBossTrait =
   | "status-vulnerable"
   | "self-healing"
 
-export type FinalFantasyVBossScoreDimension = "tempo" | "safety" | "reliability"
+export type BossScoreDimension = "tempo" | "safety" | "reliability"
 
-export interface FinalFantasyVBossProfileDefinition {
+export interface BossProfileDefinition {
   readonly boss: string
   readonly targetCount: number
-  readonly vulnerabilities: readonly FinalFantasyVElement[]
-  readonly traits: readonly FinalFantasyVBossTrait[]
+  readonly vulnerabilities: readonly Element[]
+  readonly traits: readonly BossTrait[]
   readonly threats: readonly {
     readonly source: string
-    readonly kind: FinalFantasyVBossThreat
+    readonly kind: BossThreat
   }[]
 }
 
-export interface FinalFantasyVBossStrategyAssumptionDefinition {
+export interface BossStrategyAssumptionDefinition {
   readonly id: string
   readonly statement: string
 }
 
-export interface FinalFantasyVBossCapabilityProviderDefinition {
+export interface BossCapabilityProviderDefinition {
   readonly ability: string
   readonly atLeastRank?: number
 }
 
-export interface FinalFantasyVBossCapabilityDefinition {
+export interface BossCapabilityDefinition {
   readonly key: string
-  readonly providers: readonly FinalFantasyVBossCapabilityProviderDefinition[]
+  readonly providers: readonly BossCapabilityProviderDefinition[]
 }
 
-export type FinalFantasyVBossFactDefinition =
-  | { readonly vulnerability: FinalFantasyVElement }
-  | { readonly threat: FinalFantasyVBossThreat }
-  | { readonly trait: FinalFantasyVBossTrait }
+export type BossFactDefinition =
+  | { readonly vulnerability: Element }
+  | { readonly threat: BossThreat }
+  | { readonly trait: BossTrait }
 
-export interface FinalFantasyVBossPartyConditionDefinition {
+export interface BossPartyConditionDefinition {
   readonly capability: string
   readonly atLeastMembers?: number
   readonly atMostMembers?: number
 }
 
-export interface FinalFantasyVBossRuleDefinition {
+export interface BossRuleDefinition {
   readonly id: string
   readonly when: {
-    readonly boss: FinalFantasyVBossFactDefinition
-    readonly party: FinalFantasyVBossPartyConditionDefinition
+    readonly boss: BossFactDefinition
+    readonly party: BossPartyConditionDefinition
   }
-  readonly score: Readonly<Partial<Record<FinalFantasyVBossScoreDimension, number>>>
+  readonly score: Readonly<Partial<Record<BossScoreDimension, number>>>
   readonly statement: string
 }
 
-export interface FinalFantasyVBossStrategyDefinitions {
-  readonly bosses: readonly FinalFantasyVBossProfileDefinition[]
-  readonly assumptions: readonly FinalFantasyVBossStrategyAssumptionDefinition[]
-  readonly capabilities: readonly FinalFantasyVBossCapabilityDefinition[]
-  readonly rules: readonly FinalFantasyVBossRuleDefinition[]
+export interface BossStrategyDefinitions {
+  readonly bosses: readonly BossProfileDefinition[]
+  readonly assumptions: readonly BossStrategyAssumptionDefinition[]
+  readonly capabilities: readonly BossCapabilityDefinition[]
+  readonly rules: readonly BossRuleDefinition[]
 }
 
-export interface FinalFantasyVBossMatchedRule {
+export interface BossMatchedRule {
   readonly ruleId: string
   readonly statement: string
-  readonly score: Readonly<Partial<Record<FinalFantasyVBossScoreDimension, number>>>
+  readonly score: Readonly<Partial<Record<BossScoreDimension, number>>>
 }
 
-export interface FinalFantasyVBossEvaluation {
+export interface BossEvaluation {
   readonly bossId: string
-  readonly assumptions: readonly FinalFantasyVBossStrategyAssumptionDefinition[]
+  readonly assumptions: readonly BossStrategyAssumptionDefinition[]
   readonly capabilityMembers: Readonly<Record<string, number>>
-  readonly score: Readonly<Record<FinalFantasyVBossScoreDimension, number>>
-  readonly matchedRules: readonly FinalFantasyVBossMatchedRule[]
+  readonly score: Readonly<Record<BossScoreDimension, number>>
+  readonly matchedRules: readonly BossMatchedRule[]
 }
 
 interface CompiledCapability {
   readonly key: string
   readonly providers: readonly {
-    readonly ability: FinalFantasyVAbility
+    readonly ability: Ability
     readonly atLeastRank?: number
   }[]
 }
 
-export class FinalFantasyVBossStrategyEngine {
-  readonly #bossProfiles: ReadonlyMap<string, FinalFantasyVBossProfileDefinition>
-  readonly #assumptions: readonly FinalFantasyVBossStrategyAssumptionDefinition[]
+export class BossStrategyEngine {
+  readonly #bossProfiles: ReadonlyMap<string, BossProfileDefinition>
+  readonly #assumptions: readonly BossStrategyAssumptionDefinition[]
   readonly #capabilities: ReadonlyMap<string, CompiledCapability>
-  readonly #rules: readonly FinalFantasyVBossRuleDefinition[]
+  readonly #rules: readonly BossRuleDefinition[]
 
   constructor(
-    strategyCatalog: FinalFantasyVStrategyCatalog,
-    bossCatalog: FinalFantasyVBossCatalog,
-    definitions: FinalFantasyVBossStrategyDefinitions,
+    strategyCatalog: StrategyCatalog,
+    bossCatalog: BossCatalog,
+    definitions: BossStrategyDefinitions,
   ) {
     rejectDuplicates("boss profile", definitions.bosses.map((boss) => boss.boss))
     rejectDuplicates("boss assumption", definitions.assumptions.map((assumption) => assumption.id))
@@ -175,8 +175,8 @@ export class FinalFantasyVBossStrategyEngine {
 
   evaluate(
     bossId: string,
-    members: readonly FinalFantasyVPartyMember[],
-  ): FinalFantasyVBossEvaluation {
+    members: readonly PartyMember[],
+  ): BossEvaluation {
     const boss = this.#bossProfiles.get(bossId)
     if (boss === undefined) {
       throw new Error(`No Final Fantasy V boss strategy profile for: ${bossId}`)
@@ -189,12 +189,12 @@ export class FinalFantasyVBossStrategyEngine {
     const matchedRules = this.#rules
       .filter((rule) => bossMatches(boss, rule.when.boss)
         && partyMatches(capabilityMembers, rule.when.party))
-      .map((rule): FinalFantasyVBossMatchedRule => ({
+      .map((rule): BossMatchedRule => ({
         ruleId: rule.id,
         statement: rule.statement,
         score: rule.score,
       }))
-    const score: Record<FinalFantasyVBossScoreDimension, number> = {
+    const score: Record<BossScoreDimension, number> = {
       tempo: 0,
       safety: 0,
       reliability: 0,
@@ -219,12 +219,12 @@ export const bossScoreDimensions = Object.freeze([
   "tempo",
   "safety",
   "reliability",
-] as const satisfies readonly FinalFantasyVBossScoreDimension[])
+] as const satisfies readonly BossScoreDimension[])
 
 function requireAbility(
-  catalog: FinalFantasyVStrategyCatalog,
+  catalog: StrategyCatalog,
   abilityId: string,
-): FinalFantasyVAbility {
+): Ability {
   const ability = catalog.abilities.get(abilityId)
   if (ability === undefined) {
     throw new Error(`Unknown Final Fantasy V boss capability ability: ${abilityId}`)
@@ -234,7 +234,7 @@ function requireAbility(
 }
 
 function validateProviderRank(
-  ability: FinalFantasyVAbility,
+  ability: Ability,
   atLeastRank: number | undefined,
 ): { readonly atLeastRank?: number } {
   if (atLeastRank === undefined) {
@@ -250,7 +250,7 @@ function validateProviderRank(
   return { atLeastRank }
 }
 
-function validateMemberBounds(rule: FinalFantasyVBossRuleDefinition): void {
+function validateMemberBounds(rule: BossRuleDefinition): void {
   const { atLeastMembers, atMostMembers } = rule.when.party
   if (atLeastMembers === undefined && atMostMembers === undefined) {
     throw new Error(`Final Fantasy V boss rule ${rule.id} must bound capability members`)
@@ -267,7 +267,7 @@ function validateMemberBounds(rule: FinalFantasyVBossRuleDefinition): void {
 }
 
 function memberHasCapability(
-  member: FinalFantasyVPartyMember,
+  member: PartyMember,
   capability: CompiledCapability,
 ): boolean {
   const abilities = [...member.loadout.assignments, ...member.loadout.innateAbilities]
@@ -278,7 +278,7 @@ function memberHasCapability(
 }
 
 function resolvedAbilityHasRank(
-  ability: FinalFantasyVResolvedAbility,
+  ability: ResolvedAbility,
   atLeastRank: number | undefined,
 ): boolean {
   return atLeastRank === undefined
@@ -286,8 +286,8 @@ function resolvedAbilityHasRank(
 }
 
 function bossMatches(
-  boss: FinalFantasyVBossProfileDefinition,
-  fact: FinalFantasyVBossFactDefinition,
+  boss: BossProfileDefinition,
+  fact: BossFactDefinition,
 ): boolean {
   if ("vulnerability" in fact) {
     return boss.vulnerabilities.includes(fact.vulnerability)
@@ -301,7 +301,7 @@ function bossMatches(
 
 function partyMatches(
   capabilityMembers: Readonly<Record<string, number>>,
-  condition: FinalFantasyVBossPartyConditionDefinition,
+  condition: BossPartyConditionDefinition,
 ): boolean {
   const count = capabilityMembers[condition.capability] ?? 0
 

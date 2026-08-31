@@ -1,56 +1,56 @@
 import { parse } from "yaml"
 
-export const finalFantasyTownsYamlFile = "data/final-fantasy/towns.yaml"
+export const townsYamlFile = "data/final-fantasy/towns.yaml"
 
-export type FinalFantasyShopType =
+export type ShopType =
   | "weapons"
   | "armor"
   | "white-magic"
   | "black-magic"
 
-export interface FinalFantasyShopDefinition {
-  readonly type: FinalFantasyShopType
+export interface ShopDefinition {
+  readonly type: ShopType
   readonly wares: readonly string[]
 }
 
-export interface FinalFantasyTownDefinition {
+export interface TownDefinition {
   readonly key: string
   readonly name: string
-  readonly shops: readonly FinalFantasyShopDefinition[]
+  readonly shops: readonly ShopDefinition[]
 }
 
-export interface FinalFantasyTownDefinitions {
-  readonly towns: readonly FinalFantasyTownDefinition[]
+export interface TownDefinitions {
+  readonly towns: readonly TownDefinition[]
 }
 
-export type FinalFantasyTownYamlTextLoader = (path: string) => Promise<string>
+export type TownYamlTextLoader = (path: string) => Promise<string>
 
-const shopTypes = new Set<FinalFantasyShopType>([
+const shopTypes = new Set<ShopType>([
   "weapons",
   "armor",
   "white-magic",
   "black-magic",
 ])
 
-export async function loadFinalFantasyTowns(
-  loadText: FinalFantasyTownYamlTextLoader,
-): Promise<FinalFantasyTownDefinitions> {
-  const text = await loadText(finalFantasyTownsYamlFile)
+export async function loadTowns(
+  loadText: TownYamlTextLoader,
+): Promise<TownDefinitions> {
+  const text = await loadText(townsYamlFile)
 
   if (text.trim().length === 0) {
-    throw new Error(`YAML data is empty: ${finalFantasyTownsYamlFile}`)
+    throw new Error(`YAML data is empty: ${townsYamlFile}`)
   }
 
   try {
 
-    return decodeFinalFantasyTowns(parse(text))
+    return decodeTowns(parse(text))
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`Invalid ${finalFantasyTownsYamlFile}: ${message}`)
+    throw new Error(`Invalid ${townsYamlFile}: ${message}`)
   }
 }
 
-export function decodeFinalFantasyTowns(value: unknown): FinalFantasyTownDefinitions {
+export function decodeTowns(value: unknown): TownDefinitions {
   const document = requireRecord(value, "Final Fantasy towns")
 
   return {
@@ -58,7 +58,7 @@ export function decodeFinalFantasyTowns(value: unknown): FinalFantasyTownDefinit
   }
 }
 
-function decodeTown(value: unknown, index: number): FinalFantasyTownDefinition {
+function decodeTown(value: unknown, index: number): TownDefinition {
   const path = `Final Fantasy towns.towns[${index}]`
   const record = requireRecord(value, path)
 
@@ -70,7 +70,7 @@ function decodeTown(value: unknown, index: number): FinalFantasyTownDefinition {
   }
 }
 
-function decodeShop(value: unknown, path: string): FinalFantasyShopDefinition {
+function decodeShop(value: unknown, path: string): ShopDefinition {
   const record = requireRecord(value, path)
 
   return {
@@ -80,13 +80,13 @@ function decodeShop(value: unknown, path: string): FinalFantasyShopDefinition {
   }
 }
 
-function requireShopType(value: unknown, path: string): FinalFantasyShopType {
+function requireShopType(value: unknown, path: string): ShopType {
   const shopType = requireString(value, path)
-  if (!shopTypes.has(shopType as FinalFantasyShopType)) {
+  if (!shopTypes.has(shopType as ShopType)) {
     throw new Error(`${path} must be a known Final Fantasy shop type`)
   }
 
-  return shopType as FinalFantasyShopType
+  return shopType as ShopType
 }
 
 function requireRecord(value: unknown, path: string): Record<string, unknown> {

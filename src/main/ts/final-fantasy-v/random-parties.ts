@@ -1,39 +1,39 @@
 import {
-  selectFinalFantasyVBoss,
-  type FinalFantasyVBossCatalog,
-  type FinalFantasyVBossEncounter,
+  selectBoss,
+  type BossCatalog,
+  type BossEncounter,
 } from "./bosses.ts"
 import {
-  finalFantasyVGalufAvailabilityByCrystal,
-  finalFantasyVJobIsAvailableThroughCrystal,
-  type FinalFantasyVGalufAvailability,
-  type FinalFantasyVStrategyCatalog,
+  galufAvailabilityByCrystal,
+  jobIsAvailableThroughCrystal,
+  type GalufAvailability,
+  type StrategyCatalog,
 } from "./catalog.ts"
-import { finalFantasyVSlotCount } from "./loadouts.ts"
-import type { FinalFantasyVCharacterId } from "./party-strategy.ts"
+import { slotCount } from "./loadouts.ts"
+import type { CharacterId } from "./party-strategy.ts"
 
-export interface FinalFantasyVRandomPartyMemberCandidate {
-  readonly characterId: FinalFantasyVCharacterId
+export interface RandomPartyMemberCandidate {
+  readonly characterId: CharacterId
   readonly jobId: string
   readonly assignmentIds: readonly string[]
 }
 
-export interface FinalFantasyVRandomParty {
-  readonly members: readonly FinalFantasyVRandomPartyMemberCandidate[]
+export interface RandomParty {
+  readonly members: readonly RandomPartyMemberCandidate[]
 }
 
-export interface FinalFantasyVRandomStoryParty extends FinalFantasyVRandomParty {
-  readonly boss: FinalFantasyVBossEncounter
+export interface RandomStoryParty extends RandomParty {
+  readonly boss: BossEncounter
 }
 
-export interface FinalFantasyVStoryAvailability {
-  readonly characterIds: readonly FinalFantasyVCharacterId[]
-  readonly galufAvailability: FinalFantasyVGalufAvailability
+export interface StoryAvailability {
+  readonly characterIds: readonly CharacterId[]
+  readonly galufAvailability: GalufAvailability
   readonly jobIds: readonly string[]
   readonly abilityIds: readonly string[]
 }
 
-type CharacterSlot = FinalFantasyVCharacterId | "galuf-or-krile"
+type CharacterSlot = CharacterId | "galuf-or-krile"
 
 const randomPartyCharacterSlots: readonly CharacterSlot[] = [
   "bartz",
@@ -42,10 +42,10 @@ const randomPartyCharacterSlots: readonly CharacterSlot[] = [
   "galuf-or-krile",
 ]
 
-export function createRandomFinalFantasyVParty(
-  catalog: FinalFantasyVStrategyCatalog,
+export function createRandomParty(
+  catalog: StrategyCatalog,
   random: () => number = Math.random,
-): FinalFantasyVRandomParty {
+): RandomParty {
   return {
     members: createRandomPartyMembers(
       randomPartyCharacterSlots,
@@ -56,18 +56,18 @@ export function createRandomFinalFantasyVParty(
   }
 }
 
-export function createRandomFinalFantasyVStoryParty(
-  strategyCatalog: FinalFantasyVStrategyCatalog,
-  bossCatalog: FinalFantasyVBossCatalog,
+export function createRandomStoryParty(
+  strategyCatalog: StrategyCatalog,
+  bossCatalog: BossCatalog,
   random: () => number = Math.random,
-): FinalFantasyVRandomStoryParty {
-  const boss = selectFinalFantasyVBoss(bossCatalog, { kind: "random", random })
-  const availability = finalFantasyVStoryAvailability(strategyCatalog, boss)
+): RandomStoryParty {
+  const boss = selectBoss(bossCatalog, { kind: "random", random })
+  const availability = storyAvailability(strategyCatalog, boss)
 
   return {
     boss,
     members: createRandomLoadoutsForCharacters(
-      finalFantasyVCanonicalStoryCharacterIds(availability.galufAvailability),
+      canonicalStoryCharacterIds(availability.galufAvailability),
       availability.jobIds,
       availability.abilityIds,
       random,
@@ -75,15 +75,15 @@ export function createRandomFinalFantasyVStoryParty(
   }
 }
 
-export function finalFantasyVStoryAvailability(
-  catalog: FinalFantasyVStrategyCatalog,
-  boss: FinalFantasyVBossEncounter,
-): FinalFantasyVStoryAvailability {
+export function storyAvailability(
+  catalog: StrategyCatalog,
+  boss: BossEncounter,
+): StoryAvailability {
   const jobs = [...catalog.jobs.values()]
-    .filter((job) => finalFantasyVJobIsAvailableThroughCrystal(job, boss.jobsUnlocked))
+    .filter((job) => jobIsAvailableThroughCrystal(job, boss.jobsUnlocked))
   const jobIds = jobs.map((job) => job.id)
   const jobIdSet = new Set(jobIds)
-  const galufAvailability = finalFantasyVGalufAvailabilityByCrystal[boss.jobsUnlocked]
+  const galufAvailability = galufAvailabilityByCrystal[boss.jobsUnlocked]
 
   return {
     characterIds: galufAvailability === "must"
@@ -99,9 +99,9 @@ export function finalFantasyVStoryAvailability(
   }
 }
 
-export function finalFantasyVCanonicalStoryCharacterIds(
-  galufAvailability: FinalFantasyVGalufAvailability,
-): readonly FinalFantasyVCharacterId[] {
+export function canonicalStoryCharacterIds(
+  galufAvailability: GalufAvailability,
+): readonly CharacterId[] {
   return galufAvailability === "cannot"
     ? ["bartz", "lenna", "krile", "faris"]
     : ["bartz", "lenna", "galuf", "faris"]
@@ -112,7 +112,7 @@ function createRandomPartyMembers(
   jobIds: readonly string[],
   abilityIds: readonly string[],
   random: () => number,
-): FinalFantasyVRandomPartyMemberCandidate[] {
+): RandomPartyMemberCandidate[] {
   const partySize = randomIndex(characterSlots.length, random) + 1
   const selectedCharacterSlots = sampleWithoutReplacement(characterSlots, partySize, random)
 
@@ -127,11 +127,11 @@ function createRandomPartyMembers(
 }
 
 function createRandomLoadoutsForCharacters(
-  characterIds: readonly FinalFantasyVCharacterId[],
+  characterIds: readonly CharacterId[],
   jobIds: readonly string[],
   abilityIds: readonly string[],
   random: () => number,
-): FinalFantasyVRandomPartyMemberCandidate[] {
+): RandomPartyMemberCandidate[] {
   return characterIds.map((characterId) => createRandomLoadoutForCharacter(
     characterId,
     randomItem(jobIds, random),
@@ -141,16 +141,16 @@ function createRandomLoadoutsForCharacters(
 }
 
 function createRandomLoadoutForCharacter(
-  characterId: FinalFantasyVCharacterId,
+  characterId: CharacterId,
   jobId: string,
   abilityIds: readonly string[],
   random: () => number,
-): FinalFantasyVRandomPartyMemberCandidate {
+): RandomPartyMemberCandidate {
   return {
     characterId,
     jobId,
     assignmentIds: Array.from(
-      { length: randomIndex(finalFantasyVSlotCount(jobId) + 1, random) },
+      { length: randomIndex(slotCount(jobId) + 1, random) },
       () => randomItem(abilityIds, random),
     ),
   }
