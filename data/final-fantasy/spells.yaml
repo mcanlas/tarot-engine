@@ -17,6 +17,132 @@
   attributes:
     - healing
 
+- spell: cura
+  name: Cura
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
+- spell: diara
+  name: Diara
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - anti-undead
+
+- spell: fira
+  name: Fira
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- spell: hold
+  name: Hold
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - control-magic
+
+- spell: thundara
+  name: Thundara
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- spell: focara
+  name: Focara
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - physical-support
+
+- spell: poisona
+  name: Poisona
+  learnableBy:
+    - white-mage
+    - red-mage
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
+- spell: fear
+  name: Fear
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - control-magic
+
+- spell: vox
+  name: Vox
+  learnableBy:
+    - white-mage
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
+- spell: sleepra
+  name: Sleepra
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - control-magic
+
+- spell: confuse
+  name: Confuse
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - control-magic
+
+- spell: blizzara
+  name: Blizzara
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
 - spell: dia
   name: Dia
   learnableBy:

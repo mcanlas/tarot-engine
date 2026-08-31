@@ -53,9 +53,11 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "raise-evasion": 20,
     "raise-resistance": 30,
     "raise-attack": 35,
+    "multiply-attack-count": 60,
     "inflict-status": 25,
     "lower-attack-count": 20,
     "lower-evasion": 5,
+    "increase-flee": 0,
   }),
   spellPotency: Object.freeze({
     "restore-hp": 1,
@@ -65,9 +67,11 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "raise-evasion": 0.125,
     "raise-resistance": 0,
     "raise-attack": 2,
+    "multiply-attack-count": 0,
     "inflict-status": 0,
     "lower-attack-count": 0,
     "lower-evasion": 0.5,
+    "increase-flee": 0,
   }),
   spellAccuracy: 0.125,
   allEnemiesBonus: 10,
@@ -264,7 +268,7 @@ function scoreMagic(
     reasons.push(`duplicate ${magicResponsibility(magic)} multiplier ${duplicateMultiplier}`)
   }
 
-  if (effect.kind === "raise-attack") {
+  if (effect.kind === "raise-attack" || effect.kind === "multiply-attack-count") {
     const targetFit = attackBuffTargetFit(party, policy)
     value *= targetFit.multiplier
     reasons.push(`${targetFit.label} multiplier ${targetFit.multiplier}`)
@@ -471,6 +475,9 @@ function magicCapabilityKey(magic: MagicDefinition): string {
   }
   if (effect.kind === "raise-resistance") {
     discriminators.push(effect.element)
+  }
+  if (effect.kind === "restore-hp") {
+    discriminators.push(magic.target)
   }
 
   return discriminators.join(":")

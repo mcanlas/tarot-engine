@@ -148,6 +148,8 @@ test("exposes an explicit default policy", () => {
   assert(defaultPartyUtilityPolicy.excludedEquipmentKeys.has("nunchaku"))
   assert.equal(defaultPartyUtilityPolicy.monkWeaponMultiplier, 0)
   assert.equal(defaultPartyUtilityPolicy.spellEffect.damage, 20)
+  assert.equal(defaultPartyUtilityPolicy.spellEffect["multiply-attack-count"], 60)
+  assert.equal(defaultPartyUtilityPolicy.spellEffect["increase-flee"], 0)
   assert.equal(defaultPartyUtilityPolicy.spellPotency["restore-hp"], 1)
   assert.equal(defaultPartyUtilityPolicy.spellPotency["raise-defense"], 2)
   assert.equal(defaultPartyUtilityPolicy.spellPotency["raise-evasion"], 0.125)

@@ -126,3 +126,131 @@ magic:
     price: 250
     target: all-enemies
     effect: { kind: lower-attack-count, accuracy: 64 }
+
+  - key: cura
+    name: Cura
+    school: white
+    level: 3
+    price: 1000
+    target: single-ally
+    effect: { kind: restore-hp, potency: 33 }
+
+  - key: diara
+    name: Diara
+    school: white
+    level: 3
+    price: 1000
+    target: all-enemies
+    effect: { kind: damage, potency: 40, accuracy: 24, targetFamily: undead }
+
+  - key: nulblaze
+    name: NulBlaze
+    school: white
+    level: 3
+    price: 1000
+    target: all-allies
+    effect: { kind: raise-resistance, element: fire }
+
+  - key: heal
+    name: Heal
+    school: white
+    level: 3
+    price: 1000
+    target: all-allies
+    effect: { kind: restore-hp, potency: 12 }
+
+  - key: fira
+    name: Fira
+    school: black
+    level: 3
+    price: 1000
+    target: all-enemies
+    effect: { kind: damage, potency: 30, accuracy: 24, element: fire }
+
+  - key: hold
+    name: Hold
+    school: black
+    level: 3
+    price: 1000
+    target: single-enemy
+    effect: { kind: inflict-status, status: paralysis, accuracy: 64 }
+
+  - key: thundara
+    name: Thundara
+    school: black
+    level: 3
+    price: 1000
+    target: all-enemies
+    effect: { kind: damage, potency: 30, accuracy: 24, element: lightning }
+
+  - key: focara
+    name: Focara
+    school: black
+    level: 3
+    price: 1000
+    target: all-enemies
+    effect: { kind: lower-evasion, potency: 20, accuracy: 64 }
+
+  - key: poisona
+    name: Poisona
+    school: white
+    level: 4
+    price: 2500
+    target: single-ally
+    effect: { kind: cure-status, status: poison }
+
+  - key: fear
+    name: Fear
+    school: white
+    level: 4
+    price: 2500
+    target: all-enemies
+    effect: { kind: increase-flee }
+
+  - key: nulfrost
+    name: NulFrost
+    school: white
+    level: 4
+    price: 2500
+    target: all-allies
+    effect: { kind: raise-resistance, element: ice }
+
+  - key: vox
+    name: Vox
+    school: white
+    level: 4
+    price: 2500
+    target: single-ally
+    effect: { kind: cure-status, status: silence }
+
+  - key: sleepra
+    name: Sleepra
+    school: black
+    level: 4
+    price: 2500
+    target: single-enemy
+    effect: { kind: inflict-status, status: sleep, accuracy: 64 }
+
+  - key: haste
+    name: Haste
+    school: black
+    level: 4
+    price: 2500
+    target: single-ally
+    effect: { kind: multiply-attack-count, factor: 2 }
+
+  - key: confuse
+    name: Confuse
+    school: black
+    level: 4
+    price: 2500
+    target: all-enemies
+    effect: { kind: inflict-status, status: confusion, accuracy: 64 }
+
+  - key: blizzara
+    name: Blizzara
+    school: black
+    level: 4
+    price: 2500
+    target: all-enemies
+    effect: { kind: damage, potency: 40, accuracy: 24, element: ice }

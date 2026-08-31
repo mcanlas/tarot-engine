@@ -33,7 +33,13 @@ export type MagicTarget =
   | "all-allies"
 
 export type MagicElement = "fire" | "ice" | "lightning"
-export type MagicStatus = "darkness" | "silence" | "sleep"
+export type MagicStatus =
+  | "confusion"
+  | "darkness"
+  | "paralysis"
+  | "poison"
+  | "silence"
+  | "sleep"
 
 export type MagicEffect =
   | { readonly kind: "restore-hp"; readonly potency: number }
@@ -49,9 +55,11 @@ export type MagicEffect =
   | { readonly kind: "raise-evasion"; readonly potency: number }
   | { readonly kind: "raise-resistance"; readonly element: MagicElement }
   | { readonly kind: "raise-attack"; readonly potency: number }
+  | { readonly kind: "multiply-attack-count"; readonly factor: number }
   | { readonly kind: "inflict-status"; readonly status: MagicStatus; readonly accuracy: number }
   | { readonly kind: "lower-attack-count"; readonly accuracy: number }
   | { readonly kind: "lower-evasion"; readonly potency: number; readonly accuracy: number }
+  | { readonly kind: "increase-flee" }
 
 export interface MagicDefinition {
   readonly key: string
@@ -317,6 +325,12 @@ function validateMagicMechanics(magic: MagicDefinition): void {
       return
     case "cure-status":
     case "raise-resistance":
+    case "increase-flee":
+      return
+    case "multiply-attack-count":
+      if (!Number.isFinite(magic.effect.factor) || magic.effect.factor < 1) {
+        throw new Error(`Final Fantasy magic ${magic.key} factor must be at least one`)
+      }
       return
     case "damage":
     case "lower-evasion":

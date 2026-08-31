@@ -35,7 +35,7 @@ interface ProvokaScenario {
   readonly town: TownDefinition
 }
 
-async function loadProvokaScenario(): Promise<ProvokaScenario> {
+async function loadScenario(townKey: string): Promise<ProvokaScenario> {
   const [strategyCatalog, towns, itemText, magicText] = await Promise.all([
     loadStrategyCatalog(loadProjectFile),
     loadTowns(loadProjectFile),
@@ -50,9 +50,11 @@ async function loadProvokaScenario(): Promise<ProvokaScenario> {
   return {
     catalog,
     provider: new NextActionProvider(strategyCatalog, catalog),
-    town: cumulativeTown(towns, "provoka"),
+    town: cumulativeTown(towns, townKey),
   }
 }
+
+const loadProvokaScenario = (): Promise<ProvokaScenario> => loadScenario("provoka")
 
 test("multiple Red Mages divide Provoka coverage instead of cloning control loadouts", async () => {
   const scenario = await loadProvokaScenario()
@@ -102,13 +104,29 @@ test("Red Red White Black gives core school work to specialists and gaps to Red 
   assertThreeSpellsPerLevel(finalParty, scenario.catalog.magic)
 })
 
+test("Elfheim recommendations value Haste and party healing without spending a slot on Fear", async () => {
+  const scenario = await loadScenario("elfheim")
+  const finalParty = recommendAll(scenario, [
+    character("warrior", "warrior"),
+    character("white", "white-mage"),
+    character("black", "black-mage"),
+  ], 50_000)
+  const byId = new Map(finalParty.characters.map((member) => [member.id, member]))
+
+  assert(byId.get("black")!.learnedSpells.has("haste"))
+  assert(byId.get("white")!.learnedSpells.has("heal"))
+  assert(!byId.get("white")!.learnedSpells.has("fear"))
+  assertThreeSpellsPerLevel(finalParty, scenario.catalog.magic)
+})
+
 function recommendAll(
   scenario: ProvokaScenario,
   characters: readonly CharacterState[],
+  gil = 5_000,
 ): PartyState {
   const evaluator = new PartyUtilityEvaluator(scenario.catalog)
   const recommender = new NextActionRecommender(scenario.provider, evaluator.evaluate)
-  let party: PartyState = { characters, gil: 5_000 }
+  let party: PartyState = { characters, gil }
 
   for (const recommendation of recommender.recommendPlan(party, scenario.town)) {
     if (recommendation.kind === "take-action") {

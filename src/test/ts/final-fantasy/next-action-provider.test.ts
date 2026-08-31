@@ -129,14 +129,18 @@ test("loads Pixel Remaster combat stats for seeded weapons", async () => {
         criticalRate,
       })),
     [
-      { key: "nunchaku", attack: 12, accuracy: 0, criticalRate: 10 },
-      { key: "knife", attack: 5, accuracy: 10, criticalRate: 5 },
-      { key: "staff", attack: 6, accuracy: 0, criticalRate: 1 },
-      { key: "rapier", attack: 9, accuracy: 5, criticalRate: 10 },
-      { key: "hammer", attack: 9, accuracy: 0, criticalRate: 1 },
-      { key: "broadsword", attack: 15, accuracy: 10, criticalRate: 10 },
-      { key: "battle-axe", attack: 16, accuracy: 5, criticalRate: 10 },
-      { key: "scimitar", attack: 10, accuracy: 10, criticalRate: 5 },
+      { key: "nunchaku", attack: 12, accuracy: 0, criticalRate: 1 },
+      { key: "knife", attack: 5, accuracy: 10, criticalRate: 2 },
+      { key: "staff", attack: 6, accuracy: 0, criticalRate: 3 },
+      { key: "rapier", attack: 9, accuracy: 5, criticalRate: 4 },
+      { key: "hammer", attack: 9, accuracy: 0, criticalRate: 5 },
+      { key: "broadsword", attack: 15, accuracy: 10, criticalRate: 6 },
+      { key: "battle-axe", attack: 16, accuracy: 5, criticalRate: 7 },
+      { key: "scimitar", attack: 10, accuracy: 10, criticalRate: 8 },
+      { key: "iron-nunchaku", attack: 16, accuracy: 0, criticalRate: 9 },
+      { key: "dagger", attack: 7, accuracy: 10, criticalRate: 10 },
+      { key: "crosier", attack: 14, accuracy: 0, criticalRate: 11 },
+      { key: "saber", attack: 13, accuracy: 5, criticalRate: 12 },
     ],
   )
 })
@@ -155,6 +159,10 @@ test("loads Pixel Remaster defense and weight for seeded armor", async () => {
       { key: "iron-armor", defense: 24, weight: 23 },
       { key: "leather-shield", defense: 2, weight: 0 },
       { key: "gloves", defense: 1, weight: 1 },
+      { key: "copper-armlet", defense: 4, weight: 1 },
+      { key: "iron-shield", defense: 4, weight: 0 },
+      { key: "leather-cap", defense: 1, weight: 1 },
+      { key: "helm", defense: 3, weight: 3 },
     ],
   )
 })
@@ -237,8 +245,105 @@ test("loads explicit seeded magic mechanics", async () => {
         target: "all-enemies",
         effect: { kind: "lower-attack-count", accuracy: 64 },
       },
+      { key: "cura", target: "single-ally", effect: { kind: "restore-hp", potency: 33 } },
+      {
+        key: "diara",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 40, accuracy: 24, targetFamily: "undead" },
+      },
+      {
+        key: "nulblaze",
+        target: "all-allies",
+        effect: { kind: "raise-resistance", element: "fire" },
+      },
+      { key: "heal", target: "all-allies", effect: { kind: "restore-hp", potency: 12 } },
+      {
+        key: "fira",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 30, accuracy: 24, element: "fire" },
+      },
+      {
+        key: "hold",
+        target: "single-enemy",
+        effect: { kind: "inflict-status", status: "paralysis", accuracy: 64 },
+      },
+      {
+        key: "thundara",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 30, accuracy: 24, element: "lightning" },
+      },
+      {
+        key: "focara",
+        target: "all-enemies",
+        effect: { kind: "lower-evasion", potency: 20, accuracy: 64 },
+      },
+      {
+        key: "poisona",
+        target: "single-ally",
+        effect: { kind: "cure-status", status: "poison" },
+      },
+      { key: "fear", target: "all-enemies", effect: { kind: "increase-flee" } },
+      {
+        key: "nulfrost",
+        target: "all-allies",
+        effect: { kind: "raise-resistance", element: "ice" },
+      },
+      {
+        key: "vox",
+        target: "single-ally",
+        effect: { kind: "cure-status", status: "silence" },
+      },
+      {
+        key: "sleepra",
+        target: "single-enemy",
+        effect: { kind: "inflict-status", status: "sleep", accuracy: 64 },
+      },
+      {
+        key: "haste",
+        target: "single-ally",
+        effect: { kind: "multiply-attack-count", factor: 2 },
+      },
+      {
+        key: "confuse",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "confusion", accuracy: 64 },
+      },
+      {
+        key: "blizzara",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 40, accuracy: 24, element: "ice" },
+      },
     ],
   )
+})
+
+test("provides every Elfheim level 3 and 4 spell to eligible specialists", async () => {
+  const { provider } = await loadProvider()
+  const towns = await loadTowns(loadProjectFile)
+  const elfheim = towns.towns.find((town) => town.key === "elfheim")!
+  const actions = provider.availableActions(party([
+    character("white", "white-mage"),
+    character("black", "black-mage"),
+  ], 10_000), elfheim)
+
+  assert.deepEqual(actions.filter((action) => action.kind === "learn-spell").map(actionKey), [
+    "white:learn:cura",
+    "white:learn:diara",
+    "white:learn:nulblaze",
+    "white:learn:heal",
+    "white:learn:poisona",
+    "white:learn:fear",
+    "white:learn:nulfrost",
+    "white:learn:vox",
+    "black:learn:fira",
+    "black:learn:hold",
+    "black:learn:thundara",
+    "black:learn:focara",
+    "black:learn:sleepra",
+    "black:learn:haste",
+    "black:learn:confuse",
+    "black:learn:blizzara",
+  ])
 })
 
 test("resolves promotion independently from a character's base class", async () => {

@@ -61,3 +61,43 @@ towns:
           - dark
           - temper
           - slow
+
+  - key: elfheim
+    name: Elfheim
+    shops:
+      - type: weapons
+        wares:
+          - iron-nunchaku
+          - dagger
+          - crosier
+          - saber
+
+      - type: armor
+        wares:
+          - iron-armor
+          - copper-armlet
+          - iron-shield
+          - leather-cap
+          - helm
+
+      - type: white-magic
+        wares:
+          - cura
+          - diara
+          - nulblaze
+          - heal
+          - poisona
+          - fear
+          - nulfrost
+          - vox
+
+      - type: black-magic
+        wares:
+          - fira
+          - hold
+          - thundara
+          - focara
+          - sleepra
+          - haste
+          - confuse
+          - blizzara
