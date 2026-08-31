@@ -1,0 +1,9 @@
+magic:
+  - { key: cure, name: Cure, school: white, price: 50 }
+  - { key: dia, name: Dia, school: white, price: 50 }
+  - { key: protect, name: Protect, school: white, price: 50 }
+  - { key: blink, name: Blink, school: white, price: 50 }
+  - { key: fire, name: Fire, school: black, price: 50 }
+  - { key: sleep, name: Sleep, school: black, price: 50 }
+  - { key: focus, name: Focus, school: black, price: 50 }
+  - { key: thunder, name: Thunder, school: black, price: 50 }

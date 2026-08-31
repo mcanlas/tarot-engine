@@ -8,15 +8,9 @@ export type FinalFantasyShopType =
   | "white-magic"
   | "black-magic"
 
-export interface FinalFantasyShopWareDefinition {
-  readonly key: string
-  readonly name: string
-  readonly price: number
-}
-
 export interface FinalFantasyShopDefinition {
   readonly type: FinalFantasyShopType
-  readonly wares: readonly FinalFantasyShopWareDefinition[]
+  readonly wares: readonly string[]
 }
 
 export interface FinalFantasyTownDefinition {
@@ -82,17 +76,7 @@ function decodeShop(value: unknown, path: string): FinalFantasyShopDefinition {
   return {
     type: requireShopType(record.type, `${path}.type`),
     wares: requireArray(record.wares, `${path}.wares`)
-      .map((ware, wareIndex) => decodeWare(ware, `${path}.wares[${wareIndex}]`)),
-  }
-}
-
-function decodeWare(value: unknown, path: string): FinalFantasyShopWareDefinition {
-  const record = requireRecord(value, path)
-
-  return {
-    key: requireString(record.key, `${path}.key`),
-    name: requireString(record.name, `${path}.name`),
-    price: requireNonNegativeInteger(record.price, `${path}.price`),
+      .map((ware, wareIndex) => requireString(ware, `${path}.wares[${wareIndex}]`)),
   }
 }
 
@@ -124,14 +108,6 @@ function requireArray(value: unknown, path: string): unknown[] {
 function requireString(value: unknown, path: string): string {
   if (typeof value !== "string" || value.length === 0) {
     throw new Error(`${path} must be a non-empty string`)
-  }
-
-  return value
-}
-
-function requireNonNegativeInteger(value: unknown, path: string): number {
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
-    throw new Error(`${path} must be a non-negative integer`)
   }
 
   return value

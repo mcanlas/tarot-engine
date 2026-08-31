@@ -4,28 +4,28 @@ towns:
     shops:
       - type: weapons
         wares:
-          - { key: nunchaku, name: Nunchaku, price: 8 }
-          - { key: knife, name: Knife, price: 4 }
-          - { key: staff, name: Staff, price: 4 }
-          - { key: rapier, name: Rapier, price: 8 }
-          - { key: hammer, name: Hammer, price: 8 }
+          - nunchaku
+          - knife
+          - staff
+          - rapier
+          - hammer
 
       - type: armor
         wares:
-          - { key: clothes, name: Clothes, price: 8 }
-          - { key: leather-armor, name: Leather Armor, price: 40 }
-          - { key: chain-mail, name: Chain Mail, price: 65 }
+          - clothes
+          - leather-armor
+          - chain-mail
 
       - type: white-magic
         wares:
-          - { key: cure, name: Cure, price: 50 }
-          - { key: dia, name: Dia, price: 50 }
-          - { key: protect, name: Protect, price: 50 }
-          - { key: blink, name: Blink, price: 50 }
+          - cure
+          - dia
+          - protect
+          - blink
 
       - type: black-magic
         wares:
-          - { key: fire, name: Fire, price: 50 }
-          - { key: sleep, name: Sleep, price: 50 }
-          - { key: focus, name: Focus, price: 50 }
-          - { key: thunder, name: Thunder, price: 50 }
+          - fire
+          - sleep
+          - focus
+          - thunder
