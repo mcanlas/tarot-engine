@@ -1,4 +1,4 @@
-import type { StrategyCatalog, Job } from "./strategy-core.ts"
+import type { StrategyCatalog, Job, Spell } from "./strategy-core.ts"
 import type { ShopType, TownDefinition } from "./towns.ts"
 
 export type EquipmentSlot = "weapon" | "body" | "shield" | "head" | "arms"
@@ -180,7 +180,7 @@ export class NextActionProvider {
           : characters.flatMap(({ state, activeJob }) =>
             spell.learnableBy.has(activeJob.id)
             && !state.learnedSpells.has(spell.id)
-            && learnedSpellCountAtLevel(state, magic.level, this.#magic) < maximumSpellsPerLevel
+            && learnedSpellCountAtLevel(state, spell.level, this.#strategyCatalog.spells) < maximumSpellsPerLevel
               ? [{
                   kind: "learn-spell" as const,
                   characterId: state.id,
@@ -213,10 +213,10 @@ function bindEquipment(
 function learnedSpellCountAtLevel(
   character: CharacterState,
   level: number,
-  magic: ReadonlyMap<string, MagicDefinition>,
+  spells: ReadonlyMap<string, Spell>,
 ): number {
   return [...character.learnedSpells]
-    .filter((spell) => magic.get(spell)?.level === level)
+    .filter((spell) => spells.get(spell)?.level === level)
     .length
 }
 

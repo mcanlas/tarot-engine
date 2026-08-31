@@ -50,7 +50,12 @@ if (
     magic: magic.map((spell) => ({ ...spell, price: 0 })),
   }
   const itemNames = new Map(equipment.map((item) => [item.key, item.name]))
-  const spellNames = new Map(magic.map((spell) => [spell.key, spell.name]))
+  const spellNames = new Map([...strategyCatalog.spells].map(([key, spell]) => [key, spell.name]))
+  const spellLevels = new Map([...strategyCatalog.spells].map(([key, spell]) => [key, spell.level]))
+  const spellCatalogs = new Map()
+  for (const spell of strategyCatalog.spells.values()) {
+    spellCatalogs.set(spell.level, [...(spellCatalogs.get(spell.level) ?? []), spell])
+  }
   const equipmentCatalogs = new Map(equipmentSlots.map((slot) => [
     slot,
     equipment.filter((item) => item.slot === slot),
@@ -64,15 +69,16 @@ if (
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {
     const party = {
       gil: 0,
-      characters: emptyCharacters(equipmentCatalogs, ...partyEngine.createRandomParty()),
+      characters: emptyCharacters(equipmentCatalogs, spellCatalogs, ...partyEngine.createRandomParty()),
     }
 
     console.log(`\n=== FF1 next-action run ${occurrence + 1} ===`)
     console.log(`Town: ${town.name}`)
-    console.log(`Starting party (spell sets are empty; each equipment slot is a coin flip): ${
+    console.log(`Starting party: ${
       party.characters.map((character) => character.id).join(" / ")
     }`)
     console.log(`\n${formatEquipmentTable(party.characters, itemNames)}\n`)
+    console.log(`${formatSpellTable(party.characters, spellNames, spellLevels)}\n`)
     const jobWidth = Math.max("JOB".length, ...party.characters.map(({ id }) => id.length))
     if (!verbose) {
       console.log(`${"#".padStart(2)} | ${"JOB".padEnd(jobWidth)} | ${"ACTION".padEnd(compactActionWidth)} | ${"UTILITY".padStart(7)}`)
@@ -116,7 +122,7 @@ if (
   console.log(`\nCompleted ${occurrences} random FF1 next-action runs.`)
 }
 
-function emptyCharacters(equipmentCatalogs, ...baseClasses) {
+function emptyCharacters(equipmentCatalogs, spellCatalogs, ...baseClasses) {
   const duplicateClasses = new Set(
     baseClasses.filter((baseClass, index) => baseClasses.indexOf(baseClass) !== index),
   )
@@ -130,17 +136,18 @@ function emptyCharacters(equipmentCatalogs, ...baseClasses) {
       duplicateClasses.has(baseClass) ? `${baseClass}-${count}` : baseClass,
       baseClass,
       equipmentCatalogs,
+      spellCatalogs,
     )
   })
 }
 
-function emptyCharacter(id, baseClass, equipmentCatalogs) {
+function emptyCharacter(id, baseClass, equipmentCatalogs, spellCatalogs) {
   return {
     id,
     baseClass,
     promoted: false,
     equipment: randomStartingEquipment(baseClass, equipmentCatalogs),
-    learnedSpells: new Set(),
+    learnedSpells: randomStartingSpells(baseClass, spellCatalogs),
   }
 }
 
@@ -162,6 +169,33 @@ function randomStartingEquipment(baseClass, equipmentCatalogs) {
   }))
 }
 
+function randomStartingSpells(baseClass, spellCatalogs) {
+  const learnedSpells = new Set()
+  for (const spells of spellCatalogs.values()) {
+    const legalSpells = spells.filter((spell) => spell.learnableBy.has(baseClass))
+    const spellCount = Math.min(randomInteger(4), legalSpells.length)
+    for (const spell of randomSample(legalSpells, spellCount)) {
+      learnedSpells.add(spell.id)
+    }
+  }
+
+  return learnedSpells
+}
+
+function randomSample(values, count) {
+  const pool = [...values]
+  const result = []
+  while (result.length < count && pool.length > 0) {
+    result.push(pool.splice(randomInteger(pool.length), 1)[0])
+  }
+
+  return result
+}
+
+function randomInteger(exclusiveMaximum) {
+  return Math.floor(Math.random() * exclusiveMaximum)
+}
+
 function formatEquipmentTable(characters, itemNames) {
   const jobHeader = "JOB"
   const jobWidth = Math.max(jobHeader.length, ...characters.map(({ id }) => id.length))
@@ -180,6 +214,36 @@ function formatEquipmentTable(characters, itemNames) {
   ].join(" | "))
 
   return [headerRow, ...rows].map((line) => `  ${line}`).join("\n")
+}
+
+function formatSpellTable(characters, spellNames, spellLevels) {
+  const jobHeader = "JOB"
+  const spellsHeader = "SPELLS"
+  const jobWidth = Math.max(jobHeader.length, ...characters.map(({ id }) => id.length))
+
+  const rows = characters.flatMap((character) => {
+    const spellsByLevel = new Map()
+    for (const spell of character.learnedSpells) {
+      const level = spellLevels.get(spell)
+      const name = spellNames.get(spell) ?? spell
+
+      spellsByLevel.set(level, [...(spellsByLevel.get(level) ?? []), name])
+    }
+    const levels = [...spellsByLevel.keys()].sort((left, right) => left - right)
+
+    return levels.length === 0
+      ? [[character.id, "-"]]
+      : levels.map((level, index) => [
+        index === 0 ? character.id : "",
+        spellsByLevel.get(level).join(", "),
+      ])
+  })
+
+  const spellWidth = Math.max(spellsHeader.length, ...rows.map(([, spells]) => spells.length))
+  const headerRow = [jobHeader.padEnd(jobWidth), spellsHeader.padEnd(spellWidth)].join(" | ")
+  const bodyRows = rows.map(([job, spells]) => [job.padEnd(jobWidth), spells.padEnd(spellWidth)].join(" | "))
+
+  return [headerRow, ...bodyRows].map((line) => `  ${line}`).join("\n")
 }
 
 function formatEquipmentSlot(itemKey, itemNames) {

@@ -160,6 +160,12 @@ test("seeds catalog records for every town ware key", async () => {
     "haste",
     "confuse",
     "blizzara",
+    "life",
+    "protera",
+    "invisira",
+    "nuldeath",
+    "saber",
+    "flare",
   ])
   for (const town of definitions.towns) {
     for (const shop of town.shops) {

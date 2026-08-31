@@ -254,3 +254,51 @@ magic:
     price: 2500
     target: all-enemies
     effect: { kind: damage, potency: 40, accuracy: 24, element: ice }
+
+  - key: life
+    name: Life
+    school: white
+    level: 5
+    price: 5000
+    target: single-ally
+    effect: { kind: restore-hp, potency: 1 }
+
+  - key: protera
+    name: Protera
+    school: white
+    level: 6
+    price: 10000
+    target: all-allies
+    effect: { kind: raise-defense, potency: 20 }
+
+  - key: invisira
+    name: Invisira
+    school: white
+    level: 6
+    price: 10000
+    target: all-allies
+    effect: { kind: raise-evasion, potency: 60 }
+
+  - key: nuldeath
+    name: NulDeath
+    school: white
+    level: 7
+    price: 20000
+    target: all-allies
+    effect: { kind: raise-evasion, potency: 30 }
+
+  - key: saber
+    name: Saber
+    school: black
+    level: 7
+    price: 20000
+    target: self
+    effect: { kind: raise-attack, potency: 20 }
+
+  - key: flare
+    name: Flare
+    school: black
+    level: 8
+    price: 40000
+    target: single-enemy
+    effect: { kind: damage, potency: 60, accuracy: 24 }

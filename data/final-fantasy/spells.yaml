@@ -1,5 +1,6 @@
 - spell: cure
   name: Cure
+  level: 1
   learnableBy:
     - white-mage
     - red-mage
@@ -11,6 +12,7 @@
 
 - spell: heal
   name: Heal
+  level: 3
   learnableBy:
     - white-mage
     - white-wizard
@@ -19,6 +21,7 @@
 
 - spell: cura
   name: Cura
+  level: 3
   learnableBy:
     - white-mage
     - red-mage
@@ -30,6 +33,7 @@
 
 - spell: diara
   name: Diara
+  level: 3
   learnableBy:
     - white-mage
     - white-wizard
@@ -38,6 +42,7 @@
 
 - spell: fira
   name: Fira
+  level: 3
   learnableBy:
     - black-mage
     - red-mage
@@ -50,6 +55,7 @@
 
 - spell: hold
   name: Hold
+  level: 3
   learnableBy:
     - black-mage
     - red-mage
@@ -61,6 +67,7 @@
 
 - spell: thundara
   name: Thundara
+  level: 3
   learnableBy:
     - black-mage
     - red-mage
@@ -73,6 +80,7 @@
 
 - spell: focara
   name: Focara
+  level: 3
   learnableBy:
     - black-mage
     - red-mage
@@ -84,6 +92,7 @@
 
 - spell: poisona
   name: Poisona
+  level: 4
   learnableBy:
     - white-mage
     - red-mage
@@ -94,6 +103,7 @@
 
 - spell: fear
   name: Fear
+  level: 4
   learnableBy:
     - white-mage
     - white-wizard
@@ -102,6 +112,7 @@
 
 - spell: vox
   name: Vox
+  level: 4
   learnableBy:
     - white-mage
     - white-wizard
@@ -111,6 +122,7 @@
 
 - spell: sleepra
   name: Sleepra
+  level: 4
   learnableBy:
     - black-mage
     - red-mage
@@ -122,6 +134,7 @@
 
 - spell: confuse
   name: Confuse
+  level: 4
   learnableBy:
     - black-mage
     - red-mage
@@ -133,6 +146,7 @@
 
 - spell: blizzara
   name: Blizzara
+  level: 4
   learnableBy:
     - black-mage
     - red-mage
@@ -145,6 +159,7 @@
 
 - spell: dia
   name: Dia
+  level: 1
   learnableBy:
     - white-mage
     - white-wizard
@@ -153,6 +168,7 @@
 
 - spell: fire
   name: Fire
+  level: 1
   learnableBy:
     - black-mage
     - red-mage
@@ -165,6 +181,7 @@
 
 - spell: blizzard
   name: Blizzard
+  level: 2
   learnableBy:
     - black-mage
     - red-mage
@@ -177,6 +194,7 @@
 
 - spell: thunder
   name: Thunder
+  level: 1
   learnableBy:
     - black-mage
     - red-mage
@@ -189,6 +207,7 @@
 
 - spell: blindna
   name: Blindna
+  level: 2
   learnableBy:
     - white-mage
     - red-mage
@@ -200,6 +219,7 @@
 
 - spell: sleep
   name: Sleep
+  level: 1
   learnableBy:
     - black-mage
     - red-mage
@@ -211,6 +231,7 @@
 
 - spell: focus
   name: Focus
+  level: 1
   learnableBy:
     - black-mage
     - red-mage
@@ -222,6 +243,7 @@
 
 - spell: protect
   name: Protect
+  level: 1
   learnableBy:
     - white-mage
     - red-mage
@@ -233,6 +255,7 @@
 
 - spell: blink
   name: Blink
+  level: 1
   learnableBy:
     - white-mage
     - knight
@@ -243,6 +266,7 @@
 
 - spell: silence
   name: Silence
+  level: 2
   learnableBy:
     - white-mage
     - red-mage
@@ -254,6 +278,7 @@
 
 - spell: invis
   name: Invis
+  level: 2
   learnableBy:
     - white-mage
     - red-mage
@@ -265,6 +290,7 @@
 
 - spell: dark
   name: Dark
+  level: 2
   learnableBy:
     - black-mage
     - red-mage
@@ -276,6 +302,7 @@
 
 - spell: temper
   name: Temper
+  level: 2
   learnableBy:
     - black-mage
     - red-mage
@@ -287,6 +314,7 @@
 
 - spell: haste
   name: Haste
+  level: 4
   learnableBy:
     - black-mage
     - red-mage
@@ -298,6 +326,7 @@
 
 - spell: slow
   name: Slow
+  level: 2
   learnableBy:
     - black-mage
     - red-mage
@@ -309,6 +338,7 @@
 
 - spell: nulshock
   name: NulShock
+  level: 2
   learnableBy:
     - white-mage
     - red-mage
@@ -320,6 +350,7 @@
 
 - spell: nulblaze
   name: NulBlaze
+  level: 3
   learnableBy:
     - white-mage
     - red-mage
@@ -331,6 +362,7 @@
 
 - spell: nulfrost
   name: NulFrost
+  level: 4
   learnableBy:
     - white-mage
     - red-mage
@@ -341,6 +373,7 @@
 
 - spell: nuldeath
   name: NulDeath
+  level: 7
   learnableBy:
     - white-mage
     - white-wizard
@@ -350,6 +383,7 @@
 
 - spell: protera
   name: Protera
+  level: 6
   learnableBy:
     - white-mage
     - white-wizard
@@ -359,6 +393,7 @@
 
 - spell: invisira
   name: Invisira
+  level: 6
   learnableBy:
     - white-mage
     - white-wizard
@@ -368,6 +403,7 @@
 
 - spell: flare
   name: Flare
+  level: 8
   learnableBy:
     - black-wizard
   attributes:
@@ -375,6 +411,7 @@
 
 - spell: life
   name: Life
+  level: 5
   learnableBy:
     - white-mage
     - white-wizard
@@ -384,6 +421,7 @@
 
 - spell: saber
   name: Saber
+  level: 7
   learnableBy:
     - black-wizard
   attributes: []

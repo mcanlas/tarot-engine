@@ -63,6 +63,7 @@ export interface ClassDefinition {
 export interface SpellDefinition {
   spell: string
   name: string
+  level: number
   learnableBy: string[]
   attributes: string[]
 }
@@ -120,6 +121,7 @@ export interface Job {
 export interface Spell {
   id: string
   name: string
+  level: number
   learnableBy: ReadonlySet<string>
   attributes: ReadonlySet<SpellAttributeId>
 }
@@ -385,6 +387,7 @@ export function buildStrategyCatalog(
     spells.set(definition.spell, {
       id: definition.spell,
       name: definition.name,
+      level: requireSpellLevel(definition.level),
       learnableBy: new Set(definition.learnableBy),
       attributes: new Set(definition.attributes.map(requireSpellAttribute)),
     })
@@ -753,6 +756,13 @@ function requireSpellAttribute(id: string): SpellAttributeId {
   }
 
   return id as SpellAttributeId
+}
+function requireSpellLevel(value: number): number {
+  if (!Number.isInteger(value) || value < 1 || value > 8) {
+    throw new Error(`Final Fantasy spell level must be an integer from 1 to 8: ${value}`)
+  }
+
+  return value
 }
 function requireItem(id: string): ItemId {
   if (!items.has(id as ItemId)) {

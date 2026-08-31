@@ -77,6 +77,7 @@ test("catalog metadata owns capabilities, spell permissions, and every promotion
     [...(cure?.learnableBy ?? [])],
     ["white-mage", "red-mage", "knight", "white-wizard", "red-wizard"],
   )
+  assert.equal(cure?.level, 1)
   assert(cure?.attributes.has("healing"))
   assert.deepEqual(
     ["warrior", "thief", "monk", "red-mage", "white-mage", "black-mage"]

@@ -313,6 +313,28 @@ test("loads explicit seeded magic mechanics", async () => {
         target: "all-enemies",
         effect: { kind: "damage", potency: 40, accuracy: 24, element: "ice" },
       },
+      { key: "life", target: "single-ally", effect: { kind: "restore-hp", potency: 1 } },
+      {
+        key: "protera",
+        target: "all-allies",
+        effect: { kind: "raise-defense", potency: 20 },
+      },
+      {
+        key: "invisira",
+        target: "all-allies",
+        effect: { kind: "raise-evasion", potency: 60 },
+      },
+      {
+        key: "nuldeath",
+        target: "all-allies",
+        effect: { kind: "raise-evasion", potency: 30 },
+      },
+      { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 20 } },
+      {
+        key: "flare",
+        target: "single-enemy",
+        effect: { kind: "damage", potency: 60, accuracy: 24 },
+      },
     ],
   )
 })
