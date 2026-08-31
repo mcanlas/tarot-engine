@@ -61,7 +61,7 @@ export interface ClassDefinition {
 }
 
 export interface SpellDefinition {
-  spell: string
+  key: string
   name: string
   level: number
   learnableBy: string[]
@@ -356,7 +356,7 @@ export function buildStrategyCatalog(
   spellDefinitions: readonly SpellDefinition[],
 ): StrategyCatalog {
   rejectDuplicates("class", classDefinitions.flatMap((definition) => [definition.class, definition.promotion.class]))
-  rejectDuplicates("spell", spellDefinitions.map((definition) => definition.spell))
+  rejectDuplicates("spell", spellDefinitions.map((definition) => definition.key))
   const jobs = new Map<string, Job>()
   for (const definition of classDefinitions) {
     const jobCapabilities = new Set(definition.attributes.map(requireCapability))
@@ -382,10 +382,10 @@ export function buildStrategyCatalog(
   for (const definition of spellDefinitions) {
     const unknownJobs = definition.learnableBy.filter((id) => !jobs.has(id))
     if (unknownJobs.length > 0) {
-      throw new Error(`Spell ${definition.spell} references unknown classes: ${unknownJobs.join(", ")}`)
+      throw new Error(`Spell ${definition.key} references unknown classes: ${unknownJobs.join(", ")}`)
     }
-    spells.set(definition.spell, {
-      id: definition.spell,
+    spells.set(definition.key, {
+      id: definition.key,
       name: definition.name,
       level: requireSpellLevel(definition.level),
       learnableBy: new Set(definition.learnableBy),

@@ -1,6 +1,10 @@
-- spell: cure
+- key: cure
   name: Cure
+  school: white
   level: 1
+  price: 50
+  target: single-ally
+  effect: { kind: restore-hp, potency: 16 }
   learnableBy:
     - white-mage
     - red-mage
@@ -10,18 +14,26 @@
   attributes:
     - healing
 
-- spell: heal
+- key: heal
   name: Heal
+  school: white
   level: 3
+  price: 1000
+  target: all-allies
+  effect: { kind: restore-hp, potency: 12 }
   learnableBy:
     - white-mage
     - white-wizard
   attributes:
     - healing
 
-- spell: cura
+- key: cura
   name: Cura
+  school: white
   level: 3
+  price: 1000
+  target: single-ally
+  effect: { kind: restore-hp, potency: 33 }
   learnableBy:
     - white-mage
     - red-mage
@@ -31,18 +43,26 @@
   attributes:
     - healing
 
-- spell: diara
+- key: diara
   name: Diara
+  school: white
   level: 3
+  price: 1000
+  target: all-enemies
+  effect: { kind: damage, potency: 40, accuracy: 24, targetFamily: undead }
   learnableBy:
     - white-mage
     - white-wizard
   attributes:
     - anti-undead
 
-- spell: fira
+- key: fira
   name: Fira
+  school: black
   level: 3
+  price: 1000
+  target: all-enemies
+  effect: { kind: damage, potency: 30, accuracy: 24, element: fire }
   learnableBy:
     - black-mage
     - red-mage
@@ -53,9 +73,13 @@
     - offensive-magic
     - elemental
 
-- spell: hold
+- key: hold
   name: Hold
+  school: black
   level: 3
+  price: 1000
+  target: single-enemy
+  effect: { kind: inflict-status, status: paralysis, accuracy: 64 }
   learnableBy:
     - black-mage
     - red-mage
@@ -65,9 +89,13 @@
   attributes:
     - control-magic
 
-- spell: thundara
+- key: thundara
   name: Thundara
+  school: black
   level: 3
+  price: 1000
+  target: all-enemies
+  effect: { kind: damage, potency: 30, accuracy: 24, element: lightning }
   learnableBy:
     - black-mage
     - red-mage
@@ -78,9 +106,13 @@
     - offensive-magic
     - elemental
 
-- spell: focara
+- key: focara
   name: Focara
+  school: black
   level: 3
+  price: 1000
+  target: all-enemies
+  effect: { kind: lower-evasion, potency: 20, accuracy: 64 }
   learnableBy:
     - black-mage
     - red-mage
@@ -90,9 +122,13 @@
   attributes:
     - physical-support
 
-- spell: poisona
+- key: poisona
   name: Poisona
+  school: white
   level: 4
+  price: 2500
+  target: single-ally
+  effect: { kind: cure-status, status: poison }
   learnableBy:
     - white-mage
     - red-mage
@@ -101,18 +137,26 @@
   attributes:
     - healing
 
-- spell: fear
+- key: fear
   name: Fear
+  school: white
   level: 4
+  price: 2500
+  target: all-enemies
+  effect: { kind: increase-flee }
   learnableBy:
     - white-mage
     - white-wizard
   attributes:
     - control-magic
 
-- spell: vox
+- key: vox
   name: Vox
+  school: white
   level: 4
+  price: 2500
+  target: single-ally
+  effect: { kind: cure-status, status: silence }
   learnableBy:
     - white-mage
     - white-wizard
@@ -120,9 +164,13 @@
   attributes:
     - healing
 
-- spell: sleepra
+- key: sleepra
   name: Sleepra
+  school: black
   level: 4
+  price: 2500
+  target: single-enemy
+  effect: { kind: inflict-status, status: sleep, accuracy: 64 }
   learnableBy:
     - black-mage
     - red-mage
@@ -132,9 +180,13 @@
   attributes:
     - control-magic
 
-- spell: confuse
+- key: confuse
   name: Confuse
+  school: black
   level: 4
+  price: 2500
+  target: all-enemies
+  effect: { kind: inflict-status, status: confusion, accuracy: 64 }
   learnableBy:
     - black-mage
     - red-mage
@@ -144,9 +196,13 @@
   attributes:
     - control-magic
 
-- spell: blizzara
+- key: blizzara
   name: Blizzara
+  school: black
   level: 4
+  price: 2500
+  target: all-enemies
+  effect: { kind: damage, potency: 40, accuracy: 24, element: ice }
   learnableBy:
     - black-mage
     - red-mage
@@ -157,18 +213,26 @@
     - offensive-magic
     - elemental
 
-- spell: dia
+- key: dia
   name: Dia
+  school: white
   level: 1
+  price: 50
+  target: all-enemies
+  effect: { kind: damage, potency: 20, accuracy: 24, targetFamily: undead }
   learnableBy:
     - white-mage
     - white-wizard
   attributes:
     - anti-undead
 
-- spell: fire
+- key: fire
   name: Fire
+  school: black
   level: 1
+  price: 50
+  target: single-enemy
+  effect: { kind: damage, potency: 10, accuracy: 24, element: fire }
   learnableBy:
     - black-mage
     - red-mage
@@ -179,9 +243,13 @@
     - offensive-magic
     - elemental
 
-- spell: blizzard
+- key: blizzard
   name: Blizzard
+  school: black
   level: 2
+  price: 250
+  target: single-enemy
+  effect: { kind: damage, potency: 20, accuracy: 24, element: ice }
   learnableBy:
     - black-mage
     - red-mage
@@ -192,9 +260,13 @@
     - offensive-magic
     - elemental
 
-- spell: thunder
+- key: thunder
   name: Thunder
+  school: black
   level: 1
+  price: 50
+  target: single-enemy
+  effect: { kind: damage, potency: 10, accuracy: 24, element: lightning }
   learnableBy:
     - black-mage
     - red-mage
@@ -205,9 +277,13 @@
     - offensive-magic
     - elemental
 
-- spell: blindna
+- key: blindna
   name: Blindna
+  school: white
   level: 2
+  price: 250
+  target: single-ally
+  effect: { kind: cure-status, status: darkness }
   learnableBy:
     - white-mage
     - red-mage
@@ -217,9 +293,13 @@
   attributes:
     - healing
 
-- spell: sleep
+- key: sleep
   name: Sleep
+  school: black
   level: 1
+  price: 50
+  target: all-enemies
+  effect: { kind: inflict-status, status: sleep, accuracy: 24 }
   learnableBy:
     - black-mage
     - red-mage
@@ -229,9 +309,13 @@
   attributes:
     - control-magic
 
-- spell: focus
+- key: focus
   name: Focus
+  school: black
   level: 1
+  price: 50
+  target: single-enemy
+  effect: { kind: lower-evasion, potency: 20, accuracy: 64 }
   learnableBy:
     - black-mage
     - red-mage
@@ -241,9 +325,13 @@
   attributes:
     - physical-support
 
-- spell: protect
+- key: protect
   name: Protect
+  school: white
   level: 1
+  price: 50
+  target: single-ally
+  effect: { kind: raise-defense, potency: 8 }
   learnableBy:
     - white-mage
     - red-mage
@@ -253,9 +341,13 @@
   attributes:
     - defensive-magic
 
-- spell: blink
+- key: blink
   name: Blink
+  school: white
   level: 1
+  price: 50
+  target: self
+  effect: { kind: raise-evasion, potency: 80 }
   learnableBy:
     - white-mage
     - knight
@@ -264,9 +356,13 @@
   attributes:
     - defensive-magic
 
-- spell: silence
+- key: silence
   name: Silence
+  school: white
   level: 2
+  price: 250
+  target: all-enemies
+  effect: { kind: inflict-status, status: silence, accuracy: 24 }
   learnableBy:
     - white-mage
     - red-mage
@@ -276,9 +372,13 @@
   attributes:
     - control-magic
 
-- spell: invis
+- key: invis
   name: Invis
+  school: white
   level: 2
+  price: 250
+  target: single-ally
+  effect: { kind: raise-evasion, potency: 40 }
   learnableBy:
     - white-mage
     - red-mage
@@ -288,9 +388,13 @@
   attributes:
     - defensive-magic
 
-- spell: dark
+- key: dark
   name: Dark
+  school: black
   level: 2
+  price: 250
+  target: all-enemies
+  effect: { kind: inflict-status, status: darkness, accuracy: 24 }
   learnableBy:
     - black-mage
     - red-mage
@@ -300,9 +404,13 @@
   attributes:
     - control-magic
 
-- spell: temper
+- key: temper
   name: Temper
+  school: black
   level: 2
+  price: 250
+  target: single-ally
+  effect: { kind: raise-attack, potency: 14 }
   learnableBy:
     - black-mage
     - red-mage
@@ -312,9 +420,13 @@
   attributes:
     - physical-support
 
-- spell: haste
+- key: haste
   name: Haste
+  school: black
   level: 4
+  price: 2500
+  target: single-ally
+  effect: { kind: multiply-attack-count, factor: 2 }
   learnableBy:
     - black-mage
     - red-mage
@@ -324,9 +436,13 @@
   attributes:
     - physical-support
 
-- spell: slow
+- key: slow
   name: Slow
+  school: black
   level: 2
+  price: 250
+  target: all-enemies
+  effect: { kind: lower-attack-count, accuracy: 64 }
   learnableBy:
     - black-mage
     - red-mage
@@ -336,9 +452,13 @@
   attributes:
     - control-magic
 
-- spell: nulshock
+- key: nulshock
   name: NulShock
+  school: white
   level: 2
+  price: 250
+  target: all-allies
+  effect: { kind: raise-resistance, element: lightning }
   learnableBy:
     - white-mage
     - red-mage
@@ -348,9 +468,13 @@
   attributes:
     - defensive-magic
 
-- spell: nulblaze
+- key: nulblaze
   name: NulBlaze
+  school: white
   level: 3
+  price: 1000
+  target: all-allies
+  effect: { kind: raise-resistance, element: fire }
   learnableBy:
     - white-mage
     - red-mage
@@ -360,9 +484,13 @@
   attributes:
     - defensive-magic
 
-- spell: nulfrost
+- key: nulfrost
   name: NulFrost
+  school: white
   level: 4
+  price: 2500
+  target: all-allies
+  effect: { kind: raise-resistance, element: ice }
   learnableBy:
     - white-mage
     - red-mage
@@ -371,9 +499,13 @@
   attributes:
     - defensive-magic
 
-- spell: nuldeath
+- key: nuldeath
   name: NulDeath
+  school: white
   level: 7
+  price: 20000
+  target: all-allies
+  effect: { kind: raise-evasion, potency: 30 }
   learnableBy:
     - white-mage
     - white-wizard
@@ -381,9 +513,13 @@
   attributes:
     - defensive-magic
 
-- spell: protera
+- key: protera
   name: Protera
+  school: white
   level: 6
+  price: 10000
+  target: all-allies
+  effect: { kind: raise-defense, potency: 20 }
   learnableBy:
     - white-mage
     - white-wizard
@@ -391,9 +527,13 @@
   attributes:
     - defensive-magic
 
-- spell: invisira
+- key: invisira
   name: Invisira
+  school: white
   level: 6
+  price: 10000
+  target: all-allies
+  effect: { kind: raise-evasion, potency: 60 }
   learnableBy:
     - white-mage
     - white-wizard
@@ -401,17 +541,25 @@
   attributes:
     - defensive-magic
 
-- spell: flare
+- key: flare
   name: Flare
+  school: black
   level: 8
+  price: 40000
+  target: single-enemy
+  effect: { kind: damage, potency: 60, accuracy: 24 }
   learnableBy:
     - black-wizard
   attributes:
     - offensive-magic
 
-- spell: life
+- key: life
   name: Life
+  school: white
   level: 5
+  price: 5000
+  target: single-ally
+  effect: { kind: restore-hp, potency: 1 }
   learnableBy:
     - white-mage
     - white-wizard
@@ -419,9 +567,13 @@
   attributes:
     - healing
 
-- spell: saber
+- key: saber
   name: Saber
+  school: black
   level: 7
+  price: 20000
+  target: self
+  effect: { kind: raise-attack, potency: 20 }
   learnableBy:
     - black-wizard
   attributes: []

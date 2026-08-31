@@ -57,7 +57,7 @@ function decodeSpell(value: unknown, index: number): SpellDefinition {
   const record = requireRecord(value, `spells[${index}]`)
 
   return {
-    spell: requireString(record.spell, `spells[${index}].spell`),
+    key: requireString(record.key, `spells[${index}].key`),
     name: requireString(record.name, `spells[${index}].name`),
     level: requireNumber(record.level, `spells[${index}].level`),
     learnableBy: requireStringArray(record.learnableBy, `spells[${index}].learnableBy`),

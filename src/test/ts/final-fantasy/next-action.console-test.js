@@ -36,15 +36,15 @@ if (
   console.error("Usage: node src/test/ts/final-fantasy/next-action.console-test.js <positive integer occurrences> [town key] [verbose]")
   process.exitCode = 1
 } else {
-  const [partyEngine, strategyCatalog, towns, itemText, magicText] = await Promise.all([
+  const [partyEngine, strategyCatalog, towns, itemText, spellText] = await Promise.all([
     loadPartyStrategyEngine(loadProjectFile),
     loadStrategyCatalog(loadProjectFile),
     loadTowns(loadProjectFile),
     loadProjectFile("data/final-fantasy/items.yaml"),
-    loadProjectFile("data/final-fantasy/magic.yaml"),
+    loadProjectFile("data/final-fantasy/spells.yaml"),
   ])
   const equipment = parse(itemText).items
-  const magic = parse(magicText).magic
+  const magic = parse(spellText)
   const actionCatalog = {
     equipment: equipment.map((item) => ({ ...item, price: 0 })),
     magic: magic.map((spell) => ({ ...spell, price: 0 })),

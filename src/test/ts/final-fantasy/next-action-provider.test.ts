@@ -53,14 +53,14 @@ interface LoadedProvider {
 }
 
 async function loadProvider(): Promise<LoadedProvider> {
-  const [catalog, towns, itemText, magicText] = await Promise.all([
+  const [catalog, towns, itemText, spellText] = await Promise.all([
     loadStrategyCatalog(loadProjectFile),
     loadTowns(loadProjectFile),
     loadProjectFile("data/final-fantasy/items.yaml"),
-    loadProjectFile("data/final-fantasy/magic.yaml"),
+    loadProjectFile("data/final-fantasy/spells.yaml"),
   ])
   const equipment = (parse(itemText) as { items: EquipmentDefinition[] }).items
-  const magic = (parse(magicText) as { magic: MagicDefinition[] }).magic
+  const magic = parse(spellText) as MagicDefinition[]
   const actionCatalog = { equipment, magic }
   const cornelia = towns.towns[0]!
 
@@ -174,89 +174,13 @@ test("loads explicit seeded magic mechanics", async () => {
     actionCatalog.magic.map(({ key, target, effect }) => ({ key, target, effect })),
     [
       { key: "cure", target: "single-ally", effect: { kind: "restore-hp", potency: 16 } },
-      {
-        key: "dia",
-        target: "all-enemies",
-        effect: { kind: "damage", potency: 20, accuracy: 24, targetFamily: "undead" },
-      },
-      {
-        key: "protect",
-        target: "single-ally",
-        effect: { kind: "raise-defense", potency: 8 },
-      },
-      { key: "blink", target: "self", effect: { kind: "raise-evasion", potency: 80 } },
-      {
-        key: "fire",
-        target: "single-enemy",
-        effect: { kind: "damage", potency: 10, accuracy: 24, element: "fire" },
-      },
-      {
-        key: "sleep",
-        target: "all-enemies",
-        effect: { kind: "inflict-status", status: "sleep", accuracy: 24 },
-      },
-      {
-        key: "focus",
-        target: "single-enemy",
-        effect: { kind: "lower-evasion", potency: 20, accuracy: 64 },
-      },
-      {
-        key: "thunder",
-        target: "single-enemy",
-        effect: { kind: "damage", potency: 10, accuracy: 24, element: "lightning" },
-      },
-      {
-        key: "blindna",
-        target: "single-ally",
-        effect: { kind: "cure-status", status: "darkness" },
-      },
-      {
-        key: "silence",
-        target: "all-enemies",
-        effect: { kind: "inflict-status", status: "silence", accuracy: 24 },
-      },
-      {
-        key: "nulshock",
-        target: "all-allies",
-        effect: { kind: "raise-resistance", element: "lightning" },
-      },
-      {
-        key: "invis",
-        target: "single-ally",
-        effect: { kind: "raise-evasion", potency: 40 },
-      },
-      {
-        key: "blizzard",
-        target: "single-enemy",
-        effect: { kind: "damage", potency: 20, accuracy: 24, element: "ice" },
-      },
-      {
-        key: "dark",
-        target: "all-enemies",
-        effect: { kind: "inflict-status", status: "darkness", accuracy: 24 },
-      },
-      {
-        key: "temper",
-        target: "single-ally",
-        effect: { kind: "raise-attack", potency: 14 },
-      },
-      {
-        key: "slow",
-        target: "all-enemies",
-        effect: { kind: "lower-attack-count", accuracy: 64 },
-      },
+      { key: "heal", target: "all-allies", effect: { kind: "restore-hp", potency: 12 } },
       { key: "cura", target: "single-ally", effect: { kind: "restore-hp", potency: 33 } },
       {
         key: "diara",
         target: "all-enemies",
         effect: { kind: "damage", potency: 40, accuracy: 24, targetFamily: "undead" },
       },
-      {
-        key: "nulblaze",
-        target: "all-allies",
-        effect: { kind: "raise-resistance", element: "fire" },
-      },
-      { key: "heal", target: "all-allies", effect: { kind: "restore-hp", potency: 12 } },
       {
         key: "fira",
         target: "all-enemies",
@@ -284,11 +208,6 @@ test("loads explicit seeded magic mechanics", async () => {
       },
       { key: "fear", target: "all-enemies", effect: { kind: "increase-flee" } },
       {
-        key: "nulfrost",
-        target: "all-allies",
-        effect: { kind: "raise-resistance", element: "ice" },
-      },
-      {
         key: "vox",
         target: "single-ally",
         effect: { kind: "cure-status", status: "silence" },
@@ -297,11 +216,6 @@ test("loads explicit seeded magic mechanics", async () => {
         key: "sleepra",
         target: "single-enemy",
         effect: { kind: "inflict-status", status: "sleep", accuracy: 64 },
-      },
-      {
-        key: "haste",
-        target: "single-ally",
-        effect: { kind: "multiply-attack-count", factor: 2 },
       },
       {
         key: "confuse",
@@ -313,7 +227,97 @@ test("loads explicit seeded magic mechanics", async () => {
         target: "all-enemies",
         effect: { kind: "damage", potency: 40, accuracy: 24, element: "ice" },
       },
-      { key: "life", target: "single-ally", effect: { kind: "restore-hp", potency: 1 } },
+      {
+        key: "dia",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 20, accuracy: 24, targetFamily: "undead" },
+      },
+      {
+        key: "fire",
+        target: "single-enemy",
+        effect: { kind: "damage", potency: 10, accuracy: 24, element: "fire" },
+      },
+      {
+        key: "blizzard",
+        target: "single-enemy",
+        effect: { kind: "damage", potency: 20, accuracy: 24, element: "ice" },
+      },
+      {
+        key: "thunder",
+        target: "single-enemy",
+        effect: { kind: "damage", potency: 10, accuracy: 24, element: "lightning" },
+      },
+      {
+        key: "blindna",
+        target: "single-ally",
+        effect: { kind: "cure-status", status: "darkness" },
+      },
+      {
+        key: "sleep",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "sleep", accuracy: 24 },
+      },
+      {
+        key: "focus",
+        target: "single-enemy",
+        effect: { kind: "lower-evasion", potency: 20, accuracy: 64 },
+      },
+      {
+        key: "protect",
+        target: "single-ally",
+        effect: { kind: "raise-defense", potency: 8 },
+      },
+      { key: "blink", target: "self", effect: { kind: "raise-evasion", potency: 80 } },
+      {
+        key: "silence",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "silence", accuracy: 24 },
+      },
+      {
+        key: "invis",
+        target: "single-ally",
+        effect: { kind: "raise-evasion", potency: 40 },
+      },
+      {
+        key: "dark",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "darkness", accuracy: 24 },
+      },
+      {
+        key: "temper",
+        target: "single-ally",
+        effect: { kind: "raise-attack", potency: 14 },
+      },
+      {
+        key: "haste",
+        target: "single-ally",
+        effect: { kind: "multiply-attack-count", factor: 2 },
+      },
+      {
+        key: "slow",
+        target: "all-enemies",
+        effect: { kind: "lower-attack-count", accuracy: 64 },
+      },
+      {
+        key: "nulshock",
+        target: "all-allies",
+        effect: { kind: "raise-resistance", element: "lightning" },
+      },
+      {
+        key: "nulblaze",
+        target: "all-allies",
+        effect: { kind: "raise-resistance", element: "fire" },
+      },
+      {
+        key: "nulfrost",
+        target: "all-allies",
+        effect: { kind: "raise-resistance", element: "ice" },
+      },
+      {
+        key: "nuldeath",
+        target: "all-allies",
+        effect: { kind: "raise-evasion", potency: 30 },
+      },
       {
         key: "protera",
         target: "all-allies",
@@ -325,16 +329,12 @@ test("loads explicit seeded magic mechanics", async () => {
         effect: { kind: "raise-evasion", potency: 60 },
       },
       {
-        key: "nuldeath",
-        target: "all-allies",
-        effect: { kind: "raise-evasion", potency: 30 },
-      },
-      { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 20 } },
-      {
         key: "flare",
         target: "single-enemy",
         effect: { kind: "damage", potency: 60, accuracy: 24 },
       },
+      { key: "life", target: "single-ally", effect: { kind: "restore-hp", potency: 1 } },
+      { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 20 } }
     ],
   )
 })

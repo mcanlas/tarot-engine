@@ -36,15 +36,15 @@ interface ProvokaScenario {
 }
 
 async function loadScenario(townKey: string): Promise<ProvokaScenario> {
-  const [strategyCatalog, towns, itemText, magicText] = await Promise.all([
+  const [strategyCatalog, towns, itemText, spellText] = await Promise.all([
     loadStrategyCatalog(loadProjectFile),
     loadTowns(loadProjectFile),
     loadProjectFile("data/final-fantasy/items.yaml"),
-    loadProjectFile("data/final-fantasy/magic.yaml"),
+    loadProjectFile("data/final-fantasy/spells.yaml"),
   ])
   const catalog = {
     equipment: (parse(itemText) as { items: EquipmentDefinition[] }).items,
-    magic: (parse(magicText) as { magic: MagicDefinition[] }).magic,
+    magic: parse(spellText) as MagicDefinition[],
   }
 
   return {

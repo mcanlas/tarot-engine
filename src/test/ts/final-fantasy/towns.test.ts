@@ -95,13 +95,13 @@ test("loads seeded town shops", async () => {
 })
 
 test("seeds catalog records for every town ware key", async () => {
-  const [definitions, itemDocument, magicDocument] = await Promise.all([
+  const [definitions, itemDocument, spellDocument] = await Promise.all([
     loadTowns(loadProjectFile),
     loadProjectFile("data/final-fantasy/items.yaml").then(parse),
-    loadProjectFile("data/final-fantasy/magic.yaml").then(parse),
+    loadProjectFile("data/final-fantasy/spells.yaml").then(parse),
   ])
   const itemKeys = new Set(itemDocument.items.map((item: { key: string }) => item.key))
-  const magicKeys = new Set(magicDocument.magic.map((spell: { key: string }) => spell.key))
+  const magicKeys = new Set(spellDocument.map((spell: { key: string }) => spell.key))
 
   assert.deepEqual([...itemKeys], [
     "nunchaku",
@@ -129,43 +129,43 @@ test("seeds catalog records for every town ware key", async () => {
   ])
   assert.deepEqual([...magicKeys], [
     "cure",
-    "dia",
-    "protect",
-    "blink",
-    "fire",
-    "sleep",
-    "focus",
-    "thunder",
-    "blindna",
-    "silence",
-    "nulshock",
-    "invis",
-    "blizzard",
-    "dark",
-    "temper",
-    "slow",
+    "heal",
     "cura",
     "diara",
-    "nulblaze",
-    "heal",
     "fira",
     "hold",
     "thundara",
     "focara",
     "poisona",
     "fear",
-    "nulfrost",
     "vox",
     "sleepra",
-    "haste",
     "confuse",
     "blizzara",
-    "life",
+    "dia",
+    "fire",
+    "blizzard",
+    "thunder",
+    "blindna",
+    "sleep",
+    "focus",
+    "protect",
+    "blink",
+    "silence",
+    "invis",
+    "dark",
+    "temper",
+    "haste",
+    "slow",
+    "nulshock",
+    "nulblaze",
+    "nulfrost",
+    "nuldeath",
     "protera",
     "invisira",
-    "nuldeath",
-    "saber",
     "flare",
+    "life",
+    "saber",
   ])
   for (const town of definitions.towns) {
     for (const shop of town.shops) {
