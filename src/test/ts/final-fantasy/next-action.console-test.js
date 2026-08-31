@@ -51,7 +51,10 @@ if (
   }
   const itemNames = new Map(equipment.map((item) => [item.key, item.name]))
   const spellNames = new Map(magic.map((spell) => [spell.key, spell.name]))
-  const weaponCatalog = equipment.filter((item) => item.slot === "weapon")
+  const equipmentCatalogs = new Map(equipmentSlots.map((slot) => [
+    slot,
+    equipment.filter((item) => item.slot === slot),
+  ]))
   const town = cumulativeTown(towns, townKey)
 
   const provider = new NextActionProvider(strategyCatalog, actionCatalog)
@@ -61,12 +64,12 @@ if (
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {
     const party = {
       gil: 0,
-      characters: emptyCharacters(weaponCatalog, ...partyEngine.createRandomParty()),
+      characters: emptyCharacters(equipmentCatalogs, ...partyEngine.createRandomParty()),
     }
 
     console.log(`\n=== FF1 next-action run ${occurrence + 1} ===`)
     console.log(`Town: ${town.name}`)
-    console.log(`Starting party (spell sets are empty; weapon slot is a coin flip): ${
+    console.log(`Starting party (spell sets are empty; each equipment slot is a coin flip): ${
       party.characters.map((character) => character.id).join(" / ")
     }`)
     console.log(`\n${formatEquipmentTable(party.characters, itemNames)}\n`)
@@ -113,7 +116,7 @@ if (
   console.log(`\nCompleted ${occurrences} random FF1 next-action runs.`)
 }
 
-function emptyCharacters(weaponCatalog, ...baseClasses) {
+function emptyCharacters(equipmentCatalogs, ...baseClasses) {
   const duplicateClasses = new Set(
     baseClasses.filter((baseClass, index) => baseClasses.indexOf(baseClass) !== index),
   )
@@ -126,34 +129,37 @@ function emptyCharacters(weaponCatalog, ...baseClasses) {
     return emptyCharacter(
       duplicateClasses.has(baseClass) ? `${baseClass}-${count}` : baseClass,
       baseClass,
-      weaponCatalog,
+      equipmentCatalogs,
     )
   })
 }
 
-function emptyCharacter(id, baseClass, weaponCatalog) {
+function emptyCharacter(id, baseClass, equipmentCatalogs) {
   return {
     id,
     baseClass,
     promoted: false,
-    equipment: randomStartingWeaponEquipment(baseClass, weaponCatalog),
+    equipment: randomStartingEquipment(baseClass, equipmentCatalogs),
     learnedSpells: new Set(),
   }
 }
 
-function randomStartingWeaponEquipment(baseClass, weaponCatalog) {
+function randomStartingEquipment(baseClass, equipmentCatalogs) {
   if (baseClass === "monk") {
     return {}
   }
 
-  const legalWeapons = weaponCatalog.filter((weapon) => weapon.canEquip.includes(baseClass))
-  if (legalWeapons.length === 0 || Math.random() < 0.5) {
-    return {}
-  }
+  return Object.fromEntries(equipmentSlots.flatMap((slot) => {
+    const legalEquipment = (equipmentCatalogs.get(slot) ?? [])
+      .filter((item) => item.canEquip.includes(baseClass))
+    if (legalEquipment.length === 0 || Math.random() < 0.5) {
+      return []
+    }
 
-  const weapon = legalWeapons[Math.floor(Math.random() * legalWeapons.length)]
+    const item = legalEquipment[Math.floor(Math.random() * legalEquipment.length)]
 
-  return { weapon: weapon.key }
+    return [[slot, item.key]]
+  }))
 }
 
 function formatEquipmentTable(characters, itemNames) {

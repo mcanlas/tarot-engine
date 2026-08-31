@@ -68,6 +68,42 @@ const catalog: NextActionCatalog = {
       weight: 15,
       canEquip: ["warrior"],
     },
+    {
+      key: "leather-armor",
+      name: "Leather Armor",
+      slot: "body",
+      price: 40,
+      defense: 4,
+      weight: 8,
+      canEquip: ["monk"],
+    },
+    {
+      key: "buckler",
+      name: "Buckler",
+      slot: "shield",
+      price: 12,
+      defense: 2,
+      weight: 0,
+      canEquip: ["monk"],
+    },
+    {
+      key: "leather-cap",
+      name: "Leather Cap",
+      slot: "head",
+      price: 65,
+      defense: 1,
+      weight: 1,
+      canEquip: ["monk"],
+    },
+    {
+      key: "gloves",
+      name: "Gloves",
+      slot: "arms",
+      price: 50,
+      defense: 1,
+      weight: 1,
+      canEquip: ["monk"],
+    },
   ],
   magic: [
     magic("cure", "white", "single-ally", { kind: "restore-hp", potency: 16 }),
@@ -126,6 +162,39 @@ const staffAction: NextAction = {
   slot: "weapon",
   price: 4,
 }
+const leatherArmorAction: NextAction = {
+  kind: "bind-equipment",
+  characterId: "monk",
+  item: "leather-armor",
+  slot: "body",
+  price: 40,
+}
+const monkEquipmentActions: readonly NextAction[] = [
+  nunchakuAction,
+  staffAction,
+  leatherArmorAction,
+  {
+    kind: "bind-equipment",
+    characterId: "monk",
+    item: "buckler",
+    slot: "shield",
+    price: 12,
+  },
+  {
+    kind: "bind-equipment",
+    characterId: "monk",
+    item: "leather-cap",
+    slot: "head",
+    price: 65,
+  },
+  {
+    kind: "bind-equipment",
+    characterId: "monk",
+    item: "gloves",
+    slot: "arms",
+    price: 50,
+  },
+]
 
 const character = (
   id: string,
@@ -146,7 +215,7 @@ test("exposes an explicit default policy", () => {
   assert.equal(defaultPartyUtilityPolicy.armorDefense, 4)
   assert.equal(defaultPartyUtilityPolicy.armorWeightPenalty, 1)
   assert(defaultPartyUtilityPolicy.excludedEquipmentKeys.has("nunchaku"))
-  assert.equal(defaultPartyUtilityPolicy.monkWeaponMultiplier, 0)
+  assert.equal(defaultPartyUtilityPolicy.monkEquipmentMultiplier, 0)
   assert.equal(defaultPartyUtilityPolicy.spellEffect.damage, 20)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["multiply-attack-count"], 60)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["increase-flee"], 0)
@@ -214,11 +283,11 @@ test("scores armor defense against its weight penalty", () => {
   )
 })
 
-test("keeps Monks unarmed and excludes Nunchaku from recommendations", () => {
+test("keeps Monks item-free and excludes Nunchaku from recommendations", () => {
   const evaluator = new PartyUtilityEvaluator(catalog)
   const monk = character("monk", { baseClass: "monk" })
   const recommender = new NextActionRecommender({
-    availableActions: () => [nunchakuAction, staffAction],
+    availableActions: () => monkEquipmentActions,
   }, evaluator.evaluate)
 
   assert.deepEqual(recommender.recommend(party([monk]), town), {
@@ -236,6 +305,39 @@ test("keeps Monks unarmed and excludes Nunchaku from recommendations", () => {
       value: 0,
       reason: "Nunchaku weapon attack 12*4 + accuracy 0*1 + critical rate 10*1; excluded from recommendations",
     }],
+  )
+  assert.deepEqual(
+    evaluator.evaluate(party([character("monk", {
+      baseClass: "monk",
+      equipment: {
+        body: "leather-armor",
+        shield: "buckler",
+        head: "leather-cap",
+        arms: "gloves",
+      },
+    })])).components,
+    [
+      {
+        key: "monk:equipment:body",
+        value: 0,
+        reason: "Leather Armor armor defense 4*4 - weight 8*1; Monk item-free multiplier 0",
+      },
+      {
+        key: "monk:equipment:shield",
+        value: 0,
+        reason: "Buckler armor defense 2*4 - weight 0*1; Monk item-free multiplier 0",
+      },
+      {
+        key: "monk:equipment:head",
+        value: 0,
+        reason: "Leather Cap armor defense 1*4 - weight 1*1; Monk item-free multiplier 0",
+      },
+      {
+        key: "monk:equipment:arms",
+        value: 0,
+        reason: "Gloves armor defense 1*4 - weight 1*1; Monk item-free multiplier 0",
+      },
+    ],
   )
 })
 

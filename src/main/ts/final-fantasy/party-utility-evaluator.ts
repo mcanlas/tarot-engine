@@ -18,7 +18,7 @@ export interface PartyUtilityPolicy {
   readonly armorDefense: number
   readonly armorWeightPenalty: number
   readonly excludedEquipmentKeys: ReadonlySet<string>
-  readonly monkWeaponMultiplier: number
+  readonly monkEquipmentMultiplier: number
   readonly spellEffect: Readonly<Record<MagicDefinition["effect"]["kind"], number>>
   readonly spellPotency: Readonly<Record<MagicDefinition["effect"]["kind"], number>>
   readonly spellAccuracy: number
@@ -44,7 +44,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
   armorDefense: 4,
   armorWeightPenalty: 1,
   excludedEquipmentKeys: new Set(["nunchaku"]),
-  monkWeaponMultiplier: 0,
+  monkEquipmentMultiplier: 0,
   spellEffect: Object.freeze({
     "restore-hp": 50,
     "cure-status": 20,
@@ -108,8 +108,8 @@ export class PartyUtilityEvaluator {
     // - weapon = attack * weaponAttack + accuracy * weaponAccuracy
     //   + criticalRate * weaponCriticalRate
     // - armor = defense * armorDefense - weight * armorWeightPenalty
-    // - excluded equipment and Monk weapons receive no recommendation value; this model treats
-    //   Monks as unarmed because it does not carry the level needed for an early-game crossover
+    // - excluded equipment and Monk equipment receive no recommendation value; this model treats
+    //   Monks as item-free because it does not carry the level needed for an early-game crossover
     //
     // Spell components:
     // - begin with spellEffect[effect.kind]
@@ -187,36 +187,34 @@ function scoreEquipment(
   equipment: WeaponDefinition | ArmorDefinition,
   policy: PartyUtilityPolicy,
 ): ScoreComponent {
+  let value: number
+  let reasons: string[]
+
   if (equipment.slot === "weapon") {
     const attackValue = equipment.attack * policy.weaponAttack
     const accuracyValue = equipment.accuracy * policy.weaponAccuracy
     const criticalValue = equipment.criticalRate * policy.weaponCriticalRate
-    let value = attackValue + accuracyValue + criticalValue
-    const reasons = [`${equipment.name} weapon attack ${equipment.attack}*${policy.weaponAttack} + accuracy ${equipment.accuracy}*${policy.weaponAccuracy} + critical rate ${equipment.criticalRate}*${policy.weaponCriticalRate}`]
-
-    if (policy.excludedEquipmentKeys.has(equipment.key)) {
-      value = 0
-      reasons.push("excluded from recommendations")
-    } else if (character.baseClass === "monk") {
-      value *= policy.monkWeaponMultiplier
-      reasons.push(`Monk unarmed multiplier ${policy.monkWeaponMultiplier}`)
-    }
-
-    return {
-      key: `${character.id}:equipment:${equipment.slot}`,
-      value,
-      reason: reasons.join("; "),
-    }
+    value = attackValue + accuracyValue + criticalValue
+    reasons = [`${equipment.name} weapon attack ${equipment.attack}*${policy.weaponAttack} + accuracy ${equipment.accuracy}*${policy.weaponAccuracy} + critical rate ${equipment.criticalRate}*${policy.weaponCriticalRate}`]
+  } else {
+    const defenseValue = equipment.defense * policy.armorDefense
+    const weightPenalty = equipment.weight * policy.armorWeightPenalty
+    value = defenseValue - weightPenalty
+    reasons = [`${equipment.name} armor defense ${equipment.defense}*${policy.armorDefense} - weight ${equipment.weight}*${policy.armorWeightPenalty}`]
   }
 
-  const defenseValue = equipment.defense * policy.armorDefense
-  const weightPenalty = equipment.weight * policy.armorWeightPenalty
-  const value = defenseValue - weightPenalty
+  if (policy.excludedEquipmentKeys.has(equipment.key)) {
+    value = 0
+    reasons.push("excluded from recommendations")
+  } else if (character.baseClass === "monk") {
+    value *= policy.monkEquipmentMultiplier
+    reasons.push(`Monk item-free multiplier ${policy.monkEquipmentMultiplier}`)
+  }
 
   return {
     key: `${character.id}:equipment:${equipment.slot}`,
     value,
-    reason: `${equipment.name} armor defense ${equipment.defense}*${policy.armorDefense} - weight ${equipment.weight}*${policy.armorWeightPenalty}`,
+    reason: reasons.join("; "),
   }
 }
 
