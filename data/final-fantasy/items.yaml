@@ -44,6 +44,33 @@ items:
     criticalRate: 1
     canEquip: [warrior, knight, white-mage, white-wizard, ninja]
 
+  - key: broadsword
+    name: Broadsword
+    slot: weapon
+    price: 450
+    attack: 15
+    accuracy: 10
+    criticalRate: 10
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
+
+  - key: battle-axe
+    name: Battle Axe
+    slot: weapon
+    price: 450
+    attack: 16
+    accuracy: 5
+    criticalRate: 10
+    canEquip: [warrior, knight, ninja]
+
+  - key: scimitar
+    name: Scimitar
+    slot: weapon
+    price: 160
+    attack: 10
+    accuracy: 10
+    criticalRate: 5
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
+
   - key: clothes
     name: Clothes
     slot: body
@@ -67,3 +94,27 @@ items:
     defense: 15
     weight: 15
     canEquip: [warrior, knight, ninja, red-mage, red-wizard]
+
+  - key: iron-armor
+    name: Iron Armor
+    slot: body
+    price: 640
+    defense: 24
+    weight: 23
+    canEquip: [warrior, knight, ninja]
+
+  - key: leather-shield
+    name: Leather Shield
+    slot: shield
+    price: 12
+    defense: 2
+    weight: 0
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
+
+  - key: gloves
+    name: Gloves
+    slot: arms
+    price: 50
+    defense: 1
+    weight: 1
+    canEquip: [warrior, knight, thief, ninja, monk, master, red-mage, red-wizard, white-mage, white-wizard, black-mage, black-wizard]

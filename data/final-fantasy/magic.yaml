@@ -62,3 +62,67 @@ magic:
     price: 50
     target: single-enemy
     effect: { kind: damage, potency: 10, accuracy: 24, element: lightning }
+
+  - key: blindna
+    name: Blindna
+    school: white
+    level: 2
+    price: 250
+    target: single-ally
+    effect: { kind: cure-status, status: darkness }
+
+  - key: silence
+    name: Silence
+    school: white
+    level: 2
+    price: 250
+    target: all-enemies
+    effect: { kind: inflict-status, status: silence, accuracy: 24 }
+
+  - key: nulshock
+    name: NulShock
+    school: white
+    level: 2
+    price: 250
+    target: all-allies
+    effect: { kind: raise-resistance, element: lightning }
+
+  - key: invis
+    name: Invis
+    school: white
+    level: 2
+    price: 250
+    target: single-ally
+    effect: { kind: raise-evasion, potency: 40 }
+
+  - key: blizzard
+    name: Blizzard
+    school: black
+    level: 2
+    price: 250
+    target: single-enemy
+    effect: { kind: damage, potency: 20, accuracy: 24, element: ice }
+
+  - key: dark
+    name: Dark
+    school: black
+    level: 2
+    price: 250
+    target: all-enemies
+    effect: { kind: inflict-status, status: darkness, accuracy: 24 }
+
+  - key: temper
+    name: Temper
+    school: black
+    level: 2
+    price: 250
+    target: single-ally
+    effect: { kind: raise-attack, potency: 14 }
+
+  - key: slow
+    name: Slow
+    school: black
+    level: 2
+    price: 250
+    target: all-enemies
+    effect: { kind: lower-attack-count, accuracy: 64 }

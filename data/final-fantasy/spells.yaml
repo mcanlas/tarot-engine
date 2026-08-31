@@ -61,6 +61,17 @@
     - offensive-magic
     - elemental
 
+- spell: blindna
+  name: Blindna
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
 - spell: sleep
   name: Sleep
   learnableBy:
@@ -111,6 +122,28 @@
     - red-mage
     - knight
     - white-wizard
+    - red-wizard
+  attributes:
+    - control-magic
+
+- spell: invis
+  name: Invis
+  learnableBy:
+    - white-mage
+    - red-mage
+    - knight
+    - white-wizard
+    - red-wizard
+  attributes:
+    - defensive-magic
+
+- spell: dark
+  name: Dark
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
     - red-wizard
   attributes:
     - control-magic

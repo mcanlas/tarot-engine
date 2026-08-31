@@ -25,12 +25,13 @@ export interface TownDefinitions {
 
 export type TownYamlTextLoader = (path: string) => Promise<string>
 
-const shopTypes = new Set<ShopType>([
+const shopTypeOrder = [
   "weapons",
   "armor",
   "white-magic",
   "black-magic",
-])
+] as const
+const shopTypes = new Set<ShopType>(shopTypeOrder)
 
 export async function loadTowns(
   loadText: TownYamlTextLoader,
@@ -55,6 +56,45 @@ export function decodeTowns(value: unknown): TownDefinitions {
 
   return {
     towns: requireArray(document.towns, "Final Fantasy towns.towns").map(decodeTown),
+  }
+}
+
+export function cumulativeTown(definitions: TownDefinitions, townKey: string): TownDefinition {
+  const townIndex = definitions.towns.findIndex((town) => town.key === townKey)
+  if (townIndex < 0) {
+    throw new Error(`${townKey} is missing from the Final Fantasy town catalog`)
+  }
+
+  const waresByType = new Map<ShopType, string[]>(
+    shopTypeOrder.map((type) => [type, []]),
+  )
+  const seenByType = new Map<ShopType, Set<string>>(
+    shopTypeOrder.map((type) => [type, new Set<string>()]),
+  )
+  for (const town of definitions.towns.slice(0, townIndex + 1)) {
+    for (const shop of town.shops) {
+      const wares = waresByType.get(shop.type)
+      const seen = seenByType.get(shop.type)
+      if (wares === undefined || seen === undefined) {
+        throw new Error(`Unknown Final Fantasy shop type: ${shop.type}`)
+      }
+      for (const ware of shop.wares) {
+        if (!seen.has(ware)) {
+          seen.add(ware)
+          wares.push(ware)
+        }
+      }
+    }
+  }
+  const selectedTown = definitions.towns[townIndex]!
+
+  return {
+    key: selectedTown.key,
+    name: selectedTown.name,
+    shops: shopTypeOrder.map((type) => ({
+      type,
+      wares: waresByType.get(type) ?? [],
+    })),
   }
 }
 

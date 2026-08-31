@@ -25,20 +25,32 @@ export interface ArmorDefinition extends EquipmentDefinitionBase {
 
 export type EquipmentDefinition = WeaponDefinition | ArmorDefinition
 
-export type MagicTarget = "self" | "single-ally" | "single-enemy" | "all-enemies"
+export type MagicTarget =
+  | "self"
+  | "single-ally"
+  | "single-enemy"
+  | "all-enemies"
+  | "all-allies"
+
+export type MagicElement = "fire" | "ice" | "lightning"
+export type MagicStatus = "darkness" | "silence" | "sleep"
 
 export type MagicEffect =
   | { readonly kind: "restore-hp"; readonly potency: number }
+  | { readonly kind: "cure-status"; readonly status: MagicStatus }
   | {
       readonly kind: "damage"
       readonly potency: number
       readonly accuracy: number
-      readonly element?: "fire" | "lightning"
+      readonly element?: MagicElement
       readonly targetFamily?: "undead"
     }
   | { readonly kind: "raise-defense"; readonly potency: number }
   | { readonly kind: "raise-evasion"; readonly potency: number }
-  | { readonly kind: "inflict-status"; readonly status: "sleep"; readonly accuracy: number }
+  | { readonly kind: "raise-resistance"; readonly element: MagicElement }
+  | { readonly kind: "raise-attack"; readonly potency: number }
+  | { readonly kind: "inflict-status"; readonly status: MagicStatus; readonly accuracy: number }
+  | { readonly kind: "lower-attack-count"; readonly accuracy: number }
   | { readonly kind: "lower-evasion"; readonly potency: number; readonly accuracy: number }
 
 export interface MagicDefinition {
@@ -133,7 +145,7 @@ export class NextActionProvider {
     }))
 
     // TODO: Add a reached-town watermark to party state and derive which town catalogs are
-    // unlocked. For now the caller provides the complete Cornelia catalog directly.
+    // unlocked. For now the caller provides the seeded town catalog directly.
     return town.shops.flatMap((shop) => shop.wares.flatMap(
       (ware): NextAction[] => {
         if (shop.type === "weapons" || shop.type === "armor") {
@@ -285,7 +297,13 @@ function requireNonNegativeInteger(value: number, label: string): void {
 }
 
 function validateMagicMechanics(magic: MagicDefinition): void {
-  const targets = new Set<MagicTarget>(["self", "single-ally", "single-enemy", "all-enemies"])
+  const targets = new Set<MagicTarget>([
+    "self",
+    "single-ally",
+    "single-enemy",
+    "all-enemies",
+    "all-allies",
+  ])
   if (!targets.has(magic.target)) {
     throw new Error(`Final Fantasy magic ${magic.key} must have a known target`)
   }
@@ -294,7 +312,11 @@ function validateMagicMechanics(magic: MagicDefinition): void {
     case "restore-hp":
     case "raise-defense":
     case "raise-evasion":
+    case "raise-attack":
       requireNonNegativeInteger(magic.effect.potency, `magic ${magic.key} potency`)
+      return
+    case "cure-status":
+    case "raise-resistance":
       return
     case "damage":
     case "lower-evasion":
@@ -302,6 +324,7 @@ function validateMagicMechanics(magic: MagicDefinition): void {
       requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
       return
     case "inflict-status":
+    case "lower-attack-count":
       requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
       return
     default: {

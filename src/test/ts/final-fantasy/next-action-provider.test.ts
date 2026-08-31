@@ -116,7 +116,7 @@ test("provides every legal Cornelia action for a mixed party", async () => {
   ])
 })
 
-test("loads Pixel Remaster combat stats for Cornelia weapons", async () => {
+test("loads Pixel Remaster combat stats for seeded weapons", async () => {
   const { actionCatalog } = await loadProvider()
 
   assert.deepEqual(
@@ -134,11 +134,14 @@ test("loads Pixel Remaster combat stats for Cornelia weapons", async () => {
       { key: "staff", attack: 6, accuracy: 0, criticalRate: 1 },
       { key: "rapier", attack: 9, accuracy: 5, criticalRate: 10 },
       { key: "hammer", attack: 9, accuracy: 0, criticalRate: 1 },
+      { key: "broadsword", attack: 15, accuracy: 10, criticalRate: 10 },
+      { key: "battle-axe", attack: 16, accuracy: 5, criticalRate: 10 },
+      { key: "scimitar", attack: 10, accuracy: 10, criticalRate: 5 },
     ],
   )
 })
 
-test("loads Pixel Remaster defense and weight for Cornelia armor", async () => {
+test("loads Pixel Remaster defense and weight for seeded armor", async () => {
   const { actionCatalog } = await loadProvider()
 
   assert.deepEqual(
@@ -149,11 +152,14 @@ test("loads Pixel Remaster defense and weight for Cornelia armor", async () => {
       { key: "clothes", defense: 1, weight: 2 },
       { key: "leather-armor", defense: 4, weight: 8 },
       { key: "chain-mail", defense: 15, weight: 15 },
+      { key: "iron-armor", defense: 24, weight: 23 },
+      { key: "leather-shield", defense: 2, weight: 0 },
+      { key: "gloves", defense: 1, weight: 1 },
     ],
   )
 })
 
-test("loads explicit Cornelia magic mechanics", async () => {
+test("loads explicit seeded magic mechanics", async () => {
   const { actionCatalog } = await loadProvider()
 
   assert.deepEqual(
@@ -190,6 +196,46 @@ test("loads explicit Cornelia magic mechanics", async () => {
         key: "thunder",
         target: "single-enemy",
         effect: { kind: "damage", potency: 10, accuracy: 24, element: "lightning" },
+      },
+      {
+        key: "blindna",
+        target: "single-ally",
+        effect: { kind: "cure-status", status: "darkness" },
+      },
+      {
+        key: "silence",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "silence", accuracy: 24 },
+      },
+      {
+        key: "nulshock",
+        target: "all-allies",
+        effect: { kind: "raise-resistance", element: "lightning" },
+      },
+      {
+        key: "invis",
+        target: "single-ally",
+        effect: { kind: "raise-evasion", potency: 40 },
+      },
+      {
+        key: "blizzard",
+        target: "single-enemy",
+        effect: { kind: "damage", potency: 20, accuracy: 24, element: "ice" },
+      },
+      {
+        key: "dark",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "darkness", accuracy: 24 },
+      },
+      {
+        key: "temper",
+        target: "single-ally",
+        effect: { kind: "raise-attack", potency: 14 },
+      },
+      {
+        key: "slow",
+        target: "all-enemies",
+        effect: { kind: "lower-attack-count", accuracy: 64 },
       },
     ],
   )

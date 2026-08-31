@@ -33,18 +33,26 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
   armorWeightPenalty: 1,
   spellEffect: Object.freeze({
     "restore-hp": 50,
+    "cure-status": 20,
     damage: 20,
     "raise-defense": 25,
     "raise-evasion": 20,
+    "raise-resistance": 30,
+    "raise-attack": 35,
     "inflict-status": 25,
+    "lower-attack-count": 20,
     "lower-evasion": 5,
   }),
   spellPotency: Object.freeze({
     "restore-hp": 1,
+    "cure-status": 0,
     damage: 1,
     "raise-defense": 2,
     "raise-evasion": 0.125,
+    "raise-resistance": 0,
+    "raise-attack": 2,
     "inflict-status": 0,
+    "lower-attack-count": 0,
     "lower-evasion": 0.5,
   }),
   spellAccuracy: 0.125,
@@ -198,6 +206,12 @@ function magicCapabilityKey(magic: MagicDefinition): string {
   }
   if (effect.kind === "inflict-status") {
     discriminators.push(effect.status)
+  }
+  if (effect.kind === "cure-status") {
+    discriminators.push(effect.status)
+  }
+  if (effect.kind === "raise-resistance") {
+    discriminators.push(effect.element)
   }
 
   return discriminators.join(":")

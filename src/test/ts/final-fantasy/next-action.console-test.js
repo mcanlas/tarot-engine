@@ -13,13 +13,13 @@ import {
   PartyUtilityEvaluator,
 } from "../../../main/ts/final-fantasy/party-utility-evaluator.ts"
 import { loadStrategyCatalog } from "../../../main/ts/final-fantasy/strategy-data.ts"
-import { loadTowns } from "../../../main/ts/final-fantasy/towns.ts"
+import { cumulativeTown, loadTowns } from "../../../main/ts/final-fantasy/towns.ts"
 import { loadPartyStrategyEngine } from "./party-strategy.ts"
 
 const loadProjectFile = (path) =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
-const [occurrencesText, ...extraArgs] = process.argv.slice(2)
+const [occurrencesText, townKey = "cornelia", ...extraArgs] = process.argv.slice(2)
 const occurrences = Number(occurrencesText)
 
 if (
@@ -28,7 +28,7 @@ if (
   || !Number.isSafeInteger(occurrences)
   || occurrences < 1
 ) {
-  console.error("Usage: node src/test/ts/final-fantasy/next-action.console-test.js <positive integer occurrences>")
+  console.error("Usage: node src/test/ts/final-fantasy/next-action.console-test.js <positive integer occurrences> [town key]")
   process.exitCode = 1
 } else {
   const [partyEngine, strategyCatalog, towns, itemText, magicText] = await Promise.all([
@@ -43,11 +43,7 @@ if (
   const actionCatalog = { equipment, magic }
   const itemNames = new Map(equipment.map((item) => [item.key, item.name]))
   const spellNames = new Map(magic.map((spell) => [spell.key, spell.name]))
-  const cornelia = towns.towns.find((town) => town.key === "cornelia")
-
-  if (cornelia === undefined) {
-    throw new Error("Cornelia is missing from the Final Fantasy town catalog")
-  }
+  const town = cumulativeTown(towns, townKey)
 
   const provider = new NextActionProvider(strategyCatalog, actionCatalog)
   const evaluator = new PartyUtilityEvaluator(actionCatalog)
@@ -55,12 +51,12 @@ if (
 
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {
     const party = {
-      gil: 500,
+      gil: 5_000,
       characters: emptyCharacters(...partyEngine.createRandomParty()),
     }
 
     console.log(`\n=== FF1 next-action run ${occurrence + 1} ===`)
-    console.log(`Town: ${cornelia.name}`)
+    console.log(`Town: ${town.name}`)
     console.log(`Starting gil: ${party.gil}`)
     console.log(`Starting party (all equipment and spell sets are empty): ${
       party.characters.map((character) => character.id).join(" / ")
@@ -70,7 +66,7 @@ if (
     let step = 1
 
     while (true) {
-      const recommendation = recommender.recommend(currentParty, cornelia)
+      const recommendation = recommender.recommend(currentParty, town)
       if (recommendation.kind === "stop") {
         console.log(`\nStop: ${formatStopReason(recommendation.reason)}.`)
         console.log(`Final gil: ${currentParty.gil}`)
@@ -98,6 +94,9 @@ if (
 }
 
 function emptyCharacters(...baseClasses) {
+  const duplicateClasses = new Set(
+    baseClasses.filter((baseClass, index) => baseClasses.indexOf(baseClass) !== index),
+  )
   const classCounts = new Map()
 
   return baseClasses.map((baseClass) => {
@@ -105,7 +104,7 @@ function emptyCharacters(...baseClasses) {
 
     classCounts.set(baseClass, count)
     return emptyCharacter(
-      count === 1 ? baseClass : `${baseClass}-${count}`,
+      duplicateClasses.has(baseClass) ? `${baseClass}-${count}` : baseClass,
       baseClass,
     )
   })

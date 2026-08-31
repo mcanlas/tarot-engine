@@ -5,6 +5,7 @@ import test from "node:test"
 import { parse } from "yaml"
 
 import {
+  cumulativeTown,
   decodeTowns,
   townsYamlFile,
   loadTowns,
@@ -13,37 +14,61 @@ import {
 const loadProjectFile = (path: string): Promise<string> =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
-test("loads Cornelia's four seeded shops", async () => {
+test("loads seeded town shops", async () => {
   const definitions = await loadTowns(loadProjectFile)
 
   assert.equal(townsYamlFile, "data/final-fantasy/towns.yaml")
   assert.deepEqual(definitions, {
-    towns: [{
-      key: "cornelia",
-      name: "Cornelia",
-      shops: [
-        {
-          type: "weapons",
-          wares: ["nunchaku", "knife", "staff", "rapier", "hammer"],
-        },
-        {
-          type: "armor",
-          wares: ["clothes", "leather-armor", "chain-mail"],
-        },
-        {
-          type: "white-magic",
-          wares: ["cure", "dia", "protect", "blink"],
-        },
-        {
-          type: "black-magic",
-          wares: ["fire", "sleep", "focus", "thunder"],
-        },
-      ],
-    }],
+    towns: [
+      {
+        key: "cornelia",
+        name: "Cornelia",
+        shops: [
+          {
+            type: "weapons",
+            wares: ["nunchaku", "knife", "staff", "rapier", "hammer"],
+          },
+          {
+            type: "armor",
+            wares: ["clothes", "leather-armor", "chain-mail"],
+          },
+          {
+            type: "white-magic",
+            wares: ["cure", "dia", "protect", "blink"],
+          },
+          {
+            type: "black-magic",
+            wares: ["fire", "sleep", "focus", "thunder"],
+          },
+        ],
+      },
+      {
+        key: "provoka",
+        name: "Provoka",
+        shops: [
+          {
+            type: "weapons",
+            wares: ["hammer", "broadsword", "battle-axe", "scimitar"],
+          },
+          {
+            type: "armor",
+            wares: ["leather-armor", "chain-mail", "iron-armor", "leather-shield", "gloves"],
+          },
+          {
+            type: "white-magic",
+            wares: ["blindna", "silence", "nulshock", "invis"],
+          },
+          {
+            type: "black-magic",
+            wares: ["blizzard", "dark", "temper", "slow"],
+          },
+        ],
+      },
+    ],
   })
 })
 
-test("seeds catalog records for every Cornelia ware key", async () => {
+test("seeds catalog records for every town ware key", async () => {
   const [definitions, itemDocument, magicDocument] = await Promise.all([
     loadTowns(loadProjectFile),
     loadProjectFile("data/final-fantasy/items.yaml").then(parse),
@@ -51,7 +76,6 @@ test("seeds catalog records for every Cornelia ware key", async () => {
   ])
   const itemKeys = new Set(itemDocument.items.map((item: { key: string }) => item.key))
   const magicKeys = new Set(magicDocument.magic.map((spell: { key: string }) => spell.key))
-  const [weapons, armor, whiteMagic, blackMagic] = definitions.towns[0]!.shops
 
   assert.deepEqual([...itemKeys], [
     "nunchaku",
@@ -59,9 +83,15 @@ test("seeds catalog records for every Cornelia ware key", async () => {
     "staff",
     "rapier",
     "hammer",
+    "broadsword",
+    "battle-axe",
+    "scimitar",
     "clothes",
     "leather-armor",
     "chain-mail",
+    "iron-armor",
+    "leather-shield",
+    "gloves",
   ])
   assert.deepEqual([...magicKeys], [
     "cure",
@@ -72,11 +102,69 @@ test("seeds catalog records for every Cornelia ware key", async () => {
     "sleep",
     "focus",
     "thunder",
+    "blindna",
+    "silence",
+    "nulshock",
+    "invis",
+    "blizzard",
+    "dark",
+    "temper",
+    "slow",
   ])
-  assert(weapons!.wares.every((key) => itemKeys.has(key)))
-  assert(armor!.wares.every((key) => itemKeys.has(key)))
-  assert(whiteMagic!.wares.every((key) => magicKeys.has(key)))
-  assert(blackMagic!.wares.every((key) => magicKeys.has(key)))
+  for (const town of definitions.towns) {
+    for (const shop of town.shops) {
+      const keys = shop.type === "weapons" || shop.type === "armor" ? itemKeys : magicKeys
+      assert(shop.wares.every((key) => keys.has(key)))
+    }
+  }
+})
+
+test("resolves ordinal town access through the selected town", async () => {
+  const definitions = await loadTowns(loadProjectFile)
+
+  assert.deepEqual(cumulativeTown(definitions, "cornelia"), definitions.towns[0])
+  assert.deepEqual(cumulativeTown(definitions, "provoka"), {
+    key: "provoka",
+    name: "Provoka",
+    shops: [
+      {
+        type: "weapons",
+        wares: [
+          "nunchaku",
+          "knife",
+          "staff",
+          "rapier",
+          "hammer",
+          "broadsword",
+          "battle-axe",
+          "scimitar",
+        ],
+      },
+      {
+        type: "armor",
+        wares: [
+          "clothes",
+          "leather-armor",
+          "chain-mail",
+          "iron-armor",
+          "leather-shield",
+          "gloves",
+        ],
+      },
+      {
+        type: "white-magic",
+        wares: ["cure", "dia", "protect", "blink", "blindna", "silence", "nulshock", "invis"],
+      },
+      {
+        type: "black-magic",
+        wares: ["fire", "sleep", "focus", "thunder", "blizzard", "dark", "temper", "slow"],
+      },
+    ],
+  })
+  assert.throws(
+    () => cumulativeTown(definitions, "elfheim"),
+    /elfheim is missing from the Final Fantasy town catalog/,
+  )
 })
 
 test("rejects malformed town, shop, and ware fields", () => {

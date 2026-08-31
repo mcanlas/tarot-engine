@@ -29,3 +29,35 @@ towns:
           - sleep
           - focus
           - thunder
+
+  - key: provoka
+    name: Provoka
+    shops:
+      - type: weapons
+        wares:
+          - hammer
+          - broadsword
+          - battle-axe
+          - scimitar
+
+      - type: armor
+        wares:
+          - leather-armor
+          - chain-mail
+          - iron-armor
+          - leather-shield
+          - gloves
+
+      - type: white-magic
+        wares:
+          - blindna
+          - silence
+          - nulshock
+          - invis
+
+      - type: black-magic
+        wares:
+          - blizzard
+          - dark
+          - temper
+          - slow
