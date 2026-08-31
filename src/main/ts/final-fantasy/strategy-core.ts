@@ -1,8 +1,8 @@
 export const finalFantasyStrategyYamlFiles = Object.freeze({
-  classes: "data/final-fantasy-classes.yaml",
-  spells: "data/final-fantasy-spells.yaml",
-  bosses: "data/final-fantasy-bosses.yaml",
-  bossStrategy: "data/final-fantasy-boss-strategy.yaml",
+  classes: "data/final-fantasy/classes.yaml",
+  spells: "data/final-fantasy/spells.yaml",
+  bosses: "data/final-fantasy/bosses.yaml",
+  bossStrategy: "data/final-fantasy/boss-strategy.yaml",
 })
 
 export type CapabilityId =

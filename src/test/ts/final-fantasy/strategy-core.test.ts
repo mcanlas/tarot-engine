@@ -397,7 +397,7 @@ test("YAML decoding reports empty, malformed, and structurally invalid documents
   )
   await assert.rejects(
     loadFinalFantasyStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "[unterminated" : loadProjectFile(path)),
-    /Invalid data\/final-fantasy-classes.yaml/,
+    /Invalid data\/final-fantasy\/classes.yaml/,
   )
   await assert.rejects(
     loadFinalFantasyStrategyEngine(async (path) => path.endsWith("classes.yaml") ? "classes: nope" : loadProjectFile(path)),

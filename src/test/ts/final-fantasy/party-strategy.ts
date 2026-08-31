@@ -21,7 +21,7 @@ import {
   type YamlTextLoader,
 } from "../../../main/ts/final-fantasy/strategy-data.ts"
 
-export const partyStrategyYamlFile = "data/final-fantasy-party-strategy.yaml"
+export const partyStrategyYamlFile = "data/final-fantasy/party-strategy.yaml"
 
 export interface RandomPartyBossStrategy {
   partyStrategy: PartyStrategy

@@ -12,16 +12,16 @@ import io.circe.yaml.parser
 object FinalFantasyStrategyData:
   private val files =
     List(
-      "classes"       -> "final-fantasy-classes.yaml",
-      "spells"        -> "final-fantasy-spells.yaml",
-      "bosses"        -> "final-fantasy-bosses.yaml",
-      "strategy"      -> "final-fantasy-boss-strategy.yaml",
-      "partyStrategy" -> "final-fantasy-party-strategy.yaml"
+      "classes"       -> "classes.yaml",
+      "spells"        -> "spells.yaml",
+      "bosses"        -> "bosses.yaml",
+      "strategy"      -> "boss-strategy.yaml",
+      "partyStrategy" -> "party-strategy.yaml"
     )
 
   private def loadFile(fileName: String): IO[Json] =
     for
-      yaml <- IO.blocking(Files.readString(Path.of("data", fileName), StandardCharsets.UTF_8))
+      yaml <- IO.blocking(Files.readString(Path.of("data", "final-fantasy", fileName), StandardCharsets.UTF_8))
       json <- IO.fromEither(parser.parse(yaml))
     yield json
 

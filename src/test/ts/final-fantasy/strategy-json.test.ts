@@ -16,11 +16,11 @@ const loadProjectFile = (path: string): Promise<string> =>
 
 test("browser payload preserves ordered party and boss-position rules", async () => {
   const [classes, spells, bosses, strategy, partyStrategy] = await Promise.all([
-    loadYaml("data/final-fantasy-classes.yaml"),
-    loadYaml("data/final-fantasy-spells.yaml"),
-    loadYaml("data/final-fantasy-bosses.yaml"),
-    loadYaml("data/final-fantasy-boss-strategy.yaml"),
-    loadYaml("data/final-fantasy-party-strategy.yaml"),
+    loadYaml("data/final-fantasy/classes.yaml"),
+    loadYaml("data/final-fantasy/spells.yaml"),
+    loadYaml("data/final-fantasy/bosses.yaml"),
+    loadYaml("data/final-fantasy/boss-strategy.yaml"),
+    loadYaml("data/final-fantasy/party-strategy.yaml"),
   ])
   const payload = decodeStrategyPayload({ classes, spells, bosses, strategy, partyStrategy })
   const bossEngine = buildFinalFantasyStrategyEngine(payload.definitions)

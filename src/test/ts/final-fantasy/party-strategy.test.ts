@@ -49,7 +49,7 @@ test("loads class facts from existing catalogs and party rules from their own YA
     "black-mage",
   ])
   assert.equal(engine.ruleCount, 29)
-  assert.equal(partyStrategyYamlFile, "data/final-fantasy-party-strategy.yaml")
+  assert.equal(partyStrategyYamlFile, "data/final-fantasy/party-strategy.yaml")
 })
 
 test("derives a balanced party's capabilities from classes and potential spells", () => {
