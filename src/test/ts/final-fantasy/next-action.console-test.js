@@ -19,6 +19,8 @@ import { loadPartyStrategyEngine } from "./party-strategy.ts"
 const loadProjectFile = (path) =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
+const equipmentSlots = ["weapon", "body", "shield", "head", "arms"]
+
 const [occurrencesText, townKey = "cornelia", verbosity, ...extraArgs] = process.argv.slice(2)
 const occurrences = Number(occurrencesText)
 const verbose = verbosity === "verbose"
@@ -49,6 +51,7 @@ if (
   }
   const itemNames = new Map(equipment.map((item) => [item.key, item.name]))
   const spellNames = new Map(magic.map((spell) => [spell.key, spell.name]))
+  const weaponCatalog = equipment.filter((item) => item.slot === "weapon")
   const town = cumulativeTown(towns, townKey)
 
   const provider = new NextActionProvider(strategyCatalog, actionCatalog)
@@ -58,14 +61,15 @@ if (
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {
     const party = {
       gil: 0,
-      characters: emptyCharacters(...partyEngine.createRandomParty()),
+      characters: emptyCharacters(weaponCatalog, ...partyEngine.createRandomParty()),
     }
 
     console.log(`\n=== FF1 next-action run ${occurrence + 1} ===`)
     console.log(`Town: ${town.name}`)
-    console.log(`Starting party (all equipment and spell sets are empty): ${
+    console.log(`Starting party (spell sets are empty; weapon slot is a coin flip): ${
       party.characters.map((character) => character.id).join(" / ")
     }`)
+    console.log(`\n${formatEquipmentTable(party.characters, itemNames)}\n`)
     const jobWidth = Math.max("JOB".length, ...party.characters.map(({ id }) => id.length))
     if (!verbose) {
       console.log(`${"#".padStart(2)} | ${"JOB".padEnd(jobWidth)} | ${"ACTION".padEnd(compactActionWidth)} | ${"UTILITY".padStart(7)}`)
@@ -109,7 +113,7 @@ if (
   console.log(`\nCompleted ${occurrences} random FF1 next-action runs.`)
 }
 
-function emptyCharacters(...baseClasses) {
+function emptyCharacters(weaponCatalog, ...baseClasses) {
   const duplicateClasses = new Set(
     baseClasses.filter((baseClass, index) => baseClasses.indexOf(baseClass) !== index),
   )
@@ -122,18 +126,58 @@ function emptyCharacters(...baseClasses) {
     return emptyCharacter(
       duplicateClasses.has(baseClass) ? `${baseClass}-${count}` : baseClass,
       baseClass,
+      weaponCatalog,
     )
   })
 }
 
-function emptyCharacter(id, baseClass) {
+function emptyCharacter(id, baseClass, weaponCatalog) {
   return {
     id,
     baseClass,
     promoted: false,
-    equipment: {},
+    equipment: randomStartingWeaponEquipment(baseClass, weaponCatalog),
     learnedSpells: new Set(),
   }
+}
+
+function randomStartingWeaponEquipment(baseClass, weaponCatalog) {
+  if (baseClass === "monk") {
+    return {}
+  }
+
+  const legalWeapons = weaponCatalog.filter((weapon) => weapon.canEquip.includes(baseClass))
+  if (legalWeapons.length === 0 || Math.random() < 0.5) {
+    return {}
+  }
+
+  const weapon = legalWeapons[Math.floor(Math.random() * legalWeapons.length)]
+
+  return { weapon: weapon.key }
+}
+
+function formatEquipmentTable(characters, itemNames) {
+  const jobHeader = "JOB"
+  const jobWidth = Math.max(jobHeader.length, ...characters.map(({ id }) => id.length))
+  const columns = equipmentSlots.map((slot) => {
+    const header = slot.toUpperCase()
+    const values = characters.map((character) => formatEquipmentSlot(character.equipment[slot], itemNames))
+
+    return { header, width: Math.max(header.length, ...values.map((value) => value.length)), values }
+  })
+
+  const headerRow = [jobHeader.padEnd(jobWidth), ...columns.map(({ header, width }) => header.padEnd(width))]
+    .join(" | ")
+  const rows = characters.map((character, index) => [
+    character.id.padEnd(jobWidth),
+    ...columns.map(({ values, width }) => values[index].padEnd(width)),
+  ].join(" | "))
+
+  return [headerRow, ...rows].map((line) => `  ${line}`).join("\n")
+}
+
+function formatEquipmentSlot(itemKey, itemNames) {
+  return itemKey === undefined ? "-" : (itemNames.get(itemKey) ?? itemKey)
 }
 
 function formatAction(action, itemNames, spellNames) {
