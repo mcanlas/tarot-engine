@@ -116,6 +116,85 @@ test("provides every legal Cornelia action for a mixed party", async () => {
   ])
 })
 
+test("loads Pixel Remaster combat stats for Cornelia weapons", async () => {
+  const { actionCatalog } = await loadProvider()
+
+  assert.deepEqual(
+    actionCatalog.equipment
+      .filter((equipment) => equipment.slot === "weapon")
+      .map(({ key, attack, accuracy, criticalRate }) => ({
+        key,
+        attack,
+        accuracy,
+        criticalRate,
+      })),
+    [
+      { key: "nunchaku", attack: 12, accuracy: 0, criticalRate: 10 },
+      { key: "knife", attack: 5, accuracy: 10, criticalRate: 5 },
+      { key: "staff", attack: 6, accuracy: 0, criticalRate: 1 },
+      { key: "rapier", attack: 9, accuracy: 5, criticalRate: 10 },
+      { key: "hammer", attack: 9, accuracy: 0, criticalRate: 1 },
+    ],
+  )
+})
+
+test("loads Pixel Remaster defense and weight for Cornelia armor", async () => {
+  const { actionCatalog } = await loadProvider()
+
+  assert.deepEqual(
+    actionCatalog.equipment
+      .filter((equipment) => equipment.slot !== "weapon")
+      .map(({ key, defense, weight }) => ({ key, defense, weight })),
+    [
+      { key: "clothes", defense: 1, weight: 2 },
+      { key: "leather-armor", defense: 4, weight: 8 },
+      { key: "chain-mail", defense: 15, weight: 15 },
+    ],
+  )
+})
+
+test("loads explicit Cornelia magic mechanics", async () => {
+  const { actionCatalog } = await loadProvider()
+
+  assert.deepEqual(
+    actionCatalog.magic.map(({ key, target, effect }) => ({ key, target, effect })),
+    [
+      { key: "cure", target: "single-ally", effect: { kind: "restore-hp", potency: 16 } },
+      {
+        key: "dia",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 20, accuracy: 24, targetFamily: "undead" },
+      },
+      {
+        key: "protect",
+        target: "single-ally",
+        effect: { kind: "raise-defense", potency: 8 },
+      },
+      { key: "blink", target: "self", effect: { kind: "raise-evasion", potency: 80 } },
+      {
+        key: "fire",
+        target: "single-enemy",
+        effect: { kind: "damage", potency: 10, accuracy: 24, element: "fire" },
+      },
+      {
+        key: "sleep",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "sleep", accuracy: 24 },
+      },
+      {
+        key: "focus",
+        target: "single-enemy",
+        effect: { kind: "lower-evasion", potency: 20, accuracy: 64 },
+      },
+      {
+        key: "thunder",
+        target: "single-enemy",
+        effect: { kind: "damage", potency: 10, accuracy: 24, element: "lightning" },
+      },
+    ],
+  )
+})
+
 test("resolves promotion independently from a character's base class", async () => {
   const { provider, cornelia } = await loadProvider()
   const novice = character("bikke", "thief")
@@ -250,6 +329,35 @@ test("rejects inconsistent action catalogs and town wares", async () => {
       magic: [actionCatalog.magic[0]!, actionCatalog.magic[0]!],
     }),
     /Duplicate Final Fantasy magic key: cure/,
+  )
+  assert.throws(
+    () => new NextActionProvider(catalog, {
+      ...actionCatalog,
+      equipment: actionCatalog.equipment.map((equipment) =>
+        equipment.key === "nunchaku" ? { ...equipment, attack: -1 } : equipment,
+      ),
+    }),
+    /nunchaku attack must be a non-negative integer/,
+  )
+  assert.throws(
+    () => new NextActionProvider(catalog, {
+      ...actionCatalog,
+      equipment: actionCatalog.equipment.map((equipment) =>
+        equipment.key === "clothes" ? { ...equipment, weight: -1 } : equipment,
+      ),
+    }),
+    /clothes weight must be a non-negative integer/,
+  )
+  assert.throws(
+    () => new NextActionProvider(catalog, {
+      ...actionCatalog,
+      magic: actionCatalog.magic.map((magic) =>
+        magic.key === "fire"
+          ? { ...magic, effect: { ...magic.effect, accuracy: -1 } }
+          : magic,
+      ) as MagicDefinition[],
+    }),
+    /fire accuracy must be a non-negative integer/,
   )
 
   const warrior = party([character("garland", "warrior")])

@@ -3,46 +3,67 @@ items:
     name: Nunchaku
     slot: weapon
     price: 8
+    attack: 12
+    accuracy: 0
+    criticalRate: 10
     canEquip: [monk, master, ninja]
 
   - key: knife
     name: Knife
     slot: weapon
     price: 4
+    attack: 5
+    accuracy: 10
+    criticalRate: 5
     canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard, black-mage, black-wizard]
 
   - key: staff
     name: Staff
     slot: weapon
     price: 4
+    attack: 6
+    accuracy: 0
+    criticalRate: 1
     canEquip: [warrior, knight, monk, master, red-mage, red-wizard, white-mage, white-wizard, black-mage, black-wizard, ninja]
 
   - key: rapier
     name: Rapier
     slot: weapon
     price: 8
+    attack: 9
+    accuracy: 5
+    criticalRate: 10
     canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
 
   - key: hammer
     name: Hammer
     slot: weapon
     price: 8
+    attack: 9
+    accuracy: 0
+    criticalRate: 1
     canEquip: [warrior, knight, white-mage, white-wizard, ninja]
 
   - key: clothes
     name: Clothes
     slot: body
     price: 8
+    defense: 1
+    weight: 2
     canEquip: [warrior, knight, thief, ninja, monk, master, red-mage, red-wizard, white-mage, white-wizard, black-mage, black-wizard]
 
   - key: leather-armor
     name: Leather Armor
     slot: body
     price: 40
+    defense: 4
+    weight: 8
     canEquip: [warrior, knight, thief, ninja, monk, master, red-mage, red-wizard]
 
   - key: chain-mail
     name: Chain Mail
     slot: body
     price: 65
+    defense: 15
+    weight: 15
     canEquip: [warrior, knight, ninja, red-mage, red-wizard]

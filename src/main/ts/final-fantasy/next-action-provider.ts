@@ -3,13 +3,43 @@ import type { ShopType, TownDefinition } from "./towns.ts"
 
 export type EquipmentSlot = "weapon" | "body" | "shield" | "head" | "arms"
 
-export interface EquipmentDefinition {
+interface EquipmentDefinitionBase {
   readonly key: string
   readonly name: string
-  readonly slot: EquipmentSlot
   readonly price: number
   readonly canEquip: readonly string[]
 }
+
+export interface WeaponDefinition extends EquipmentDefinitionBase {
+  readonly slot: "weapon"
+  readonly attack: number
+  readonly accuracy: number
+  readonly criticalRate: number
+}
+
+export interface ArmorDefinition extends EquipmentDefinitionBase {
+  readonly slot: Exclude<EquipmentSlot, "weapon">
+  readonly defense: number
+  readonly weight: number
+}
+
+export type EquipmentDefinition = WeaponDefinition | ArmorDefinition
+
+export type MagicTarget = "self" | "single-ally" | "single-enemy" | "all-enemies"
+
+export type MagicEffect =
+  | { readonly kind: "restore-hp"; readonly potency: number }
+  | {
+      readonly kind: "damage"
+      readonly potency: number
+      readonly accuracy: number
+      readonly element?: "fire" | "lightning"
+      readonly targetFamily?: "undead"
+    }
+  | { readonly kind: "raise-defense"; readonly potency: number }
+  | { readonly kind: "raise-evasion"; readonly potency: number }
+  | { readonly kind: "inflict-status"; readonly status: "sleep"; readonly accuracy: number }
+  | { readonly kind: "lower-evasion"; readonly potency: number; readonly accuracy: number }
 
 export interface MagicDefinition {
   readonly key: string
@@ -17,6 +47,8 @@ export interface MagicDefinition {
   readonly school: "white" | "black"
   readonly level: number
   readonly price: number
+  readonly target: MagicTarget
+  readonly effect: MagicEffect
 }
 
 export interface NextActionCatalog {
@@ -72,6 +104,22 @@ export class NextActionProvider {
     this.#strategyCatalog = strategyCatalog
     this.#equipment = uniqueByKey("equipment", actionCatalog.equipment)
     this.#magic = uniqueByKey("magic", actionCatalog.magic)
+    for (const equipment of this.#equipment.values()) {
+      if (equipment.slot === "weapon") {
+        requireNonNegativeInteger(equipment.attack, `equipment ${equipment.key} attack`)
+        requireNonNegativeInteger(equipment.accuracy, `equipment ${equipment.key} accuracy`)
+        requireNonNegativeInteger(
+          equipment.criticalRate,
+          `equipment ${equipment.key} critical rate`,
+        )
+      } else {
+        requireNonNegativeInteger(equipment.defense, `equipment ${equipment.key} defense`)
+        requireNonNegativeInteger(equipment.weight, `equipment ${equipment.key} weight`)
+      }
+    }
+    for (const magic of this.#magic.values()) {
+      validateMagicMechanics(magic)
+    }
   }
 
   availableActions(
@@ -228,4 +276,37 @@ function uniqueByKey<T extends { readonly key: string }>(
   }
 
   return result
+}
+
+function requireNonNegativeInteger(value: number, label: string): void {
+  if (!Number.isInteger(value) || value < 0) {
+    throw new Error(`Final Fantasy ${label} must be a non-negative integer`)
+  }
+}
+
+function validateMagicMechanics(magic: MagicDefinition): void {
+  const targets = new Set<MagicTarget>(["self", "single-ally", "single-enemy", "all-enemies"])
+  if (!targets.has(magic.target)) {
+    throw new Error(`Final Fantasy magic ${magic.key} must have a known target`)
+  }
+
+  switch (magic.effect.kind) {
+    case "restore-hp":
+    case "raise-defense":
+    case "raise-evasion":
+      requireNonNegativeInteger(magic.effect.potency, `magic ${magic.key} potency`)
+      return
+    case "damage":
+    case "lower-evasion":
+      requireNonNegativeInteger(magic.effect.potency, `magic ${magic.key} potency`)
+      requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
+      return
+    case "inflict-status":
+      requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
+      return
+    default: {
+      const unknownEffect: never = magic.effect
+      throw new Error(`Final Fantasy magic ${magic.key} has an unknown effect: ${String(unknownEffect)}`)
+    }
+  }
 }

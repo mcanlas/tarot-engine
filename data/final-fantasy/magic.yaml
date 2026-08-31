@@ -1,9 +1,64 @@
 magic:
-  - { key: cure, name: Cure, school: white, level: 1, price: 50 }
-  - { key: dia, name: Dia, school: white, level: 1, price: 50 }
-  - { key: protect, name: Protect, school: white, level: 1, price: 50 }
-  - { key: blink, name: Blink, school: white, level: 1, price: 50 }
-  - { key: fire, name: Fire, school: black, level: 1, price: 50 }
-  - { key: sleep, name: Sleep, school: black, level: 1, price: 50 }
-  - { key: focus, name: Focus, school: black, level: 1, price: 50 }
-  - { key: thunder, name: Thunder, school: black, level: 1, price: 50 }
+  - key: cure
+    name: Cure
+    school: white
+    level: 1
+    price: 50
+    target: single-ally
+    effect: { kind: restore-hp, potency: 16 }
+
+  - key: dia
+    name: Dia
+    school: white
+    level: 1
+    price: 50
+    target: all-enemies
+    effect: { kind: damage, potency: 20, accuracy: 24, targetFamily: undead }
+
+  - key: protect
+    name: Protect
+    school: white
+    level: 1
+    price: 50
+    target: single-ally
+    effect: { kind: raise-defense, potency: 8 }
+
+  - key: blink
+    name: Blink
+    school: white
+    level: 1
+    price: 50
+    target: self
+    effect: { kind: raise-evasion, potency: 80 }
+
+  - key: fire
+    name: Fire
+    school: black
+    level: 1
+    price: 50
+    target: single-enemy
+    effect: { kind: damage, potency: 10, accuracy: 24, element: fire }
+
+  - key: sleep
+    name: Sleep
+    school: black
+    level: 1
+    price: 50
+    target: all-enemies
+    effect: { kind: inflict-status, status: sleep, accuracy: 24 }
+
+  - key: focus
+    name: Focus
+    school: black
+    level: 1
+    price: 50
+    target: single-enemy
+    effect: { kind: lower-evasion, potency: 20, accuracy: 64 }
+
+  - key: thunder
+    name: Thunder
+    school: black
+    level: 1
+    price: 50
+    target: single-enemy
+    effect: { kind: damage, potency: 10, accuracy: 24, element: lightning }
