@@ -17,12 +17,24 @@ export interface PartyUtilityPolicy {
   readonly weaponCriticalRate: number
   readonly armorDefense: number
   readonly armorWeightPenalty: number
+  readonly excludedEquipmentKeys: ReadonlySet<string>
+  readonly monkWeaponMultiplier: number
   readonly spellEffect: Readonly<Record<MagicDefinition["effect"]["kind"], number>>
   readonly spellPotency: Readonly<Record<MagicDefinition["effect"]["kind"], number>>
   readonly spellAccuracy: number
   readonly allEnemiesBonus: number
   readonly restrictedTargetPenalty: number
-  readonly duplicateCapabilityMultiplier: number
+  readonly firstPartyCapabilityBonus: number
+  readonly specialistRoleMultiplier: number
+  readonly coveredRedMageMultiplier: number
+  readonly duplicateDamageMultiplier: number
+  readonly duplicateRecoveryMultiplier: number
+  readonly duplicateSupportMultiplier: number
+  readonly attackBuffPhysicalTargetMultiplier: number
+  readonly attackBuffUnarmedMonkTargetMultiplier: number
+  readonly attackBuffHybridTargetMultiplier: number
+  readonly attackBuffNoTargetMultiplier: number
+  readonly spellSlotOpportunityCosts: readonly [number, number, number]
 }
 
 export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
@@ -31,6 +43,8 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
   weaponCriticalRate: 1,
   armorDefense: 4,
   armorWeightPenalty: 1,
+  excludedEquipmentKeys: new Set(["nunchaku"]),
+  monkWeaponMultiplier: 0,
   spellEffect: Object.freeze({
     "restore-hp": 50,
     "cure-status": 20,
@@ -58,7 +72,17 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
   spellAccuracy: 0.125,
   allEnemiesBonus: 10,
   restrictedTargetPenalty: 10,
-  duplicateCapabilityMultiplier: 0.5,
+  firstPartyCapabilityBonus: 15,
+  specialistRoleMultiplier: 1.15,
+  coveredRedMageMultiplier: 0.75,
+  duplicateDamageMultiplier: 0.5,
+  duplicateRecoveryMultiplier: 0.6,
+  duplicateSupportMultiplier: 0.15,
+  attackBuffPhysicalTargetMultiplier: 0.8,
+  attackBuffUnarmedMonkTargetMultiplier: 1,
+  attackBuffHybridTargetMultiplier: 0.75,
+  attackBuffNoTargetMultiplier: 0,
+  spellSlotOpportunityCosts: Object.freeze([0, 8, 28] as const),
 })
 
 export class PartyUtilityEvaluator {
@@ -80,6 +104,8 @@ export class PartyUtilityEvaluator {
     // - weapon = attack * weaponAttack + accuracy * weaponAccuracy
     //   + criticalRate * weaponCriticalRate
     // - armor = defense * armorDefense - weight * armorWeightPenalty
+    // - excluded equipment and Monk weapons receive no recommendation value; this model treats
+    //   Monks as unarmed because it does not carry the level needed for an early-game crossover
     //
     // Spell components:
     // - begin with spellEffect[effect.kind]
@@ -87,15 +113,34 @@ export class PartyUtilityEvaluator {
     // - add accuracy * spellAccuracy when the effect has accuracy
     // - add allEnemiesBonus for all-enemies spells
     // - subtract restrictedTargetPenalty when damage has targetFamily
-    // - identify duplicate capabilities by effect kind plus element, target family, or status;
-    //   multiply the second and later party-wide copies by duplicateCapabilityMultiplier
+    // - reward the first party-wide copy of a capability, then diminish duplicate damage,
+    //   recovery, and support/control at different rates
+    // - prefer school specialists; Red Mages retain full value only when they are covering a
+    //   school that has no specialist in the party
+    // - charge escalating opportunity costs as each character fills a level's three slots
+    // - scale attack buffs by the best actual recipient: an unarmed Monk, a physical attacker,
+    //   a hybrid Red Mage, or no viable target
     //
     // Emit one ScoreComponent per equipped item and learned spell. Component keys must be
     // `${character.id}:equipment:${slot}` and `${character.id}:magic:${spell}`. Reasons must
     // name the concrete mechanics that produced the value. Reject equipped or learned keys
     // absent from the supplied catalog. Sum components for PartyScore.total.
     const components: ScoreComponent[] = []
-    const seenCapabilities = new Map<string, number>()
+    const learnedMagic = party.characters.flatMap((character) =>
+      [...character.learnedSpells].map((spellKey) => {
+        const magic = this.#magic.get(spellKey)
+        if (magic === undefined) {
+          throw new Error(`Unknown Final Fantasy magic state key: ${spellKey}`)
+        }
+
+        return { character, magic }
+      }),
+    )
+    const partySchools = new Set(
+      party.characters.flatMap((character) => specialistSchool(character.baseClass)),
+    )
+    const primaryCapabilities = selectPrimaryCapabilities(learnedMagic, partySchools, this.#policy)
+    const spellLevelCounts = countSpellLevels(learnedMagic)
 
     for (const character of party.characters) {
       for (const [slot, itemKey] of Object.entries(character.equipment)) {
@@ -106,18 +151,23 @@ export class PartyUtilityEvaluator {
         if (equipment.slot !== slot) {
           throw new Error(`Final Fantasy equipment state key ${itemKey} does not match slot ${slot}`)
         }
-        components.push(scoreEquipment(character.id, equipment, this.#policy))
+        components.push(scoreEquipment(character, equipment, this.#policy))
       }
 
       for (const spellKey of character.learnedSpells) {
-        const magic = this.#magic.get(spellKey)
-        if (magic === undefined) {
-          throw new Error(`Unknown Final Fantasy magic state key: ${spellKey}`)
-        }
+        const magic = this.#magic.get(spellKey)!
         const capability = magicCapabilityKey(magic)
-        const duplicateCount = seenCapabilities.get(capability) ?? 0
-        seenCapabilities.set(capability, duplicateCount + 1)
-        components.push(scoreMagic(character.id, magic, duplicateCount > 0, this.#policy))
+        const primary = primaryCapabilities.get(capability)
+        const levelCount = spellLevelCounts.get(spellLevelKey(character.id, magic.level)) ?? 0
+        components.push(scoreMagic(
+          character,
+          magic,
+          primary?.character.id === character.id && primary.magic.key === magic.key,
+          party.characters,
+          partySchools,
+          levelCount,
+          this.#policy,
+        ))
       }
     }
 
@@ -129,7 +179,7 @@ export class PartyUtilityEvaluator {
 }
 
 function scoreEquipment(
-  characterId: string,
+  character: PartyState["characters"][number],
   equipment: WeaponDefinition | ArmorDefinition,
   policy: PartyUtilityPolicy,
 ): ScoreComponent {
@@ -137,12 +187,21 @@ function scoreEquipment(
     const attackValue = equipment.attack * policy.weaponAttack
     const accuracyValue = equipment.accuracy * policy.weaponAccuracy
     const criticalValue = equipment.criticalRate * policy.weaponCriticalRate
-    const value = attackValue + accuracyValue + criticalValue
+    let value = attackValue + accuracyValue + criticalValue
+    const reasons = [`${equipment.name} weapon attack ${equipment.attack}*${policy.weaponAttack} + accuracy ${equipment.accuracy}*${policy.weaponAccuracy} + critical rate ${equipment.criticalRate}*${policy.weaponCriticalRate}`]
+
+    if (policy.excludedEquipmentKeys.has(equipment.key)) {
+      value = 0
+      reasons.push("excluded from recommendations")
+    } else if (character.baseClass === "monk") {
+      value *= policy.monkWeaponMultiplier
+      reasons.push(`Monk unarmed multiplier ${policy.monkWeaponMultiplier}`)
+    }
 
     return {
-      key: `${characterId}:equipment:${equipment.slot}`,
+      key: `${character.id}:equipment:${equipment.slot}`,
       value,
-      reason: `${equipment.name} weapon attack ${equipment.attack}*${policy.weaponAttack} + accuracy ${equipment.accuracy}*${policy.weaponAccuracy} + critical rate ${equipment.criticalRate}*${policy.weaponCriticalRate}`,
+      reason: reasons.join("; "),
     }
   }
 
@@ -151,16 +210,19 @@ function scoreEquipment(
   const value = defenseValue - weightPenalty
 
   return {
-    key: `${characterId}:equipment:${equipment.slot}`,
+    key: `${character.id}:equipment:${equipment.slot}`,
     value,
     reason: `${equipment.name} armor defense ${equipment.defense}*${policy.armorDefense} - weight ${equipment.weight}*${policy.armorWeightPenalty}`,
   }
 }
 
 function scoreMagic(
-  characterId: string,
+  character: PartyState["characters"][number],
   magic: MagicDefinition,
-  duplicateCapability: boolean,
+  primaryCapability: boolean,
+  party: PartyState["characters"],
+  partySchools: ReadonlySet<MagicDefinition["school"]>,
+  spellLevelCount: number,
   policy: PartyUtilityPolicy,
 ): ScoreComponent {
   const effect = magic.effect
@@ -186,16 +248,213 @@ function scoreMagic(
     value -= policy.restrictedTargetPenalty
     reasons.push(`${effect.targetFamily} restriction -${policy.restrictedTargetPenalty}`)
   }
-  if (duplicateCapability) {
-    value *= policy.duplicateCapabilityMultiplier
-    reasons.push(`duplicate capability multiplier ${policy.duplicateCapabilityMultiplier}`)
+
+  const roleMultiplier = spellRoleMultiplier(character.baseClass, magic.school, partySchools, policy)
+  if (roleMultiplier !== 1) {
+    value *= roleMultiplier
+    reasons.push(`${spellRoleLabel(character.baseClass, magic.school, partySchools)} multiplier ${roleMultiplier}`)
   }
 
+  if (primaryCapability) {
+    value += policy.firstPartyCapabilityBonus
+    reasons.push(`first party capability bonus ${policy.firstPartyCapabilityBonus}`)
+  } else {
+    const duplicateMultiplier = duplicateMagicMultiplier(magic, policy)
+    value *= duplicateMultiplier
+    reasons.push(`duplicate ${magicResponsibility(magic)} multiplier ${duplicateMultiplier}`)
+  }
+
+  if (effect.kind === "raise-attack") {
+    const targetFit = attackBuffTargetFit(party, policy)
+    value *= targetFit.multiplier
+    reasons.push(`${targetFit.label} multiplier ${targetFit.multiplier}`)
+  }
+
+  const slotCost = spellSlotCostShare(spellLevelCount, policy)
+  value -= slotCost
+  reasons.push(`level ${magic.level} slots ${spellLevelCount}/3; opportunity cost ${slotCost}`)
+
   return {
-    key: `${characterId}:magic:${magic.key}`,
+    key: `${character.id}:magic:${magic.key}`,
     value,
     reason: reasons.join("; "),
   }
+}
+
+interface LearnedMagic {
+  readonly character: PartyState["characters"][number]
+  readonly magic: MagicDefinition
+}
+
+interface AttackBuffTargetFit {
+  readonly multiplier: number
+  readonly label: string
+}
+
+function attackBuffTargetFit(
+  party: PartyState["characters"],
+  policy: PartyUtilityPolicy,
+): AttackBuffTargetFit {
+  if (party.some((character) =>
+    character.baseClass === "monk" && character.equipment.weapon === undefined,
+  )) {
+
+    return {
+      multiplier: policy.attackBuffUnarmedMonkTargetMultiplier,
+      label: "unarmed Monk double-hit target",
+    }
+  }
+  if (party.some((character) =>
+    character.baseClass === "warrior"
+    || character.baseClass === "thief"
+    || character.baseClass === "monk",
+  )) {
+
+    return {
+      multiplier: policy.attackBuffPhysicalTargetMultiplier,
+      label: "physical attacker target",
+    }
+  }
+  if (party.some((character) => character.baseClass === "red-mage")) {
+
+    return {
+      multiplier: policy.attackBuffHybridTargetMultiplier,
+      label: "Red Mage hybrid target",
+    }
+  }
+
+  return {
+    multiplier: policy.attackBuffNoTargetMultiplier,
+    label: "no physical attack target",
+  }
+}
+
+function selectPrimaryCapabilities(
+  learnedMagic: readonly LearnedMagic[],
+  partySchools: ReadonlySet<MagicDefinition["school"]>,
+  policy: PartyUtilityPolicy,
+): ReadonlyMap<string, LearnedMagic> {
+  const primary = new Map<string, LearnedMagic>()
+  for (const learned of [...learnedMagic].sort((left, right) => {
+    const roleDifference = spellRoleMultiplier(
+      right.character.baseClass,
+      right.magic.school,
+      partySchools,
+      policy,
+    ) - spellRoleMultiplier(
+      left.character.baseClass,
+      left.magic.school,
+      partySchools,
+      policy,
+    )
+
+    return roleDifference
+      || left.character.id.localeCompare(right.character.id)
+      || left.magic.key.localeCompare(right.magic.key)
+  })) {
+    const capability = magicCapabilityKey(learned.magic)
+    if (!primary.has(capability)) {
+      primary.set(capability, learned)
+    }
+  }
+
+  return primary
+}
+
+function countSpellLevels(learnedMagic: readonly LearnedMagic[]): ReadonlyMap<string, number> {
+  const counts = new Map<string, number>()
+  for (const { character, magic } of learnedMagic) {
+    const key = spellLevelKey(character.id, magic.level)
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+
+  return counts
+}
+
+function spellLevelKey(characterId: string, level: number): string {
+  return `${characterId}:${level}`
+}
+
+function specialistSchool(baseClass: string): readonly MagicDefinition["school"][] {
+  if (baseClass === "white-mage") {
+
+    return ["white"]
+  }
+  if (baseClass === "black-mage") {
+
+    return ["black"]
+  }
+
+  return []
+}
+
+function spellRoleMultiplier(
+  baseClass: string,
+  school: MagicDefinition["school"],
+  partySchools: ReadonlySet<MagicDefinition["school"]>,
+  policy: PartyUtilityPolicy,
+): number {
+  if (specialistSchool(baseClass).includes(school)) {
+
+    return policy.specialistRoleMultiplier
+  }
+  if (baseClass === "red-mage" && partySchools.has(school)) {
+
+    return policy.coveredRedMageMultiplier
+  }
+
+  return 1
+}
+
+function spellRoleLabel(
+  baseClass: string,
+  school: MagicDefinition["school"],
+  partySchools: ReadonlySet<MagicDefinition["school"]>,
+): string {
+  return specialistSchool(baseClass).includes(school)
+    ? "school specialist"
+    : partySchools.has(school) ? "Red Mage shared responsibility" : "role fit"
+}
+
+function duplicateMagicMultiplier(
+  magic: MagicDefinition,
+  policy: PartyUtilityPolicy,
+): number {
+  const responsibility = magicResponsibility(magic)
+  if (responsibility === "damage") {
+
+    return policy.duplicateDamageMultiplier
+  }
+  if (responsibility === "recovery") {
+
+    return policy.duplicateRecoveryMultiplier
+  }
+
+  return policy.duplicateSupportMultiplier
+}
+
+function magicResponsibility(magic: MagicDefinition): "damage" | "recovery" | "support/control" {
+  if (magic.effect.kind === "damage") {
+
+    return "damage"
+  }
+  if (magic.effect.kind === "restore-hp" || magic.effect.kind === "cure-status") {
+
+    return "recovery"
+  }
+
+  return "support/control"
+}
+
+function spellSlotCostShare(spellCount: number, policy: PartyUtilityPolicy): number {
+  if (spellCount < 1) {
+    throw new Error(`Final Fantasy spell level count must be positive: ${spellCount}`)
+  }
+  const totalCost = policy.spellSlotOpportunityCosts
+    .slice(0, spellCount)
+    .reduce((sum, cost) => sum + cost, 0)
+
+  return totalCost / spellCount
 }
 
 function magicCapabilityKey(magic: MagicDefinition): string {

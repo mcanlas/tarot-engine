@@ -19,16 +19,19 @@ import { loadPartyStrategyEngine } from "./party-strategy.ts"
 const loadProjectFile = (path) =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
-const [occurrencesText, townKey = "cornelia", ...extraArgs] = process.argv.slice(2)
+const [occurrencesText, townKey = "cornelia", verbosity, ...extraArgs] = process.argv.slice(2)
 const occurrences = Number(occurrencesText)
+const verbose = verbosity === "verbose"
+const compactActionWidth = 60
 
 if (
   extraArgs.length > 0
+  || (verbosity !== undefined && !verbose)
   || occurrencesText === undefined
   || !Number.isSafeInteger(occurrences)
   || occurrences < 1
 ) {
-  console.error("Usage: node src/test/ts/final-fantasy/next-action.console-test.js <positive integer occurrences> [town key]")
+  console.error("Usage: node src/test/ts/final-fantasy/next-action.console-test.js <positive integer occurrences> [town key] [verbose]")
   process.exitCode = 1
 } else {
   const [partyEngine, strategyCatalog, towns, itemText, magicText] = await Promise.all([
@@ -40,7 +43,10 @@ if (
   ])
   const equipment = parse(itemText).items
   const magic = parse(magicText).magic
-  const actionCatalog = { equipment, magic }
+  const actionCatalog = {
+    equipment: equipment.map((item) => ({ ...item, price: 0 })),
+    magic: magic.map((spell) => ({ ...spell, price: 0 })),
+  }
   const itemNames = new Map(equipment.map((item) => [item.key, item.name]))
   const spellNames = new Map(magic.map((spell) => [spell.key, spell.name]))
   const town = cumulativeTown(towns, townKey)
@@ -51,16 +57,19 @@ if (
 
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {
     const party = {
-      gil: 5_000,
+      gil: 0,
       characters: emptyCharacters(...partyEngine.createRandomParty()),
     }
 
     console.log(`\n=== FF1 next-action run ${occurrence + 1} ===`)
     console.log(`Town: ${town.name}`)
-    console.log(`Starting gil: ${party.gil}`)
     console.log(`Starting party (all equipment and spell sets are empty): ${
       party.characters.map((character) => character.id).join(" / ")
     }`)
+    const jobWidth = Math.max("JOB".length, ...party.characters.map(({ id }) => id.length))
+    if (!verbose) {
+      console.log(`${"#".padStart(2)} | ${"JOB".padEnd(jobWidth)} | ${"ACTION".padEnd(compactActionWidth)} | ${"UTILITY".padStart(7)}`)
+    }
 
     let currentParty = party
     let step = 1
@@ -69,23 +78,30 @@ if (
       const recommendation = recommender.recommend(currentParty, town)
       if (recommendation.kind === "stop") {
         console.log(`\nStop: ${formatStopReason(recommendation.reason)}.`)
-        console.log(`Final gil: ${currentParty.gil}`)
         break
       }
 
-      const componentKey = recommendation.action.kind === "learn-spell"
-        ? `${recommendation.action.characterId}:magic:${recommendation.action.spell}`
-        : `${recommendation.action.characterId}:equipment:${recommendation.action.slot}`
-      const component = recommendation.components.find(({ key }) => key === componentKey)
-
-      console.log(`\n${step}. ${formatAction(recommendation.action, itemNames, spellNames)}`)
-      console.log(`   Marginal utility: +${recommendation.scoreDelta}`)
-      if (component !== undefined) {
-        console.log(`   Why: ${component.reason}`)
-      }
-
+      const actionText = formatAction(recommendation.action, itemNames, spellNames)
       currentParty = applyAction(currentParty, recommendation.action)
-      console.log(`   Gil remaining: ${currentParty.gil}`)
+      if (verbose) {
+        const componentKey = recommendation.action.kind === "learn-spell"
+          ? `${recommendation.action.characterId}:magic:${recommendation.action.spell}`
+          : `${recommendation.action.characterId}:equipment:${recommendation.action.slot}`
+        const component = recommendation.components.find(({ key }) => key === componentKey)
+
+        console.log(`\n${step}. ${actionText}`)
+        console.log(`   Marginal utility: +${recommendation.scoreDelta}`)
+        if (component !== undefined) {
+          console.log(`   Why: ${component.reason}`)
+        }
+      } else {
+        const actionDescription = formatActionDescription(
+          recommendation.action,
+          itemNames,
+          spellNames,
+        )
+        console.log(`${String(step).padStart(2)} | ${recommendation.action.characterId.padEnd(jobWidth)} | ${actionDescription.padEnd(compactActionWidth)} | ${formatUtility(recommendation.scoreDelta).padStart(7)}`)
+      }
       step += 1
     }
   }
@@ -121,10 +137,14 @@ function emptyCharacter(id, baseClass) {
 }
 
 function formatAction(action, itemNames, spellNames) {
+  return `${action.characterId} ${formatActionDescription(action, itemNames, spellNames)}`
+}
+
+function formatActionDescription(action, itemNames, spellNames) {
   if (action.kind === "learn-spell") {
     const spellName = spellNames.get(action.spell) ?? action.spell
 
-    return `${action.characterId} learns ${spellName} for ${action.price} gil`
+    return `learns ${spellName}`
   }
 
   const itemName = itemNames.get(action.item) ?? action.item
@@ -132,11 +152,15 @@ function formatAction(action, itemNames, spellNames) {
     ? ""
     : `, replacing ${itemNames.get(action.replaces) ?? action.replaces}`
 
-  return `${action.characterId} equips ${itemName} in ${action.slot}${replacement} for ${action.price} gil`
+  return `equips ${itemName}${replacement}`
+}
+
+function formatUtility(score) {
+  return `+${score.toFixed(2).replace(/\.?0+$/, "")}`
 }
 
 function formatStopReason(reason) {
   return reason === "no-legal-action"
-    ? "no legal affordable action remains"
+    ? "no legal action remains"
     : "no action has positive marginal utility"
 }

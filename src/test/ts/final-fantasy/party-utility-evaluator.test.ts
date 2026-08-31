@@ -20,6 +20,26 @@ import type { TownDefinition } from "../../../main/ts/final-fantasy/towns.ts"
 const catalog: NextActionCatalog = {
   equipment: [
     {
+      key: "nunchaku",
+      name: "Nunchaku",
+      slot: "weapon",
+      price: 8,
+      attack: 12,
+      accuracy: 0,
+      criticalRate: 10,
+      canEquip: ["monk"],
+    },
+    {
+      key: "staff",
+      name: "Staff",
+      slot: "weapon",
+      price: 4,
+      attack: 6,
+      accuracy: 0,
+      criticalRate: 1,
+      canEquip: ["monk"],
+    },
+    {
       key: "rapier",
       name: "Rapier",
       slot: "weapon",
@@ -58,23 +78,24 @@ const catalog: NextActionCatalog = {
       targetFamily: "undead",
     }),
     magic("protect", "white", "single-ally", { kind: "raise-defense", potency: 8 }),
-    magic("blink", "white", "self", { kind: "raise-evasion", potency: 80 }),
+    magic("blink", "white", "self", { kind: "raise-evasion", potency: 80 }, 2),
     magic("fire", "black", "single-enemy", {
       kind: "damage",
       potency: 10,
       accuracy: 24,
       element: "fire",
-    }),
+    }, 2),
     magic("sleep", "black", "all-enemies", {
       kind: "inflict-status",
       status: "sleep",
       accuracy: 24,
-    }),
+    }, 2),
     magic("focus", "black", "single-enemy", {
       kind: "lower-evasion",
       potency: 20,
       accuracy: 64,
-    }),
+    }, 3),
+    magic("temper", "black", "single-ally", { kind: "raise-attack", potency: 14 }, 2),
   ],
 }
 const town: TownDefinition = { key: "cornelia", name: "Cornelia", shops: [] }
@@ -90,6 +111,20 @@ const fireAction: NextAction = {
   characterId: "fighter",
   spell: "fire",
   price: 50,
+}
+const nunchakuAction: NextAction = {
+  kind: "bind-equipment",
+  characterId: "monk",
+  item: "nunchaku",
+  slot: "weapon",
+  price: 8,
+}
+const staffAction: NextAction = {
+  kind: "bind-equipment",
+  characterId: "monk",
+  item: "staff",
+  slot: "weapon",
+  price: 4,
 }
 
 const character = (
@@ -110,6 +145,8 @@ test("exposes an explicit default policy", () => {
   assert.equal(defaultPartyUtilityPolicy.weaponCriticalRate, 1)
   assert.equal(defaultPartyUtilityPolicy.armorDefense, 4)
   assert.equal(defaultPartyUtilityPolicy.armorWeightPenalty, 1)
+  assert(defaultPartyUtilityPolicy.excludedEquipmentKeys.has("nunchaku"))
+  assert.equal(defaultPartyUtilityPolicy.monkWeaponMultiplier, 0)
   assert.equal(defaultPartyUtilityPolicy.spellEffect.damage, 20)
   assert.equal(defaultPartyUtilityPolicy.spellPotency["restore-hp"], 1)
   assert.equal(defaultPartyUtilityPolicy.spellPotency["raise-defense"], 2)
@@ -117,7 +154,17 @@ test("exposes an explicit default policy", () => {
   assert.equal(defaultPartyUtilityPolicy.spellAccuracy, 0.125)
   assert.equal(defaultPartyUtilityPolicy.allEnemiesBonus, 10)
   assert.equal(defaultPartyUtilityPolicy.restrictedTargetPenalty, 10)
-  assert.equal(defaultPartyUtilityPolicy.duplicateCapabilityMultiplier, 0.5)
+  assert.equal(defaultPartyUtilityPolicy.firstPartyCapabilityBonus, 15)
+  assert.equal(defaultPartyUtilityPolicy.specialistRoleMultiplier, 1.15)
+  assert.equal(defaultPartyUtilityPolicy.coveredRedMageMultiplier, 0.75)
+  assert.equal(defaultPartyUtilityPolicy.duplicateDamageMultiplier, 0.5)
+  assert.equal(defaultPartyUtilityPolicy.duplicateRecoveryMultiplier, 0.6)
+  assert.equal(defaultPartyUtilityPolicy.duplicateSupportMultiplier, 0.15)
+  assert.equal(defaultPartyUtilityPolicy.attackBuffPhysicalTargetMultiplier, 0.8)
+  assert.equal(defaultPartyUtilityPolicy.attackBuffUnarmedMonkTargetMultiplier, 1)
+  assert.equal(defaultPartyUtilityPolicy.attackBuffHybridTargetMultiplier, 0.75)
+  assert.equal(defaultPartyUtilityPolicy.attackBuffNoTargetMultiplier, 0)
+  assert.deepEqual(defaultPartyUtilityPolicy.spellSlotOpportunityCosts, [0, 8, 28])
 })
 
 test("scores a character with empty equipment and spells at zero", () => {
@@ -165,6 +212,31 @@ test("scores armor defense against its weight penalty", () => {
   )
 })
 
+test("keeps Monks unarmed and excludes Nunchaku from recommendations", () => {
+  const evaluator = new PartyUtilityEvaluator(catalog)
+  const monk = character("monk", { baseClass: "monk" })
+  const recommender = new NextActionRecommender({
+    availableActions: () => [nunchakuAction, staffAction],
+  }, evaluator.evaluate)
+
+  assert.deepEqual(recommender.recommend(party([monk]), town), {
+    kind: "stop",
+    reason: "no-positive-action",
+    scoreDelta: 0,
+  })
+  assert.deepEqual(
+    evaluator.evaluate(party([character("monk", {
+      baseClass: "monk",
+      equipment: { weapon: "nunchaku" },
+    })])).components,
+    [{
+      key: "monk:equipment:weapon",
+      value: 0,
+      reason: "Nunchaku weapon attack 12*4 + accuracy 0*1 + critical rate 10*1; excluded from recommendations",
+    }],
+  )
+})
+
 test("scores every magic effect shape and target modifier", () => {
   const evaluator = new PartyUtilityEvaluator(catalog)
 
@@ -175,72 +247,116 @@ test("scores every magic effect shape and target modifier", () => {
       }),
     ])),
     {
-      total: 274,
+      total: 307,
       components: [
         {
           key: "mage:magic:cure",
-          value: 66,
-          reason: "cure restore-hp base 50; potency 16*1",
+          value: 69,
+          reason: "cure restore-hp base 50; potency 16*1; first party capability bonus 15; level 1 slots 3/3; opportunity cost 12",
         },
         {
           key: "mage:magic:dia",
-          value: 43,
-          reason: "dia damage base 20; potency 20*1; accuracy 24*0.125; all-enemies bonus 10; undead restriction -10",
+          value: 46,
+          reason: "dia damage base 20; potency 20*1; accuracy 24*0.125; all-enemies bonus 10; undead restriction -10; first party capability bonus 15; level 1 slots 3/3; opportunity cost 12",
         },
         {
           key: "mage:magic:protect",
-          value: 41,
-          reason: "protect raise-defense base 25; potency 8*2",
+          value: 44,
+          reason: "protect raise-defense base 25; potency 8*2; first party capability bonus 15; level 1 slots 3/3; opportunity cost 12",
         },
         {
           key: "mage:magic:blink",
-          value: 30,
-          reason: "blink raise-evasion base 20; potency 80*0.125",
+          value: 33,
+          reason: "blink raise-evasion base 20; potency 80*0.125; first party capability bonus 15; level 2 slots 3/3; opportunity cost 12",
         },
         {
           key: "mage:magic:fire",
-          value: 33,
-          reason: "fire damage base 20; potency 10*1; accuracy 24*0.125",
+          value: 36,
+          reason: "fire damage base 20; potency 10*1; accuracy 24*0.125; first party capability bonus 15; level 2 slots 3/3; opportunity cost 12",
         },
         {
           key: "mage:magic:sleep",
-          value: 38,
-          reason: "sleep inflict-status base 25; accuracy 24*0.125; all-enemies bonus 10",
+          value: 41,
+          reason: "sleep inflict-status base 25; accuracy 24*0.125; all-enemies bonus 10; first party capability bonus 15; level 2 slots 3/3; opportunity cost 12",
         },
         {
           key: "mage:magic:focus",
-          value: 23,
-          reason: "focus lower-evasion base 5; potency 20*0.5; accuracy 64*0.125",
+          value: 38,
+          reason: "focus lower-evasion base 5; potency 20*0.5; accuracy 64*0.125; first party capability bonus 15; level 3 slots 1/3; opportunity cost 0",
         },
       ],
     },
   )
 })
 
-test("diminishes duplicate capabilities across different party members", () => {
+test("rewards first-party coverage and strongly diminishes duplicate control", () => {
   const evaluator = new PartyUtilityEvaluator(catalog)
 
   assert.deepEqual(
     evaluator.evaluate(party([
-      character("black-mage", { learnedSpells: new Set(["fire"]) }),
-      character("black-wizard", { learnedSpells: new Set(["fire"]) }),
+      character("first", { learnedSpells: new Set(["sleep"]) }),
+      character("second", { learnedSpells: new Set(["sleep"]) }),
     ])),
     {
-      total: 49.5,
+      total: 58.7,
       components: [
         {
-          key: "black-mage:magic:fire",
-          value: 33,
-          reason: "fire damage base 20; potency 10*1; accuracy 24*0.125",
+          key: "first:magic:sleep",
+          value: 53,
+          reason: "sleep inflict-status base 25; accuracy 24*0.125; all-enemies bonus 10; first party capability bonus 15; level 2 slots 1/3; opportunity cost 0",
         },
         {
-          key: "black-wizard:magic:fire",
-          value: 16.5,
-          reason: "fire damage base 20; potency 10*1; accuracy 24*0.125; duplicate capability multiplier 0.5",
+          key: "second:magic:sleep",
+          value: 5.7,
+          reason: "sleep inflict-status base 25; accuracy 24*0.125; all-enemies bonus 10; duplicate support/control multiplier 0.15; level 2 slots 1/3; opportunity cost 0",
         },
       ],
     },
   )
+})
+
+test("gives specialists responsibility before a Red Mage when that school is covered", () => {
+  const evaluator = new PartyUtilityEvaluator(catalog)
+  const score = evaluator.evaluate(party([
+    character("red", { baseClass: "red-mage", learnedSpells: new Set(["fire"]) }),
+    character("black", { baseClass: "black-mage", learnedSpells: new Set(["fire"]) }),
+  ]))
+
+  assert.deepEqual(score.components, [
+    {
+      key: "red:magic:fire",
+      value: 12.375,
+      reason: "fire damage base 20; potency 10*1; accuracy 24*0.125; Red Mage shared responsibility multiplier 0.75; duplicate damage multiplier 0.5; level 2 slots 1/3; opportunity cost 0",
+    },
+    {
+      key: "black:magic:fire",
+      value: 52.949999999999996,
+      reason: "fire damage base 20; potency 10*1; accuracy 24*0.125; school specialist multiplier 1.15; first party capability bonus 15; level 2 slots 1/3; opportunity cost 0",
+    },
+  ])
+})
+
+test("rates Temper by its best actual physical recipient", () => {
+  const evaluator = new PartyUtilityEvaluator(catalog)
+  const temperScore = (characters: readonly CharacterState[]): number =>
+    evaluator.evaluate(party(characters)).components
+      .find(({ key }) => key === "caster:magic:temper")!.value
+  const caster = character("caster", {
+    baseClass: "black-mage",
+    learnedSpells: new Set(["temper"]),
+  })
+
+  const noTarget = temperScore([caster])
+  const redMageTarget = temperScore([caster, character("red", { baseClass: "red-mage" })])
+  const warriorTarget = temperScore([caster, character("warrior")])
+  const thiefTarget = temperScore([caster, character("thief", { baseClass: "thief" })])
+  const unarmedMonkTarget = temperScore([caster, character("monk", { baseClass: "monk" })])
+
+  assert.equal(noTarget, 0)
+  assert.equal(redMageTarget, 65.58749999999999)
+  assert.equal(warriorTarget, 69.96)
+  assert.equal(thiefTarget, warriorTarget)
+  assert.equal(unarmedMonkTarget, 87.44999999999999)
 })
 
 test("rejects equipment and spells absent from the supplied catalog", () => {
@@ -296,6 +412,7 @@ function magic(
   school: MagicDefinition["school"],
   target: MagicDefinition["target"],
   effect: MagicDefinition["effect"],
+  level = 1,
 ): MagicDefinition {
-  return { key, name: key, school, level: 1, price: 50, target, effect }
+  return { key, name: key, school, level, price: 50, target, effect }
 }
