@@ -72,6 +72,17 @@
   attributes:
     - control-magic
 
+- spell: focus
+  name: Focus
+  learnableBy:
+    - black-mage
+    - red-mage
+    - ninja
+    - black-wizard
+    - red-wizard
+  attributes:
+    - physical-support
+
 - spell: protect
   name: Protect
   learnableBy:

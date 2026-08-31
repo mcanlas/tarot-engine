@@ -1,0 +1,285 @@
+import assert from "node:assert/strict"
+import { readFile } from "node:fs/promises"
+import test from "node:test"
+
+import { parse } from "yaml"
+
+import {
+  FinalFantasyNextActionProvider,
+  type FinalFantasyCharacterState,
+  type FinalFantasyEquipmentDefinition,
+  type FinalFantasyMagicDefinition,
+  type FinalFantasyNextAction,
+  type FinalFantasyNextActionCatalog,
+  type FinalFantasyPartyState,
+} from "../../../main/ts/final-fantasy/next-action-provider.ts"
+import {
+  type FinalFantasyCatalog,
+} from "../../../main/ts/final-fantasy/strategy-core.ts"
+import {
+  loadFinalFantasyCatalog,
+} from "../../../main/ts/final-fantasy/strategy-data.ts"
+import {
+  loadFinalFantasyTowns,
+  type FinalFantasyTownDefinition,
+} from "../../../main/ts/final-fantasy/towns.ts"
+
+const loadProjectFile = (path: string): Promise<string> =>
+  readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
+
+const character = (
+  id: string,
+  baseClass: string,
+  overrides: Partial<FinalFantasyCharacterState> = {},
+): FinalFantasyCharacterState => ({
+  id,
+  baseClass,
+  promoted: false,
+  equipment: {},
+  learnedSpells: new Set(),
+  ...overrides,
+})
+
+const party = (
+  characters: readonly FinalFantasyCharacterState[],
+  gil = 100,
+): FinalFantasyPartyState => ({ characters, gil })
+
+interface LoadedProvider {
+  readonly catalog: FinalFantasyCatalog
+  readonly actionCatalog: FinalFantasyNextActionCatalog
+  readonly cornelia: FinalFantasyTownDefinition
+  readonly provider: FinalFantasyNextActionProvider
+}
+
+async function loadProvider(): Promise<LoadedProvider> {
+  const [catalog, towns, itemText, magicText] = await Promise.all([
+    loadFinalFantasyCatalog(loadProjectFile),
+    loadFinalFantasyTowns(loadProjectFile),
+    loadProjectFile("data/final-fantasy/items.yaml"),
+    loadProjectFile("data/final-fantasy/magic.yaml"),
+  ])
+  const equipment = (parse(itemText) as { items: FinalFantasyEquipmentDefinition[] }).items
+  const magic = (parse(magicText) as { magic: FinalFantasyMagicDefinition[] }).magic
+  const actionCatalog = { equipment, magic }
+  const cornelia = towns.towns[0]!
+
+  return {
+    catalog,
+    actionCatalog,
+    cornelia,
+    provider: new FinalFantasyNextActionProvider(catalog, actionCatalog),
+  }
+}
+
+const actionKey = (action: FinalFantasyNextAction): string =>
+  action.kind === "learn-spell"
+    ? `${action.characterId}:learn:${action.spell}`
+    : `${action.characterId}:bind:${action.item}`
+
+test("provides every legal Cornelia action for a mixed party", async () => {
+  const { provider, cornelia } = await loadProvider()
+  const actions = provider.availableActions(party([
+    character("garland", "warrior"),
+    character("sarah", "white-mage"),
+    character("matoya", "black-mage"),
+    character("bahamut", "monk"),
+  ]), cornelia)
+
+  assert.equal(actions.length, 25)
+  assert.deepEqual(actions.map(actionKey), [
+    "bahamut:bind:nunchaku",
+    "garland:bind:knife",
+    "matoya:bind:knife",
+    "garland:bind:staff",
+    "sarah:bind:staff",
+    "matoya:bind:staff",
+    "bahamut:bind:staff",
+    "garland:bind:rapier",
+    "garland:bind:hammer",
+    "sarah:bind:hammer",
+    "garland:bind:clothes",
+    "sarah:bind:clothes",
+    "matoya:bind:clothes",
+    "bahamut:bind:clothes",
+    "garland:bind:leather-armor",
+    "bahamut:bind:leather-armor",
+    "garland:bind:chain-mail",
+    "sarah:learn:cure",
+    "sarah:learn:dia",
+    "sarah:learn:protect",
+    "sarah:learn:blink",
+    "matoya:learn:fire",
+    "matoya:learn:sleep",
+    "matoya:learn:focus",
+    "matoya:learn:thunder",
+  ])
+})
+
+test("resolves promotion independently from a character's base class", async () => {
+  const { provider, cornelia } = await loadProvider()
+  const novice = character("bikke", "thief")
+  const ninja = character("bikke", "thief", { promoted: true })
+
+  assert.deepEqual(
+    provider.availableActions(party([novice]), cornelia).map(actionKey),
+    [
+      "bikke:bind:knife",
+      "bikke:bind:rapier",
+      "bikke:bind:clothes",
+      "bikke:bind:leather-armor",
+    ],
+  )
+  assert.deepEqual(
+    provider.availableActions(party([ninja]), cornelia).map(actionKey),
+    [
+      "bikke:bind:nunchaku",
+      "bikke:bind:knife",
+      "bikke:bind:staff",
+      "bikke:bind:rapier",
+      "bikke:bind:hammer",
+      "bikke:bind:clothes",
+      "bikke:bind:leather-armor",
+      "bikke:bind:chain-mail",
+      "bikke:learn:fire",
+      "bikke:learn:sleep",
+      "bikke:learn:focus",
+      "bikke:learn:thunder",
+    ],
+  )
+})
+
+test("excludes full spell levels and existing equipment bindings", async () => {
+  const { provider, cornelia } = await loadProvider()
+  const mage = character("astos", "black-mage", {
+    equipment: { weapon: "knife" },
+    learnedSpells: new Set(["fire", "sleep", "focus"]),
+  })
+
+  assert.deepEqual(provider.availableActions(party([mage]), cornelia), [
+    {
+      kind: "bind-equipment",
+      characterId: "astos",
+      item: "staff",
+      slot: "weapon",
+      price: 4,
+      replaces: "knife",
+    },
+    {
+      kind: "bind-equipment",
+      characterId: "astos",
+      item: "clothes",
+      slot: "body",
+      price: 8,
+    },
+  ])
+})
+
+test("only returns individually affordable actions", async () => {
+  const { provider, cornelia } = await loadProvider()
+
+  assert.deepEqual(
+    provider.availableActions(party([character("astos", "black-mage")], 4), cornelia)
+      .map(actionKey),
+    ["astos:bind:knife", "astos:bind:staff"],
+  )
+})
+
+test("rejects invalid party state", async () => {
+  const { actionCatalog, catalog, provider, cornelia } = await loadProvider()
+  const duplicate = character("same", "warrior")
+
+  assert.throws(
+    () => provider.availableActions(party([]), cornelia),
+    /must contain 1 to 4 characters/,
+  )
+  assert.throws(
+    () => provider.availableActions(party(Array.from(
+      { length: 5 },
+      (_, index) => character(String(index), "warrior"),
+    )), cornelia),
+    /must contain 1 to 4 characters/,
+  )
+  assert.throws(
+    () => provider.availableActions(party([duplicate, duplicate]), cornelia),
+    /character IDs must be unique/,
+  )
+  assert.throws(
+    () => provider.availableActions(party([character("garland", "warrior")], -1), cornelia),
+    /gil must be a non-negative finite number/,
+  )
+  assert.throws(
+    () => provider.availableActions(party([character("garland", "warrior")], Infinity), cornelia),
+    /gil must be a non-negative finite number/,
+  )
+  assert.throws(
+    () => provider.availableActions(party([character("sarah", "white-wizard")]), cornelia),
+    /must have an unpromoted base class/,
+  )
+
+  const catalogWithoutNinja = {
+    ...catalog,
+    jobs: new Map([...catalog.jobs].filter(([key]) => key !== "ninja")),
+  }
+  const missingPromotionProvider = new FinalFantasyNextActionProvider(
+    catalogWithoutNinja,
+    actionCatalog,
+  )
+  assert.throws(
+    () => missingPromotionProvider.availableActions(
+      party([character("bikke", "thief", { promoted: true })]),
+      cornelia,
+    ),
+    /Unknown promotion for thief: ninja/,
+  )
+})
+
+test("rejects inconsistent action catalogs and town wares", async () => {
+  const { catalog, actionCatalog, cornelia } = await loadProvider()
+
+  assert.throws(
+    () => new FinalFantasyNextActionProvider(catalog, {
+      ...actionCatalog,
+      equipment: [actionCatalog.equipment[0]!, actionCatalog.equipment[0]!],
+    }),
+    /Duplicate Final Fantasy equipment key: nunchaku/,
+  )
+  assert.throws(
+    () => new FinalFantasyNextActionProvider(catalog, {
+      ...actionCatalog,
+      magic: [actionCatalog.magic[0]!, actionCatalog.magic[0]!],
+    }),
+    /Duplicate Final Fantasy magic key: cure/,
+  )
+
+  const warrior = party([character("garland", "warrior")])
+  const equipmentProvider = new FinalFantasyNextActionProvider(catalog, {
+    ...actionCatalog,
+    equipment: actionCatalog.equipment.filter((item) => item.key !== "nunchaku"),
+  })
+  assert.throws(
+    () => equipmentProvider.availableActions(warrior, cornelia),
+    /weapons ware nunchaku is missing matching equipment data/,
+  )
+
+  const magicProvider = new FinalFantasyNextActionProvider(catalog, {
+    ...actionCatalog,
+    magic: actionCatalog.magic.map((magic) =>
+      magic.key === "cure" ? { ...magic, school: "black" as const } : magic,
+    ),
+  })
+  assert.throws(
+    () => magicProvider.availableActions(warrior, cornelia),
+    /white-magic ware cure is missing matching magic data/,
+  )
+
+  const catalogWithoutFocus = {
+    ...catalog,
+    spells: new Map([...catalog.spells].filter(([key]) => key !== "focus")),
+  }
+  const spellProvider = new FinalFantasyNextActionProvider(catalogWithoutFocus, actionCatalog)
+  assert.throws(
+    () => spellProvider.availableActions(warrior, cornelia),
+    /Magic focus is missing from the Final Fantasy spell catalog/,
+  )
+})

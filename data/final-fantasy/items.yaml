@@ -1,9 +1,48 @@
 items:
-  - { key: nunchaku, name: Nunchaku, type: weapon, price: 8 }
-  - { key: knife, name: Knife, type: weapon, price: 4 }
-  - { key: staff, name: Staff, type: weapon, price: 4 }
-  - { key: rapier, name: Rapier, type: weapon, price: 8 }
-  - { key: hammer, name: Hammer, type: weapon, price: 8 }
-  - { key: clothes, name: Clothes, type: armor, price: 8 }
-  - { key: leather-armor, name: Leather Armor, type: armor, price: 40 }
-  - { key: chain-mail, name: Chain Mail, type: armor, price: 65 }
+  - key: nunchaku
+    name: Nunchaku
+    slot: weapon
+    price: 8
+    canEquip: [monk, master, ninja]
+
+  - key: knife
+    name: Knife
+    slot: weapon
+    price: 4
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard, black-mage, black-wizard]
+
+  - key: staff
+    name: Staff
+    slot: weapon
+    price: 4
+    canEquip: [warrior, knight, monk, master, red-mage, red-wizard, white-mage, white-wizard, black-mage, black-wizard, ninja]
+
+  - key: rapier
+    name: Rapier
+    slot: weapon
+    price: 8
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
+
+  - key: hammer
+    name: Hammer
+    slot: weapon
+    price: 8
+    canEquip: [warrior, knight, white-mage, white-wizard, ninja]
+
+  - key: clothes
+    name: Clothes
+    slot: body
+    price: 8
+    canEquip: [warrior, knight, thief, ninja, monk, master, red-mage, red-wizard, white-mage, white-wizard, black-mage, black-wizard]
+
+  - key: leather-armor
+    name: Leather Armor
+    slot: body
+    price: 40
+    canEquip: [warrior, knight, thief, ninja, monk, master, red-mage, red-wizard]
+
+  - key: chain-mail
+    name: Chain Mail
+    slot: body
+    price: 65
+    canEquip: [warrior, knight, ninja, red-mage, red-wizard]
