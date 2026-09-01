@@ -19,7 +19,7 @@ import { loadPartyStrategyEngine } from "./party-strategy.ts"
 const loadProjectFile = (path) =>
   readFile(new URL(`../../../../${path}`, import.meta.url), "utf8")
 
-const equipmentSlots = ["weapon", "body", "shield", "head", "arms"]
+const equipmentSlots = ["weapon", "shield", "head", "body", "arms"]
 
 const [occurrencesText, townKey = "cornelia", verbosity, ...extraArgs] = process.argv.slice(2)
 const occurrences = Number(occurrencesText)
