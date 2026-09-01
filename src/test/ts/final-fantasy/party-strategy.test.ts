@@ -48,7 +48,7 @@ test("loads class facts from existing catalogs and party rules from their own YA
     "white-mage",
     "black-mage",
   ])
-  assert.equal(engine.ruleCount, 29)
+  assert.equal(engine.ruleCount, 31)
   assert.equal(partyStrategyYamlFile, "data/final-fantasy/party-strategy.yaml")
 })
 
@@ -202,7 +202,7 @@ test("pairs each random party with a random boss and a party-specific guide", ()
   assert.equal(strategy.partyStrategy.promoted, true)
   assert.equal(strategy.boss.key, "kraken")
   assert.match(rendered, /^Boss: Kraken\nOpening:/)
-  assert.match(rendered, /Black Wizard exploit Kraken's lightning weakness with Thunder/)
+  assert.match(rendered, /Black Wizard exploit Kraken's weakness with their strongest learned lightning spell/)
   assert.doesNotMatch(rendered, /White Mage|cast Dia/)
 })
 
@@ -272,7 +272,7 @@ test("rejects invalid or unreachable YAML rule definitions", async () => {
     kind: strength
     when:
       sameMemberCapabilities:
-        - healing
+        - hp-recovery
     statement: Invalid.
 `),
     /sameMemberCapabilities must combine at least two distinct capabilities/,

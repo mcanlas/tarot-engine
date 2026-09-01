@@ -7,7 +7,9 @@ export const strategyYamlFiles = Object.freeze({
 
 export type CapabilityId =
   | "physical-damage"
-  | "healing"
+  | "hp-recovery"
+  | "revival"
+  | "status-recovery"
   | "offensive-magic"
   | "defensive-magic"
   | "physical-support"
@@ -15,13 +17,17 @@ export type CapabilityId =
   | "anti-undead"
 
 export type SpellAttributeId =
-  | "healing"
+  | "hp-recovery"
+  | "revival"
+  | "status-recovery"
   | "offensive-magic"
   | "defensive-magic"
   | "physical-support"
   | "control-magic"
   | "elemental"
   | "anti-undead"
+
+export type SpellElementId = "earth" | "fire" | "ice" | "lightning"
 
 export type ItemId = "potion"
 
@@ -66,6 +72,8 @@ export interface SpellDefinition {
   level: number
   learnableBy: string[]
   attributes: string[]
+  element?: string
+  targetFamily?: string
 }
 
 export interface BossDefinition {
@@ -82,6 +90,8 @@ export type PartyConditionDefinition =
   | { capability: string; atLeast?: number }
   | { spell: string; atLeast?: number }
   | { spellAttribute: string; atLeast?: number }
+  | { spellElement: string; atLeast?: number }
+  | { spellTargetFamily: string; atLeast?: number }
   | { item: string }
   | { front: string }
   | { frontSpell: string }
@@ -124,6 +134,8 @@ export interface Spell {
   level: number
   learnableBy: ReadonlySet<string>
   attributes: ReadonlySet<SpellAttributeId>
+  element?: SpellElementId
+  targetFamily?: EnemyTagId
 }
 
 export interface StrategyCatalog {
@@ -175,7 +187,9 @@ interface BossStrategyRule {
 
 const capabilities = new Set<CapabilityId>([
   "physical-damage",
-  "healing",
+  "hp-recovery",
+  "revival",
+  "status-recovery",
   "offensive-magic",
   "defensive-magic",
   "physical-support",
@@ -183,7 +197,9 @@ const capabilities = new Set<CapabilityId>([
   "anti-undead",
 ])
 const spellAttributes = new Set<SpellAttributeId>([
-  "healing",
+  "hp-recovery",
+  "revival",
+  "status-recovery",
   "offensive-magic",
   "defensive-magic",
   "physical-support",
@@ -192,13 +208,16 @@ const spellAttributes = new Set<SpellAttributeId>([
   "anti-undead",
 ])
 const spellCapabilityAttributes = [
-  "healing",
+  "hp-recovery",
+  "revival",
+  "status-recovery",
   "offensive-magic",
   "defensive-magic",
   "physical-support",
   "control-magic",
   "anti-undead",
 ] as const
+const spellElements = new Set<SpellElementId>(["earth", "fire", "ice", "lightning"])
 const items = new Set<ItemId>(["potion"])
 const enemyTags = new Set<EnemyTagId>(["undead"])
 const frontlineSuitabilities = new Set<FrontlineSuitabilityId>([
@@ -393,6 +412,10 @@ export function buildStrategyCatalog(
       level: requireSpellLevel(definition.level),
       learnableBy: new Set(definition.learnableBy),
       attributes: new Set(definition.attributes.map(requireSpellAttribute)),
+      ...(definition.element === undefined ? {} : { element: requireSpellElement(definition.element) }),
+      ...(definition.targetFamily === undefined
+        ? {}
+        : { targetFamily: requireEnemyTag(definition.targetFamily) }),
     })
   }
 
@@ -475,6 +498,8 @@ function buildPartyCondition(
     "capability",
     "spell",
     "spellAttribute",
+    "spellElement",
+    "spellTargetFamily",
     "item",
     "front",
     "frontSpell",
@@ -514,6 +539,24 @@ function buildPartyCondition(
 
     return (party) => party.members.filter((member) =>
       [...member.learnedSpells].some((spell) => matchingSpells.has(spell)),
+    ).length >= atLeast
+  }
+
+  if ("spellElement" in definition) {
+    const element = requireSpellElement(definition.spellElement)
+    const atLeast = requireCount(definition.atLeast)
+
+    return (party) => party.members.filter((member) =>
+      [...member.learnedSpells].some((spell) => spell.element === element),
+    ).length >= atLeast
+  }
+
+  if ("spellTargetFamily" in definition) {
+    const family = requireEnemyTag(definition.spellTargetFamily)
+    const atLeast = requireCount(definition.atLeast)
+
+    return (party) => party.members.filter((member) =>
+      [...member.learnedSpells].some((spell) => spell.targetFamily === family),
     ).length >= atLeast
   }
 
@@ -606,7 +649,7 @@ function buildMemberSelector(parts: readonly string[], catalog: StrategyCatalog)
   }
   if (parts.length === 2 && parts[0] === "capability") {
     const capability = requireCapability(parts[1] ?? "")
-    const qualifier = capability === "healing" ? "with recovery magic"
+    const qualifier = capability === "hp-recovery" ? "with HP-recovery magic"
       : capability === "offensive-magic" ? "with offensive magic" : ""
 
     return {
@@ -639,6 +682,26 @@ function buildMemberSelector(parts: readonly string[], catalog: StrategyCatalog)
         [...member.learnedSpells].some((spell) => matchingSpells.has(spell)),
       ),
       qualifier: "with relevant learned spells",
+    }
+  }
+  if (parts.length === 2 && parts[0] === "knows-element") {
+    const element = requireSpellElement(parts[1] ?? "")
+
+    return {
+      select: (party) => party.members.filter((member) =>
+        [...member.learnedSpells].some((spell) => spell.element === element),
+      ),
+      qualifier: `with learned ${element} magic`,
+    }
+  }
+  if (parts.length === 2 && parts[0] === "knows-target-family") {
+    const family = requireEnemyTag(parts[1] ?? "")
+
+    return {
+      select: (party) => party.members.filter((member) =>
+        [...member.learnedSpells].some((spell) => spell.targetFamily === family),
+      ),
+      qualifier: `with learned anti-${family} magic`,
     }
   }
   if (parts.length === 2 && parts[0] === "can-use") {
@@ -759,6 +822,13 @@ function requireSpellAttribute(id: string): SpellAttributeId {
   }
 
   return id as SpellAttributeId
+}
+function requireSpellElement(id: string): SpellElementId {
+  if (!spellElements.has(id as SpellElementId)) {
+    throw new Error(`Unknown spell element: ${id}`)
+  }
+
+  return id as SpellElementId
 }
 function requireSpellLevel(value: number): number {
   if (!Number.isInteger(value) || value < 1 || value > 8) {

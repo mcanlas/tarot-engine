@@ -108,6 +108,9 @@ function decodeClass(value: unknown, index: number): ClassDefinition {
 
 function decodeSpell(value: unknown, index: number): SpellDefinition {
   const record = requireRecord(value, `spells[${index}]`)
+  const effect = record.effect === undefined
+    ? {}
+    : requireRecord(record.effect, `spells[${index}].effect`)
 
   return {
     key: requireString(record.key, `spells[${index}].key`),
@@ -115,6 +118,12 @@ function decodeSpell(value: unknown, index: number): SpellDefinition {
     level: requireNumber(record.level, `spells[${index}].level`),
     learnableBy: requireStringArray(record.learnableBy, `spells[${index}].learnableBy`),
     attributes: requireStringArray(record.attributes, `spells[${index}].attributes`),
+    ...((effect.kind !== "damage" && effect.kind !== "inflict-status") || effect.element === undefined
+      ? {}
+      : { element: requireString(effect.element, `spells[${index}].effect.element`) }),
+    ...(effect.kind !== "damage" || effect.targetFamily === undefined
+      ? {}
+      : { targetFamily: requireString(effect.targetFamily, `spells[${index}].effect.targetFamily`) }),
   }
 }
 
@@ -172,6 +181,8 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
     "capability",
     "spell",
     "spellAttribute",
+    "spellElement",
+    "spellTargetFamily",
     "item",
     "front",
     "frontSpell",
@@ -232,8 +243,24 @@ function decodeCondition(value: unknown, path: string): PartyConditionDefinition
     return { spell: requireString(record.spell, `${path}.spell`), ...atLeast }
   }
 
+  if (operation === "spellAttribute") {
+
+    return {
+      spellAttribute: requireString(record.spellAttribute, `${path}.spellAttribute`),
+      ...atLeast,
+    }
+  }
+
+  if (operation === "spellElement") {
+
+    return {
+      spellElement: requireString(record.spellElement, `${path}.spellElement`),
+      ...atLeast,
+    }
+  }
+
   return {
-    spellAttribute: requireString(record.spellAttribute, `${path}.spellAttribute`),
+    spellTargetFamily: requireString(record.spellTargetFamily, `${path}.spellTargetFamily`),
     ...atLeast,
   }
 }

@@ -127,7 +127,9 @@ export class PartyStrategyEngine {
     const capabilities = new Set(job.capabilities)
 
     const spellCapabilities = [
-      "healing",
+      "hp-recovery",
+      "revival",
+      "status-recovery",
       "offensive-magic",
       "defensive-magic",
       "physical-support",
@@ -274,7 +276,9 @@ function buildCondition(
 function requireCapability(value: string): CapabilityId {
   if (
     value !== "physical-damage"
-    && value !== "healing"
+    && value !== "hp-recovery"
+    && value !== "revival"
+    && value !== "status-recovery"
     && value !== "offensive-magic"
     && value !== "defensive-magic"
     && value !== "physical-support"

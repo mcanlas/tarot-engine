@@ -22,6 +22,9 @@ export interface PartyUtilityPolicy {
   readonly spellEffect: Readonly<Record<MagicDefinition["effect"]["kind"], number>>
   readonly spellPotency: Readonly<Record<MagicDefinition["effect"]["kind"], number>>
   readonly spellAccuracy: number
+  readonly instantDeathMultiplier: number
+  readonly maximumTargetHpMultiplier: number
+  readonly bossIndependentZeroEffects: ReadonlySet<MagicDefinition["effect"]["kind"]>
   readonly allEnemiesBonus: number
   readonly restrictedTargetPenalty: number
   readonly firstPartyCapabilityBonus: number
@@ -47,7 +50,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
   monkEquipmentMultiplier: 0,
   spellEffect: Object.freeze({
     "restore-hp": 50,
-    revive: 50,
+    revive: 100,
     "cure-status": 20,
     damage: 20,
     "raise-defense": 25,
@@ -80,6 +83,13 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "teleport-floor": 0,
   }),
   spellAccuracy: 0.125,
+  instantDeathMultiplier: 0.15,
+  maximumTargetHpMultiplier: 0.5,
+  bossIndependentZeroEffects: new Set<MagicDefinition["effect"]["kind"]>([
+    "increase-flee",
+    "exit-dungeon",
+    "teleport-floor",
+  ]),
   allEnemiesBonus: 10,
   restrictedTargetPenalty: 10,
   firstPartyCapabilityBonus: 15,
@@ -278,9 +288,23 @@ function scoreMagic(
     reasons.push(`${targetFit.label} multiplier ${targetFit.multiplier}`)
   }
 
+  if (effect.kind === "inflict-status" && effect.status === "death") {
+    value *= policy.instantDeathMultiplier
+    reasons.push(`instant-death reliability multiplier ${policy.instantDeathMultiplier}`)
+  }
+  if (effect.kind === "inflict-status" && effect.maximumTargetHp !== undefined) {
+    value *= policy.maximumTargetHpMultiplier
+    reasons.push(`target HP <= ${effect.maximumTargetHp} multiplier ${policy.maximumTargetHpMultiplier}`)
+  }
+
   const slotCost = spellSlotCostShare(spellLevelCount, policy)
   value -= slotCost
   reasons.push(`level ${magic.level} slots ${spellLevelCount}/3; opportunity cost ${slotCost}`)
+
+  if (policy.bossIndependentZeroEffects.has(effect.kind)) {
+    value = 0
+    reasons.push("no boss-independent combat utility")
+  }
 
   return {
     key: `${character.id}:magic:${magic.key}`,

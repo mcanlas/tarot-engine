@@ -78,7 +78,13 @@ test("catalog metadata owns capabilities, spell permissions, and every promotion
     ["white-mage", "red-mage", "knight", "white-wizard", "red-wizard"],
   )
   assert.equal(cure?.level, 1)
-  assert(cure?.attributes.has("healing"))
+  assert(cure?.attributes.has("hp-recovery"))
+  assert(engine.catalog.spells.get("life")?.attributes.has("revival"))
+  assert(engine.catalog.spells.get("stona")?.attributes.has("status-recovery"))
+  assert.equal(engine.catalog.spells.get("firaga")?.element, "fire")
+  assert.equal(engine.catalog.spells.get("thundaga")?.element, "lightning")
+  assert.equal(engine.catalog.spells.get("nulshock")?.element, undefined)
+  assert.equal(engine.catalog.spells.get("diaga")?.targetFamily, "undead")
   assert.deepEqual(
     ["warrior", "thief", "monk", "red-mage", "white-mage", "black-mage"]
       .map((id) => engine.catalog.jobs.get(id)?.promotion),
@@ -197,9 +203,30 @@ test("enemy tags share undead rules without inventing unlearned spells", () => {
   const lich = adviceFor("lich", trained)
   const noFire = adviceFor("vampire", [member("black-mage", "blizzard")])
 
-  assert(vampire.some((line) => line.includes("Vampire is undead") && line.includes("cast Fire")))
-  assert(lich.some((line) => line.includes("Lich is undead") && line.includes("cast Dia")))
-  assert(!noFire.some((line) => line.includes("cast Fire")))
+  assert(vampire.some((line) => line.includes("Vampire is undead") && line.includes("strongest learned fire spell")))
+  assert(lich.some((line) => line.includes("Lich is undead") && line.includes("strongest learned anti-undead spell")))
+  assert(!noFire.some((line) => line.includes("strongest learned fire spell")))
+})
+
+test("element and target-family rules recognize higher-tier spells without their base spell", () => {
+  const vampire = adviceFor("vampire", [
+    member("white-wizard", "diaga"),
+    member("black-wizard", "firaga"),
+  ])
+  const kraken = adviceFor("kraken", [member("black-wizard", "thundaga")])
+  const lightningDefenseOnly = adviceFor("kraken", [member("white-wizard", "nulshock")])
+
+  assert(vampire.some((line) => line.includes("strongest learned anti-undead spell")))
+  assert(vampire.some((line) => line.includes("strongest learned fire spell")))
+  assert(kraken.some((line) => line.includes("strongest learned lightning spell")))
+  assert(!lightningDefenseOnly.some((line) => line.includes("strongest learned lightning spell")))
+})
+
+test("revival and status recovery do not masquerade as HP recovery", () => {
+  const advice = adviceFor("lich", [member("white-wizard", "life", "stona")])
+
+  assert(advice.some((line) => line.includes("strict damage race")))
+  assert(!advice.some((line) => line.includes("reserve enough HP recovery")))
 })
 
 test("Lich combines spell-specific defenses with its no-healer fallback", () => {
@@ -251,7 +278,7 @@ test("grouped-enemies, burst-fight, and inflicts-paralysis traits cover every pa
   assert(adviceFor("vampire", bare).some((line) =>
     line.includes("commit fully to offense against Vampire")))
   assert(adviceFor("vampire", [member("warrior"), member("white-mage", "cure")]).some((line) =>
-    line.includes("White Mage save recovery for after the fight")))
+    line.includes("White Mage save HP recovery for after the fight")))
   assert(adviceFor("blue-dragon", bare).some((line) =>
     line.includes("commit fully to offense against Blue Dragon")))
 
@@ -269,8 +296,8 @@ test("boss-specific, trait, and rematch rules stay distinct", () => {
   ]
 
   assert(adviceFor("dragon-zombies", members).some((line) =>
-    line.includes("Dragon Zombies is undead") && line.includes("cast Dia")))
-  assert(adviceFor("kraken", members).some((line) => line.includes("lightning weakness")))
+    line.includes("Dragon Zombies is undead") && line.includes("strongest learned anti-undead spell")))
+  assert(adviceFor("kraken", members).some((line) => line.includes("strongest learned lightning spell")))
   assert(adviceFor("kraken-rematch", members).some((line) => line.includes("lightning weakness is gone")))
   assert(adviceFor("kraken-rematch", members).some((line) => line.includes("against Kraken")))
   assert(!adviceFor("kraken-rematch", members).some((line) => line.includes("Kraken (Rematch)")))

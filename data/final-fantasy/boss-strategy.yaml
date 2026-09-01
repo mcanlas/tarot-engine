@@ -16,14 +16,14 @@ rules:
 
   - boss: garland
     section: safety
-    when: { spellAttribute: healing }
-    advice: "Keep {{members:capability:healing}} attacking until someone is near half health, then use a learned recovery spell"
+    when: { spellAttribute: hp-recovery }
+    advice: "Keep {{members:capability:hp-recovery}} attacking until someone is near half health, then use a learned HP-recovery spell"
 
   - boss: garland
     section: safety
     when:
       all:
-        - not: { capability: healing }
+        - not: { capability: hp-recovery }
         - item: potion
     advice: "With no recovery spell, {{members:can-use:potion}} can use Potions from shared inventory"
 
@@ -31,7 +31,7 @@ rules:
     section: safety
     when:
       all:
-        - not: { capability: healing }
+        - not: { capability: hp-recovery }
         - not: { item: potion }
     advice: "You have no in-party healing, so arrive rested and treat this as a damage race"
 
@@ -57,12 +57,12 @@ rules:
 
   - boss: pirates
     section: safety
-    when: { capability: healing }
-    advice: "Do not heal preemptively; have {{members:capability:healing}} recover only if focused damage puts someone at risk"
+    when: { capability: hp-recovery }
+    advice: "Do not heal preemptively; have {{members:capability:hp-recovery}} recover HP only if focused damage puts someone at risk"
 
   - boss: pirates
     section: safety
-    when: { not: { capability: healing } }
+    when: { not: { capability: hp-recovery } }
     advice: "Without healing, crowd control and quickly reducing the Pirate count are your defenses"
 
   - boss: piscodemons
@@ -124,13 +124,13 @@ rules:
 
   - bossTag: undead
     section: party-edge
-    when: { spell: dia }
-    advice: "{{boss}} is undead; have {{members:knows:dia}} cast Dia for direct anti-undead damage"
+    when: { spellTargetFamily: undead }
+    advice: "{{boss}} is undead; have {{members:knows-target-family:undead}} use their strongest learned anti-undead spell"
 
   - bossTag: undead
     section: party-edge
-    when: { spell: fire }
-    advice: "{{boss}} is undead and weak to fire; have {{members:knows:fire}} cast Fire as the default action"
+    when: { spellElement: fire }
+    advice: "{{boss}} is undead and weak to fire; have {{members:knows-element:fire}} use their strongest learned fire spell"
 
   - boss: lich
     section: safety
@@ -144,12 +144,12 @@ rules:
 
   - boss: lich
     section: safety
-    when: { capability: healing }
-    advice: "Have {{members:capability:healing}} reserve enough healing for recovery after Lich's party-wide magic"
+    when: { capability: hp-recovery }
+    advice: "Have {{members:capability:hp-recovery}} reserve enough HP recovery for after Lich's party-wide magic"
 
   - boss: lich
     section: safety
-    when: { not: { capability: healing } }
+    when: { not: { capability: hp-recovery } }
     advice: "With no healer, Lich becomes a strict damage race; arrive fully stocked and commit your strongest attacks"
 
   - boss: marilith
@@ -232,13 +232,13 @@ rules:
 
   - boss: kraken
     section: party-edge
-    when: { spell: thunder }
-    advice: "Have {{members:knows:thunder}} exploit Kraken's lightning weakness with Thunder"
+    when: { spellElement: lightning }
+    advice: "Have {{members:knows-element:lightning}} exploit Kraken's weakness with their strongest learned lightning spell"
 
   - boss: blue-dragon
     section: party-edge
-    when: { spell: fire }
-    advice: "Have {{members:knows:fire}} exploit Blue Dragon's fire weakness with Fire"
+    when: { spellElement: fire }
+    advice: "Have {{members:knows-element:fire}} exploit Blue Dragon's weakness with their strongest learned fire spell"
 
   - boss: tiamat
     section: party-edge
@@ -247,8 +247,8 @@ rules:
 
   - boss: lich-rematch
     section: party-edge
-    when: { spell: fire }
-    advice: "Have {{members:knows:fire}} conserve Fire; the rematch no longer has Lich's original fire weakness"
+    when: { spellElement: fire }
+    advice: "Have {{members:knows-element:fire}} conserve fire magic; the rematch no longer has Lich's original fire weakness"
 
   - boss: marilith-rematch
     section: party-edge
@@ -257,8 +257,8 @@ rules:
 
   - boss: kraken-rematch
     section: party-edge
-    when: { spell: thunder }
-    advice: "Have {{members:knows:thunder}} conserve Thunder; Kraken's lightning weakness is gone in the rematch"
+    when: { spellElement: lightning }
+    advice: "Have {{members:knows-element:lightning}} conserve lightning magic; Kraken's lightning weakness is gone in the rematch"
 
   - bossTrait: physical-buffs-effective
     section: party-edge
@@ -319,12 +319,12 @@ rules:
 
   - bossTrait: endurance
     section: safety
-    when: { capability: healing }
-    advice: "Have {{members:capability:healing}} preserve recovery turns and MP; this fight is too long to treat as a pure damage race"
+    when: { capability: hp-recovery }
+    advice: "Have {{members:capability:hp-recovery}} preserve HP-recovery turns and MP; this fight is too long to treat as a pure damage race"
 
   - bossTrait: endurance
     section: safety
-    when: { not: { capability: healing } }
+    when: { not: { capability: hp-recovery } }
     advice: "With no recovery magic, have {{members:all}} commit to a short buff-and-burst line; {{boss}} will win a long fight"
 
   - bossTrait: lightning-damage
@@ -379,12 +379,12 @@ rules:
 
   - bossTrait: burst-fight
     section: safety
-    when: { capability: healing }
-    advice: "Have {{members:capability:healing}} save recovery for after the fight; {{boss}} will not last long enough to need a mid-fight heal"
+    when: { capability: hp-recovery }
+    advice: "Have {{members:capability:hp-recovery}} save HP recovery for after the fight; {{boss}} will not last long enough to need a mid-fight heal"
 
   - bossTrait: burst-fight
     section: safety
-    when: { not: { capability: healing } }
+    when: { not: { capability: hp-recovery } }
     advice: "With no healer, commit fully to offense against {{boss}}; the fight is short enough that raw damage matters more than a survival margin"
 
   - bossTrait: inflicts-paralysis

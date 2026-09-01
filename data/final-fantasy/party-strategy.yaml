@@ -51,7 +51,7 @@ rules:
         - sizeAtLeast: 2
         - front: fragile
         - capability: defensive-magic
-        - capability: healing
+        - capability: hp-recovery
     statement: Defensive and recovery magic give the party tools to compensate for a fragile caster's unavoidable slot 1 exposure
 
   # Capability counts and interactions
@@ -65,15 +65,27 @@ rules:
   - id: recovery
     kind: strength
     when:
-      capability: healing
+      capability: hp-recovery
     statement: Access to healing makes the party resilient across long stretches of exploration
 
   - id: recovery-redundancy
     kind: strength
     when:
-      capability: healing
+      capability: hp-recovery
       atLeast: 2
     statement: Multiple potential healers provide recovery redundancy and flexible turn allocation
+
+  - id: revival
+    kind: strength
+    when:
+      capability: revival
+    statement: Life can restore a defeated member and prevent one knockout from collapsing the party plan
+
+  - id: status-recovery
+    kind: strength
+    when:
+      capability: status-recovery
+    statement: Status-recovery magic can restore a disabled member without consuming a matching item
 
   - id: magical-offense
     kind: strength
@@ -121,7 +133,7 @@ rules:
     kind: strength
     when:
       capability: anti-undead
-    statement: Dia gives the party a resource-efficient magical attack against undead groups
+    statement: Anti-undead magic gives the party a resource-efficient magical attack against undead groups
 
   - id: no-physical-offense
     kind: weakness
@@ -145,7 +157,7 @@ rules:
     kind: weakness
     when:
       not:
-        capability: healing
+        capability: hp-recovery
     statement: Without a conventional healer, attrition and recovery items are persistent concerns
 
   - id: single-healer
@@ -153,9 +165,9 @@ rules:
     when:
       all:
         - sizeAtLeast: 2
-        - capability: healing
+        - capability: hp-recovery
         - not:
-            capability: healing
+            capability: hp-recovery
             atLeast: 2
     statement: Recovery depends on one member remaining able to act
 
@@ -167,7 +179,7 @@ rules:
         - capability: physical-damage
           atLeast: 2
         - not:
-            capability: healing
+            capability: hp-recovery
     statement: A physical core without recovery support must end difficult stretches before attrition takes over
 
   - id: no-front-line-specialist
@@ -191,7 +203,7 @@ rules:
     when:
       sameMemberCapabilities:
         - physical-damage
-        - healing
+        - hp-recovery
         - offensive-magic
     statement: One generalist covers physical damage, recovery, and offensive magic, but those roles compete for the same turn and spell budget
 

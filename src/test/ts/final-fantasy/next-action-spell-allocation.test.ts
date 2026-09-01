@@ -119,6 +119,42 @@ test("Elfheim recommendations value Haste and party healing without spending a s
   assertThreeSpellsPerLevel(finalParty, scenario.catalog.magic)
 })
 
+test("Melmond recommendations preserve revival and reject dungeon-only magic", async () => {
+  const scenario = await loadScenario("melmond")
+  const finalParty = recommendAll(scenario, [
+    character("warrior", "warrior"),
+    character("white", "white-mage", true),
+    character("black", "black-mage", true),
+  ], 1_000_000)
+  const byId = new Map(finalParty.characters.map((member) => [member.id, member]))
+
+  assert.deepEqual(spellsAtLevel(byId.get("white")!, 5, scenario.catalog.magic), [
+    "curaga", "healara", "life",
+  ])
+  assert(!byId.get("black")!.learnedSpells.has("teleport"))
+  assertThreeSpellsPerLevel(finalParty, scenario.catalog.magic)
+})
+
+test("Crescent Lake recommendations choose broadly useful level-six combat magic", async () => {
+  const scenario = await loadScenario("crescent-lake")
+  const finalParty = recommendAll(scenario, [
+    character("warrior", "warrior"),
+    character("white", "white-mage", true),
+    character("black", "black-mage", true),
+  ], 1_000_000)
+  const byId = new Map(finalParty.characters.map((member) => [member.id, member]))
+
+  assert.deepEqual(spellsAtLevel(byId.get("white")!, 6, scenario.catalog.magic), [
+    "protera", "stona",
+  ])
+  assert.deepEqual(spellsAtLevel(byId.get("black")!, 6, scenario.catalog.magic), [
+    "stun", "thundaga",
+  ])
+  assert(!byId.get("white")!.learnedSpells.has("exit"))
+  assert(!byId.get("black")!.learnedSpells.has("death"))
+  assertThreeSpellsPerLevel(finalParty, scenario.catalog.magic)
+})
+
 function recommendAll(
   scenario: ProvokaScenario,
   characters: readonly CharacterState[],
@@ -137,14 +173,26 @@ function recommendAll(
   return party
 }
 
-function character(id: string, baseClass: string): CharacterState {
+function character(id: string, baseClass: string, promoted = false): CharacterState {
   return {
     id,
     baseClass,
-    promoted: false,
+    promoted,
     equipment: {},
     learnedSpells: new Set(),
   }
+}
+
+function spellsAtLevel(
+  character: CharacterState,
+  level: number,
+  magicDefinitions: readonly MagicDefinition[],
+): readonly string[] {
+  const levelBySpell = new Map(magicDefinitions.map((magic) => [magic.key, magic.level]))
+
+  return [...character.learnedSpells]
+    .filter((spell) => levelBySpell.get(spell) === level)
+    .sort()
 }
 
 function duplicatedSpells(party: PartyState): readonly string[] {

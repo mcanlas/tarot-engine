@@ -12,7 +12,7 @@
     - white-wizard
     - red-wizard
   attributes:
-    - healing
+    - hp-recovery
 
 - key: heal
   name: Heal
@@ -25,7 +25,7 @@
     - white-mage
     - white-wizard
   attributes:
-    - healing
+    - hp-recovery
 
 - key: cura
   name: Cura
@@ -41,7 +41,7 @@
     - white-wizard
     - red-wizard
   attributes:
-    - healing
+    - hp-recovery
 
 - key: diara
   name: Diara
@@ -135,7 +135,7 @@
     - white-wizard
     - red-wizard
   attributes:
-    - healing
+    - status-recovery
 
 - key: fear
   name: Fear
@@ -162,7 +162,7 @@
     - white-wizard
     - red-wizard
   attributes:
-    - healing
+    - status-recovery
 
 - key: sleepra
   name: Sleepra
@@ -226,7 +226,7 @@
     - white-wizard
     - red-wizard
   attributes:
-    - healing
+    - hp-recovery
 
 - key: life
   name: Life
@@ -240,7 +240,7 @@
     - white-wizard
     - red-wizard
   attributes:
-    - healing
+    - revival
 
 - key: diaga
   name: Diaga
@@ -266,7 +266,7 @@
     - white-mage
     - white-wizard
   attributes:
-    - healing
+    - hp-recovery
 
 - key: firaga
   name: Firaga
@@ -336,7 +336,7 @@
     - white-mage
     - white-wizard
   attributes:
-    - healing
+    - status-recovery
 
 - key: exit
   name: Exit
@@ -482,7 +482,7 @@
     - white-wizard
     - red-wizard
   attributes:
-    - healing
+    - status-recovery
 
 - key: sleep
   name: Sleep

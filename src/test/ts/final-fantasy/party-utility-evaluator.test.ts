@@ -217,7 +217,7 @@ test("exposes an explicit default policy", () => {
   assert(defaultPartyUtilityPolicy.excludedEquipmentKeys.has("nunchaku"))
   assert.equal(defaultPartyUtilityPolicy.monkEquipmentMultiplier, 0)
   assert.equal(defaultPartyUtilityPolicy.spellEffect.damage, 20)
-  assert.equal(defaultPartyUtilityPolicy.spellEffect.revive, 50)
+  assert.equal(defaultPartyUtilityPolicy.spellEffect.revive, 100)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["multiply-attack-count"], 60)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["increase-flee"], 0)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["exit-dungeon"], 0)
@@ -238,6 +238,9 @@ test("exposes an explicit default policy", () => {
   assert.equal(defaultPartyUtilityPolicy.attackBuffUnarmedMonkTargetMultiplier, 1)
   assert.equal(defaultPartyUtilityPolicy.attackBuffHybridTargetMultiplier, 0.75)
   assert.equal(defaultPartyUtilityPolicy.attackBuffNoTargetMultiplier, 0)
+  assert.equal(defaultPartyUtilityPolicy.instantDeathMultiplier, 0.15)
+  assert.equal(defaultPartyUtilityPolicy.maximumTargetHpMultiplier, 0.5)
+  assert(defaultPartyUtilityPolicy.bossIndependentZeroEffects.has("exit-dungeon"))
   assert.deepEqual(defaultPartyUtilityPolicy.spellSlotOpportunityCosts, [0, 8, 28])
 })
 
@@ -393,6 +396,46 @@ test("scores every magic effect shape and target modifier", () => {
         },
       ],
     },
+  )
+})
+
+test("discounts constrained status magic and zeroes exploration-only effects", () => {
+  const constrainedCatalog: NextActionCatalog = {
+    equipment: [],
+    magic: [
+      magic("death", "black", "single-enemy", {
+        kind: "inflict-status",
+        status: "death",
+        accuracy: 32,
+      }, 6),
+      magic("stun", "black", "single-enemy", {
+        kind: "inflict-status",
+        status: "paralysis",
+        accuracy: 64,
+        maximumTargetHp: 300,
+      }, 6),
+      magic("exit", "white", "party", { kind: "exit-dungeon" }, 6),
+    ],
+  }
+  const evaluator = new PartyUtilityEvaluator(constrainedCatalog)
+  const score = evaluator.evaluate(party([
+    character("mage", { learnedSpells: new Set(["death", "stun", "exit"]) }),
+  ]))
+
+  assert.equal(score.components.find((component) => component.key.endsWith(":death"))?.value, -5.4)
+  assert.equal(score.components.find((component) => component.key.endsWith(":stun"))?.value, 12)
+  assert.equal(score.components.find((component) => component.key.endsWith(":exit"))?.value, 0)
+  assert.match(
+    score.components.find((component) => component.key.endsWith(":death"))!.reason,
+    /instant-death reliability multiplier 0\.15/,
+  )
+  assert.match(
+    score.components.find((component) => component.key.endsWith(":stun"))!.reason,
+    /target HP <= 300 multiplier 0\.5/,
+  )
+  assert.match(
+    score.components.find((component) => component.key.endsWith(":exit"))!.reason,
+    /no boss-independent combat utility/,
   )
 })
 
