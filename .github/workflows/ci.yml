@@ -19,6 +19,14 @@ jobs:
 
       - uses: sbt/setup-sbt@v1
 
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
       - name: Check linting and formatting
         run: sbt 'scalafixAll --check' scalafmtSbtCheck scalafmtCheck
 
