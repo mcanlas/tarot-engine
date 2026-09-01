@@ -32,11 +32,12 @@ export type MagicTarget =
   | "all-enemies"
   | "all-allies"
 
-export type MagicElement = "fire" | "ice" | "lightning"
+export type MagicElement = "earth" | "fire" | "ice" | "lightning"
 export type MagicStatus =
   | "confusion"
   | "darkness"
   | "paralysis"
+  | "petrification"
   | "poison"
   | "silence"
   | "sleep"
@@ -58,10 +59,17 @@ export type MagicEffect =
   | { readonly kind: "raise-resistance"; readonly element: MagicElement }
   | { readonly kind: "raise-attack"; readonly potency: number }
   | { readonly kind: "multiply-attack-count"; readonly factor: number }
-  | { readonly kind: "inflict-status"; readonly status: MagicStatus; readonly accuracy: number }
+  | {
+      readonly kind: "inflict-status"
+      readonly status: MagicStatus
+      readonly accuracy?: number
+      readonly element?: MagicElement
+      readonly maximumTargetHp?: number
+    }
   | { readonly kind: "lower-attack-count"; readonly accuracy: number }
   | { readonly kind: "lower-evasion"; readonly potency: number; readonly accuracy: number }
   | { readonly kind: "increase-flee" }
+  | { readonly kind: "exit-dungeon" }
   | { readonly kind: "teleport-floor" }
 
 export interface MagicDefinition {
@@ -330,6 +338,7 @@ function validateMagicMechanics(magic: MagicDefinition): void {
     case "cure-status":
     case "raise-resistance":
     case "increase-flee":
+    case "exit-dungeon":
     case "teleport-floor":
       return
     case "multiply-attack-count":
@@ -343,6 +352,16 @@ function validateMagicMechanics(magic: MagicDefinition): void {
       requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
       return
     case "inflict-status":
+      if (magic.effect.accuracy === undefined && magic.effect.maximumTargetHp === undefined) {
+        throw new Error(`Final Fantasy magic ${magic.key} must define accuracy or maximum target HP`)
+      }
+      if (magic.effect.accuracy !== undefined) {
+        requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
+      }
+      if (magic.effect.maximumTargetHp !== undefined) {
+        requirePositiveInteger(magic.effect.maximumTargetHp, `magic ${magic.key} maximum target HP`)
+      }
+      return
     case "lower-attack-count":
       requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
       return
@@ -350,5 +369,11 @@ function validateMagicMechanics(magic: MagicDefinition): void {
       const unknownEffect: never = magic.effect
       throw new Error(`Final Fantasy magic ${magic.key} has an unknown effect: ${String(unknownEffect)}`)
     }
+  }
+}
+
+function requirePositiveInteger(value: number, label: string): void {
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error(`Final Fantasy ${label} must be a positive integer`)
   }
 }

@@ -114,6 +114,30 @@ test("loads seeded town shops", async () => {
           },
         ],
       },
+      {
+        key: "crescent-lake",
+        name: "Crescent Lake",
+        shops: [
+          {
+            type: "weapons",
+            wares: ["mythril-knife", "mythril-sword", "mythril-hammer", "mythril-axe"],
+          },
+          {
+            type: "armor",
+            wares: [
+              "mythril-mail", "mythril-shield", "buckler", "mythril-helm", "mythril-gloves",
+            ],
+          },
+          {
+            type: "white-magic",
+            wares: ["stona", "exit", "protera", "invisira"],
+          },
+          {
+            type: "black-magic",
+            wares: ["thundaga", "death", "quake", "stun"],
+          },
+        ],
+      },
     ],
   })
 })
@@ -141,7 +165,11 @@ test("seeds catalog records for every town ware key", async () => {
     "crosier",
     "saber",
     "longsword",
+    "mythril-knife",
     "falchion",
+    "mythril-sword",
+    "mythril-hammer",
+    "mythril-axe",
     "clothes",
     "leather-armor",
     "chain-mail",
@@ -157,6 +185,11 @@ test("seeds catalog records for every town ware key", async () => {
     "great-helm",
     "bronze-gloves",
     "steel-gloves",
+    "mythril-mail",
+    "mythril-shield",
+    "buckler",
+    "mythril-helm",
+    "mythril-gloves",
   ])
   assert.deepEqual([...magicKeys], [
     "cure",
@@ -181,6 +214,12 @@ test("seeds catalog records for every town ware key", async () => {
     "scourge",
     "teleport",
     "slowra",
+    "stona",
+    "exit",
+    "thundaga",
+    "death",
+    "quake",
+    "stun",
     "dia",
     "fire",
     "blizzard",
@@ -326,9 +365,48 @@ test("resolves ordinal town access through the selected town", async () => {
       },
     ],
   })
+  assert.deepEqual(cumulativeTown(definitions, "crescent-lake"), {
+    key: "crescent-lake",
+    name: "Crescent Lake",
+    shops: [
+      {
+        type: "weapons",
+        wares: [
+          "nunchaku", "knife", "staff", "rapier", "hammer", "broadsword", "battle-axe",
+          "scimitar", "iron-nunchaku", "dagger", "crosier", "saber", "longsword", "falchion",
+          "mythril-knife", "mythril-sword", "mythril-hammer", "mythril-axe",
+        ],
+      },
+      {
+        type: "armor",
+        wares: [
+          "clothes", "leather-armor", "chain-mail", "iron-armor", "leather-shield", "gloves",
+          "copper-armlet", "iron-shield", "leather-cap", "helm", "knights-armor",
+          "silver-armlet", "great-helm", "bronze-gloves", "steel-gloves", "mythril-mail",
+          "mythril-shield", "buckler", "mythril-helm", "mythril-gloves",
+        ],
+      },
+      {
+        type: "white-magic",
+        wares: [
+          "cure", "dia", "protect", "blink", "blindna", "silence", "nulshock", "invis",
+          "cura", "diara", "nulblaze", "heal", "poisona", "fear", "nulfrost", "vox",
+          "curaga", "life", "diaga", "healara", "stona", "exit", "protera", "invisira",
+        ],
+      },
+      {
+        type: "black-magic",
+        wares: [
+          "fire", "sleep", "focus", "thunder", "blizzard", "dark", "temper", "slow",
+          "fira", "hold", "thundara", "focara", "sleepra", "haste", "confuse", "blizzara",
+          "firaga", "scourge", "teleport", "slowra", "thundaga", "death", "quake", "stun",
+        ],
+      },
+    ],
+  })
   assert.throws(
-    () => cumulativeTown(definitions, "crescent-lake"),
-    /crescent-lake is missing from the Final Fantasy town catalog/,
+    () => cumulativeTown(definitions, "gaia"),
+    /gaia is missing from the Final Fantasy town catalog/,
   )
 })
 

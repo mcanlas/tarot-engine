@@ -133,3 +133,35 @@ towns:
           - scourge
           - teleport
           - slowra
+
+  - key: crescent-lake
+    name: Crescent Lake
+    shops:
+      - type: weapons
+        wares:
+          - mythril-knife
+          - mythril-sword
+          - mythril-hammer
+          - mythril-axe
+
+      - type: armor
+        wares:
+          - mythril-mail
+          - mythril-shield
+          - buckler
+          - mythril-helm
+          - mythril-gloves
+
+      - type: white-magic
+        wares:
+          - stona
+          - exit
+          - protera
+          - invisira
+
+      - type: black-magic
+        wares:
+          - thundaga
+          - death
+          - quake
+          - stun

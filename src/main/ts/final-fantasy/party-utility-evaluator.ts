@@ -59,6 +59,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "lower-attack-count": 20,
     "lower-evasion": 5,
     "increase-flee": 0,
+    "exit-dungeon": 0,
     "teleport-floor": 0,
   }),
   spellPotency: Object.freeze({
@@ -75,6 +76,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "lower-attack-count": 0,
     "lower-evasion": 0.5,
     "increase-flee": 0,
+    "exit-dungeon": 0,
     "teleport-floor": 0,
   }),
   spellAccuracy: 0.125,
@@ -241,7 +243,7 @@ function scoreMagic(
     value += potencyValue
     reasons.push(`potency ${effect.potency}*${potencyWeight}`)
   }
-  if ("accuracy" in effect) {
+  if ("accuracy" in effect && effect.accuracy !== undefined) {
     const accuracyValue = effect.accuracy * policy.spellAccuracy
     value += accuracyValue
     reasons.push(`accuracy ${effect.accuracy}*${policy.spellAccuracy}`)
@@ -474,7 +476,7 @@ function magicCapabilityKey(magic: MagicDefinition): string {
     discriminators.push(effect.element ?? "", effect.targetFamily ?? "")
   }
   if (effect.kind === "inflict-status") {
-    discriminators.push(effect.status)
+    discriminators.push(effect.status, effect.element ?? "", String(effect.maximumTargetHp ?? ""))
   }
   if (effect.kind === "cure-status") {
     discriminators.push(effect.status)

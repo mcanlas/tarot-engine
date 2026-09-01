@@ -325,6 +325,85 @@
   attributes:
     - control-magic
 
+- key: stona
+  name: Stona
+  school: white
+  level: 6
+  price: 13000
+  target: single-ally
+  effect: { kind: cure-status, status: petrification }
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - healing
+
+- key: exit
+  name: Exit
+  school: white
+  level: 6
+  price: 13000
+  target: all-allies
+  effect: { kind: exit-dungeon }
+  learnableBy:
+    - white-wizard
+    - red-wizard
+  attributes: []
+
+- key: thundaga
+  name: Thundaga
+  school: black
+  level: 6
+  price: 13000
+  target: all-enemies
+  effect: { kind: damage, potency: 60, accuracy: 24, element: lightning }
+  learnableBy:
+    - black-mage
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- key: death
+  name: Death
+  school: black
+  level: 6
+  price: 13000
+  target: single-enemy
+  effect: { kind: inflict-status, status: death, accuracy: 24 }
+  learnableBy:
+    - black-mage
+    - black-wizard
+  attributes:
+    - control-magic
+
+- key: quake
+  name: Quake
+  school: black
+  level: 6
+  price: 13000
+  target: all-enemies
+  effect: { kind: inflict-status, status: death, accuracy: 40, element: earth }
+  learnableBy:
+    - black-mage
+    - black-wizard
+  attributes:
+    - control-magic
+
+- key: stun
+  name: Stun
+  school: black
+  level: 6
+  price: 13000
+  target: single-enemy
+  effect: { kind: inflict-status, status: paralysis, maximumTargetHp: 300 }
+  learnableBy:
+    - black-mage
+    - black-wizard
+  attributes:
+    - control-magic
+
 - key: dia
   name: Dia
   school: white
@@ -629,9 +708,9 @@
   name: Protera
   school: white
   level: 6
-  price: 10000
+  price: 13000
   target: all-allies
-  effect: { kind: raise-defense, potency: 20 }
+  effect: { kind: raise-defense, potency: 12 }
   learnableBy:
     - white-mage
     - white-wizard
@@ -643,9 +722,9 @@
   name: Invisira
   school: white
   level: 6
-  price: 10000
+  price: 13000
   target: all-allies
-  effect: { kind: raise-evasion, potency: 60 }
+  effect: { kind: raise-evasion, potency: 40 }
   learnableBy:
     - white-mage
     - white-wizard

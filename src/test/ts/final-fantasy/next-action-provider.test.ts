@@ -142,7 +142,11 @@ test("loads Pixel Remaster combat stats for seeded weapons", async () => {
       { key: "crosier", attack: 14, accuracy: 0, criticalRate: 11 },
       { key: "saber", attack: 13, accuracy: 5, criticalRate: 12 },
       { key: "longsword", attack: 20, accuracy: 10, criticalRate: 13 },
+      { key: "mythril-knife", attack: 10, accuracy: 15, criticalRate: 16 },
       { key: "falchion", attack: 15, accuracy: 10, criticalRate: 15 },
+      { key: "mythril-sword", attack: 23, accuracy: 15, criticalRate: 17 },
+      { key: "mythril-hammer", attack: 12, accuracy: 5, criticalRate: 18 },
+      { key: "mythril-axe", attack: 25, accuracy: 10, criticalRate: 19 },
     ],
   )
 })
@@ -170,6 +174,11 @@ test("loads Pixel Remaster defense and weight for seeded armor", async () => {
       { key: "great-helm", defense: 5, weight: 5 },
       { key: "bronze-gloves", defense: 2, weight: 3 },
       { key: "steel-gloves", defense: 4, weight: 5 },
+      { key: "mythril-mail", defense: 18, weight: 8 },
+      { key: "mythril-shield", defense: 8, weight: 0 },
+      { key: "buckler", defense: 2, weight: 0 },
+      { key: "mythril-helm", defense: 6, weight: 3 },
+      { key: "mythril-gloves", defense: 6, weight: 3 },
     ],
   )
 })
@@ -257,6 +266,32 @@ test("loads explicit seeded magic mechanics", async () => {
         key: "slowra",
         target: "single-enemy",
         effect: { kind: "lower-attack-count", accuracy: 64 },
+      },
+      {
+        key: "stona",
+        target: "single-ally",
+        effect: { kind: "cure-status", status: "petrification" },
+      },
+      { key: "exit", target: "all-allies", effect: { kind: "exit-dungeon" } },
+      {
+        key: "thundaga",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 60, accuracy: 24, element: "lightning" },
+      },
+      {
+        key: "death",
+        target: "single-enemy",
+        effect: { kind: "inflict-status", status: "death", accuracy: 24 },
+      },
+      {
+        key: "quake",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "death", accuracy: 40, element: "earth" },
+      },
+      {
+        key: "stun",
+        target: "single-enemy",
+        effect: { kind: "inflict-status", status: "paralysis", maximumTargetHp: 300 },
       },
       {
         key: "dia",
@@ -352,12 +387,12 @@ test("loads explicit seeded magic mechanics", async () => {
       {
         key: "protera",
         target: "all-allies",
-        effect: { kind: "raise-defense", potency: 20 },
+        effect: { kind: "raise-defense", potency: 12 },
       },
       {
         key: "invisira",
         target: "all-allies",
-        effect: { kind: "raise-evasion", potency: 60 },
+        effect: { kind: "raise-evasion", potency: 40 },
       },
       {
         key: "flare",
@@ -416,6 +451,32 @@ test("provides every Melmond level 5 spell to eligible promoted specialists", as
     "black:learn:scourge",
     "black:learn:teleport",
     "black:learn:slowra",
+  ])
+})
+
+test("provides every Crescent Lake level 6 spell to eligible promoted specialists", async () => {
+  const { provider } = await loadProvider()
+  const towns = await loadTowns(loadProjectFile)
+  const crescentLake = towns.towns.find((town) => town.key === "crescent-lake")!
+  const actions = provider.availableActions(party([
+    character("white", "white-mage", { promoted: true }),
+    character("black", "black-mage", { promoted: true }),
+    character("red", "red-mage", { promoted: true }),
+  ], 52_000), crescentLake)
+
+  assert.deepEqual(actions.filter((action) => action.kind === "learn-spell").map(actionKey), [
+    "white:learn:stona",
+    "white:learn:exit",
+    "red:learn:exit",
+    "white:learn:protera",
+    "red:learn:protera",
+    "white:learn:invisira",
+    "red:learn:invisira",
+    "black:learn:thundaga",
+    "red:learn:thundaga",
+    "black:learn:death",
+    "black:learn:quake",
+    "black:learn:stun",
   ])
 })
 

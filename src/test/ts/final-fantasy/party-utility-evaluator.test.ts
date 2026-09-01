@@ -220,6 +220,7 @@ test("exposes an explicit default policy", () => {
   assert.equal(defaultPartyUtilityPolicy.spellEffect.revive, 50)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["multiply-attack-count"], 60)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["increase-flee"], 0)
+  assert.equal(defaultPartyUtilityPolicy.spellEffect["exit-dungeon"], 0)
   assert.equal(defaultPartyUtilityPolicy.spellEffect["teleport-floor"], 0)
   assert.equal(defaultPartyUtilityPolicy.spellPotency["restore-hp"], 1)
   assert.equal(defaultPartyUtilityPolicy.spellPotency["raise-defense"], 2)

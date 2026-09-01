@@ -116,6 +116,15 @@ items:
     criticalRate: 13
     canEquip: [warrior, knight, ninja, red-mage, red-wizard]
 
+  - key: mythril-knife
+    name: Mythril Knife
+    slot: weapon
+    price: 640
+    attack: 10
+    accuracy: 15
+    criticalRate: 16
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard, black-mage, black-wizard]
+
   - key: falchion
     name: Falchion
     slot: weapon
@@ -124,6 +133,33 @@ items:
     accuracy: 10
     criticalRate: 15
     canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
+
+  - key: mythril-sword
+    name: Mythril Sword
+    slot: weapon
+    price: 3200
+    attack: 23
+    accuracy: 15
+    criticalRate: 17
+    canEquip: [warrior, knight, ninja, red-mage, red-wizard]
+
+  - key: mythril-hammer
+    name: Mythril Hammer
+    slot: weapon
+    price: 2000
+    attack: 12
+    accuracy: 5
+    criticalRate: 18
+    canEquip: [warrior, knight, ninja, white-mage, white-wizard]
+
+  - key: mythril-axe
+    name: Mythril Axe
+    slot: weapon
+    price: 3600
+    attack: 25
+    accuracy: 10
+    criticalRate: 19
+    canEquip: [warrior, knight, ninja]
 
   - key: clothes
     name: Clothes
@@ -244,3 +280,43 @@ items:
     defense: 4
     weight: 5
     canEquip: [warrior, knight, ninja]
+
+  - key: mythril-mail
+    name: Mythril Mail
+    slot: body
+    price: 6000
+    defense: 18
+    weight: 8
+    canEquip: [warrior, knight, ninja, red-mage, red-wizard]
+
+  - key: mythril-shield
+    name: Mythril Shield
+    slot: shield
+    price: 2000
+    defense: 8
+    weight: 0
+    canEquip: [warrior, knight, ninja]
+
+  - key: buckler
+    name: Buckler
+    slot: shield
+    price: 2000
+    defense: 2
+    weight: 0
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
+
+  - key: mythril-helm
+    name: Mythril Helm
+    slot: head
+    price: 2000
+    defense: 6
+    weight: 3
+    canEquip: [warrior, knight, ninja]
+
+  - key: mythril-gloves
+    name: Mythril Gloves
+    slot: arms
+    price: 2000
+    defense: 6
+    weight: 3
+    canEquip: [warrior, knight, ninja, red-wizard]
