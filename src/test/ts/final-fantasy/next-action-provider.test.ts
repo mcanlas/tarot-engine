@@ -141,6 +141,8 @@ test("loads Pixel Remaster combat stats for seeded weapons", async () => {
       { key: "dagger", attack: 7, accuracy: 10, criticalRate: 10 },
       { key: "crosier", attack: 14, accuracy: 0, criticalRate: 11 },
       { key: "saber", attack: 13, accuracy: 5, criticalRate: 12 },
+      { key: "longsword", attack: 20, accuracy: 10, criticalRate: 13 },
+      { key: "falchion", attack: 15, accuracy: 10, criticalRate: 15 },
     ],
   )
 })
@@ -163,6 +165,11 @@ test("loads Pixel Remaster defense and weight for seeded armor", async () => {
       { key: "iron-shield", defense: 4, weight: 0 },
       { key: "leather-cap", defense: 1, weight: 1 },
       { key: "helm", defense: 3, weight: 3 },
+      { key: "knights-armor", defense: 34, weight: 33 },
+      { key: "silver-armlet", defense: 15, weight: 1 },
+      { key: "great-helm", defense: 5, weight: 5 },
+      { key: "bronze-gloves", defense: 2, weight: 3 },
+      { key: "steel-gloves", defense: 4, weight: 5 },
     ],
   )
 })
@@ -226,6 +233,30 @@ test("loads explicit seeded magic mechanics", async () => {
         key: "blizzara",
         target: "all-enemies",
         effect: { kind: "damage", potency: 40, accuracy: 24, element: "ice" },
+      },
+      { key: "curaga", target: "single-ally", effect: { kind: "restore-hp", potency: 66 } },
+      { key: "life", target: "single-ally", effect: { kind: "revive", potency: 1 } },
+      {
+        key: "diaga",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 60, accuracy: 24, targetFamily: "undead" },
+      },
+      { key: "healara", target: "all-allies", effect: { kind: "restore-hp", potency: 48 } },
+      {
+        key: "firaga",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 50, accuracy: 24, element: "fire" },
+      },
+      {
+        key: "scourge",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "death", accuracy: 40 },
+      },
+      { key: "teleport", target: "all-allies", effect: { kind: "teleport-floor" } },
+      {
+        key: "slowra",
+        target: "single-enemy",
+        effect: { kind: "lower-attack-count", accuracy: 64 },
       },
       {
         key: "dia",
@@ -333,7 +364,6 @@ test("loads explicit seeded magic mechanics", async () => {
         target: "single-enemy",
         effect: { kind: "damage", potency: 60, accuracy: 24 },
       },
-      { key: "life", target: "single-ally", effect: { kind: "restore-hp", potency: 1 } },
       { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 20 } }
     ],
   )
@@ -365,6 +395,27 @@ test("provides every Elfheim level 3 and 4 spell to eligible specialists", async
     "black:learn:haste",
     "black:learn:confuse",
     "black:learn:blizzara",
+  ])
+})
+
+test("provides every Melmond level 5 spell to eligible promoted specialists", async () => {
+  const { provider } = await loadProvider()
+  const towns = await loadTowns(loadProjectFile)
+  const melmond = towns.towns.find((town) => town.key === "melmond")!
+  const actions = provider.availableActions(party([
+    character("white", "white-mage", { promoted: true }),
+    character("black", "black-mage", { promoted: true }),
+  ], 40_000), melmond)
+
+  assert.deepEqual(actions.filter((action) => action.kind === "learn-spell").map(actionKey), [
+    "white:learn:curaga",
+    "white:learn:life",
+    "white:learn:diaga",
+    "white:learn:healara",
+    "black:learn:firaga",
+    "black:learn:scourge",
+    "black:learn:teleport",
+    "black:learn:slowra",
   ])
 })
 

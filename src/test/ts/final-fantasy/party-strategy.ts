@@ -54,12 +54,12 @@ export function createRandomPartyBossStrategy(
   bossEngine: StrategyEngine,
   random: () => number = Math.random,
 ): RandomPartyBossStrategy {
-  const classIds = partyEngine.createRandomParty(random)
+  const { classIds, promoted } = partyEngine.createRandomParty(random)
   const boss = bossEngine.selectRandomBoss(random)
-  const party = createFullToolkitParty(bossEngine.catalog, classIds)
+  const party = createFullToolkitParty(bossEngine.catalog, classIds, promoted)
 
   return {
-    partyStrategy: partyEngine.analyze(classIds),
+    partyStrategy: partyEngine.analyze(classIds, promoted),
     boss,
     bossGuide: bossEngine.guideFor(party, boss.key),
   }

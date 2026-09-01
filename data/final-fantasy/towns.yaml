@@ -101,3 +101,35 @@ towns:
           - haste
           - confuse
           - blizzara
+
+  - key: melmond
+    name: Melmond
+    shops:
+      - type: weapons
+        wares:
+          - crosier
+          - saber
+          - longsword
+          - falchion
+
+      - type: armor
+        wares:
+          - knights-armor
+          - silver-armlet
+          - great-helm
+          - bronze-gloves
+          - steel-gloves
+
+      - type: white-magic
+        wares:
+          - curaga
+          - life
+          - diaga
+          - healara
+
+      - type: black-magic
+        wares:
+          - firaga
+          - scourge
+          - teleport
+          - slowra

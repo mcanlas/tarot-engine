@@ -67,13 +67,20 @@ if (
   const recommender = new NextActionRecommender(provider, evaluator.evaluate)
 
   for (let occurrence = 0; occurrence < occurrences; occurrence += 1) {
+    const randomParty = partyEngine.createRandomParty()
     const party = {
       gil: 0,
-      characters: emptyCharacters(equipmentCatalogs, spellCatalogs, ...partyEngine.createRandomParty()),
+      characters: emptyCharacters(
+        equipmentCatalogs,
+        spellCatalogs,
+        strategyCatalog,
+        randomParty,
+      ),
     }
 
     console.log(`\n=== FF1 next-action run ${occurrence + 1} ===`)
     console.log(`Town: ${town.name}`)
+    console.log(`Class promotion: ${randomParty.promoted ? "yes" : "no"}`)
     console.log(`Starting party: ${
       party.characters.map((character) => character.id).join(" / ")
     }`)
@@ -122,7 +129,8 @@ if (
   console.log(`\nCompleted ${occurrences} random FF1 next-action runs.`)
 }
 
-function emptyCharacters(equipmentCatalogs, spellCatalogs, ...baseClasses) {
+function emptyCharacters(equipmentCatalogs, spellCatalogs, strategyCatalog, randomParty) {
+  const { classIds: baseClasses, promoted } = randomParty
   const duplicateClasses = new Set(
     baseClasses.filter((baseClass, index) => baseClasses.indexOf(baseClass) !== index),
   )
@@ -130,35 +138,40 @@ function emptyCharacters(equipmentCatalogs, spellCatalogs, ...baseClasses) {
 
   return baseClasses.map((baseClass) => {
     const count = (classCounts.get(baseClass) ?? 0) + 1
+    const baseJob = strategyCatalog.jobs.get(baseClass)
+    const activeJob = promoted ? strategyCatalog.jobs.get(baseJob.promotion) : baseJob
+    const label = duplicateClasses.has(baseClass) ? `${activeJob.name} ${count}` : activeJob.name
 
     classCounts.set(baseClass, count)
     return emptyCharacter(
-      duplicateClasses.has(baseClass) ? `${baseClass}-${count}` : baseClass,
+      label,
       baseClass,
+      activeJob.id,
+      promoted,
       equipmentCatalogs,
       spellCatalogs,
     )
   })
 }
 
-function emptyCharacter(id, baseClass, equipmentCatalogs, spellCatalogs) {
+function emptyCharacter(id, baseClass, activeClass, promoted, equipmentCatalogs, spellCatalogs) {
   return {
     id,
     baseClass,
-    promoted: false,
-    equipment: randomStartingEquipment(baseClass, equipmentCatalogs),
-    learnedSpells: randomStartingSpells(baseClass, spellCatalogs),
+    promoted,
+    equipment: randomStartingEquipment(baseClass, activeClass, equipmentCatalogs),
+    learnedSpells: randomStartingSpells(activeClass, spellCatalogs),
   }
 }
 
-function randomStartingEquipment(baseClass, equipmentCatalogs) {
+function randomStartingEquipment(baseClass, activeClass, equipmentCatalogs) {
   if (baseClass === "monk") {
     return {}
   }
 
   return Object.fromEntries(equipmentSlots.flatMap((slot) => {
     const legalEquipment = (equipmentCatalogs.get(slot) ?? [])
-      .filter((item) => item.canEquip.includes(baseClass))
+      .filter((item) => item.canEquip.includes(activeClass))
     if (legalEquipment.length === 0 || Math.random() < 0.5) {
       return []
     }
@@ -169,10 +182,10 @@ function randomStartingEquipment(baseClass, equipmentCatalogs) {
   }))
 }
 
-function randomStartingSpells(baseClass, spellCatalogs) {
+function randomStartingSpells(activeClass, spellCatalogs) {
   const learnedSpells = new Set()
   for (const spells of spellCatalogs.values()) {
-    const legalSpells = spells.filter((spell) => spell.learnableBy.has(baseClass))
+    const legalSpells = spells.filter((spell) => spell.learnableBy.has(activeClass))
     const spellCount = Math.min(randomInteger(4), legalSpells.length)
     for (const spell of randomSample(legalSpells, spellCount)) {
       learnedSpells.add(spell.id)

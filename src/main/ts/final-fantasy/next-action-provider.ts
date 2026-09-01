@@ -40,9 +40,11 @@ export type MagicStatus =
   | "poison"
   | "silence"
   | "sleep"
+  | "death"
 
 export type MagicEffect =
   | { readonly kind: "restore-hp"; readonly potency: number }
+  | { readonly kind: "revive"; readonly potency: number }
   | { readonly kind: "cure-status"; readonly status: MagicStatus }
   | {
       readonly kind: "damage"
@@ -60,6 +62,7 @@ export type MagicEffect =
   | { readonly kind: "lower-attack-count"; readonly accuracy: number }
   | { readonly kind: "lower-evasion"; readonly potency: number; readonly accuracy: number }
   | { readonly kind: "increase-flee" }
+  | { readonly kind: "teleport-floor" }
 
 export interface MagicDefinition {
   readonly key: string
@@ -318,6 +321,7 @@ function validateMagicMechanics(magic: MagicDefinition): void {
 
   switch (magic.effect.kind) {
     case "restore-hp":
+    case "revive":
     case "raise-defense":
     case "raise-evasion":
     case "raise-attack":
@@ -326,6 +330,7 @@ function validateMagicMechanics(magic: MagicDefinition): void {
     case "cure-status":
     case "raise-resistance":
     case "increase-flee":
+    case "teleport-floor":
       return
     case "multiply-attack-count":
       if (!Number.isFinite(magic.effect.factor) || magic.effect.factor < 1) {

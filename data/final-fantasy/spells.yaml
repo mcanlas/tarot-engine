@@ -213,6 +213,118 @@
     - offensive-magic
     - elemental
 
+- key: curaga
+  name: Curaga
+  school: white
+  level: 5
+  price: 4000
+  target: single-ally
+  effect: { kind: restore-hp, potency: 66 }
+  learnableBy:
+    - white-mage
+    - red-mage
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
+- key: life
+  name: Life
+  school: white
+  level: 5
+  price: 4000
+  target: single-ally
+  effect: { kind: revive, potency: 1 }
+  learnableBy:
+    - white-mage
+    - white-wizard
+    - red-wizard
+  attributes:
+    - healing
+
+- key: diaga
+  name: Diaga
+  school: white
+  level: 5
+  price: 4000
+  target: all-enemies
+  effect: { kind: damage, potency: 60, accuracy: 24, targetFamily: undead }
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - anti-undead
+
+- key: healara
+  name: Healara
+  school: white
+  level: 5
+  price: 4000
+  target: all-allies
+  effect: { kind: restore-hp, potency: 48 }
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - healing
+
+- key: firaga
+  name: Firaga
+  school: black
+  level: 5
+  price: 4000
+  target: all-enemies
+  effect: { kind: damage, potency: 50, accuracy: 24, element: fire }
+  learnableBy:
+    - black-mage
+    - red-mage
+    - black-wizard
+    - red-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- key: scourge
+  name: Scourge
+  school: black
+  level: 5
+  price: 4000
+  target: all-enemies
+  effect: { kind: inflict-status, status: death, accuracy: 40 }
+  learnableBy:
+    - black-mage
+    - black-wizard
+    - red-wizard
+  attributes:
+    - control-magic
+
+- key: teleport
+  name: Teleport
+  school: black
+  level: 5
+  price: 4000
+  target: all-allies
+  effect: { kind: teleport-floor }
+  learnableBy:
+    - black-wizard
+    - red-wizard
+  attributes: []
+
+- key: slowra
+  name: Slowra
+  school: black
+  level: 5
+  price: 4000
+  target: single-enemy
+  effect: { kind: lower-attack-count, accuracy: 64 }
+  learnableBy:
+    - black-mage
+    - red-mage
+    - black-wizard
+    - red-wizard
+  attributes:
+    - control-magic
+
 - key: dia
   name: Dia
   school: white
@@ -552,20 +664,6 @@
     - black-wizard
   attributes:
     - offensive-magic
-
-- key: life
-  name: Life
-  school: white
-  level: 5
-  price: 5000
-  target: single-ally
-  effect: { kind: restore-hp, potency: 1 }
-  learnableBy:
-    - white-mage
-    - white-wizard
-    - red-wizard
-  attributes:
-    - healing
 
 - key: saber
   name: Saber

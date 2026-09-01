@@ -47,6 +47,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
   monkEquipmentMultiplier: 0,
   spellEffect: Object.freeze({
     "restore-hp": 50,
+    revive: 50,
     "cure-status": 20,
     damage: 20,
     "raise-defense": 25,
@@ -58,9 +59,11 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "lower-attack-count": 20,
     "lower-evasion": 5,
     "increase-flee": 0,
+    "teleport-floor": 0,
   }),
   spellPotency: Object.freeze({
     "restore-hp": 1,
+    revive: 1,
     "cure-status": 0,
     damage: 1,
     "raise-defense": 2,
@@ -72,6 +75,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "lower-attack-count": 0,
     "lower-evasion": 0.5,
     "increase-flee": 0,
+    "teleport-floor": 0,
   }),
   spellAccuracy: 0.125,
   allEnemiesBonus: 10,
@@ -440,7 +444,11 @@ function magicResponsibility(magic: MagicDefinition): "damage" | "recovery" | "s
 
     return "damage"
   }
-  if (magic.effect.kind === "restore-hp" || magic.effect.kind === "cure-status") {
+  if (
+    magic.effect.kind === "restore-hp"
+    || magic.effect.kind === "revive"
+    || magic.effect.kind === "cure-status"
+  ) {
 
     return "recovery"
   }
@@ -474,7 +482,7 @@ function magicCapabilityKey(magic: MagicDefinition): string {
   if (effect.kind === "raise-resistance") {
     discriminators.push(effect.element)
   }
-  if (effect.kind === "restore-hp") {
+  if (effect.kind === "restore-hp" || effect.kind === "revive") {
     discriminators.push(magic.target)
   }
 

@@ -158,22 +158,29 @@ test("accepts every supported party size and rejects invalid input", () => {
 
 test("creates random parties with equally sized probability ranges", () => {
   const values = [
-    0, 0,
-    0.25, 0.2, 0.4,
-    0.5, 0.6, 0.7, 0.9,
-    0.75, 0, 0.2, 0.4, 0.999999,
+    0, 0, 0,
+    0.25, 0.2, 0.4, 0.6,
+    0.5, 0.6, 0.7, 0.9, 0.49,
+    0.75, 0, 0.2, 0.4, 0.999999, 0.5,
   ]
   const random = (): number => values.shift() ?? 0
 
-  assert.deepEqual(engine.createRandomParty(random), ["warrior"])
-  assert.deepEqual(engine.createRandomParty(random), ["thief", "monk"])
-  assert.deepEqual(engine.createRandomParty(random), ["red-mage", "white-mage", "black-mage"])
-  assert.deepEqual(engine.createRandomParty(random), [
-    "warrior",
-    "thief",
-    "monk",
-    "black-mage",
-  ])
+  assert.deepEqual(engine.createRandomParty(random), {
+    classIds: ["warrior"],
+    promoted: false,
+  })
+  assert.deepEqual(engine.createRandomParty(random), {
+    classIds: ["thief", "monk"],
+    promoted: true,
+  })
+  assert.deepEqual(engine.createRandomParty(random), {
+    classIds: ["red-mage", "white-mage", "black-mage"],
+    promoted: false,
+  })
+  assert.deepEqual(engine.createRandomParty(random), {
+    classIds: ["warrior", "thief", "monk", "black-mage"],
+    promoted: true,
+  })
 })
 
 test("rejects values outside the random source contract", () => {
@@ -183,7 +190,7 @@ test("rejects values outside the random source contract", () => {
 })
 
 test("pairs each random party with a random boss and a party-specific guide", () => {
-  const values = [0, 0.999999, 0.52]
+  const values = [0, 0.999999, 0.5, 0.52]
   const strategy = createRandomPartyBossStrategy(
     engine,
     bossEngine,
@@ -192,16 +199,17 @@ test("pairs each random party with a random boss and a party-specific guide", ()
   const rendered = renderBossStrategy(strategy)
 
   assert.deepEqual(strategy.partyStrategy.party, ["black-mage"])
+  assert.equal(strategy.partyStrategy.promoted, true)
   assert.equal(strategy.boss.key, "kraken")
   assert.match(rendered, /^Boss: Kraken\nOpening:/)
-  assert.match(rendered, /Black Mage exploit Kraken's lightning weakness with Thunder/)
+  assert.match(rendered, /Black Wizard exploit Kraken's lightning weakness with Thunder/)
   assert.doesNotMatch(rendered, /White Mage|cast Dia/)
 })
 
 test("renders console output without exposing rule mechanics", () => {
   const rendered = engine.render(engine.analyze(["red-mage"]))
 
-  assert.match(rendered, /^Party \(front first\): Red Mage\nStrengths:/)
+  assert.match(rendered, /^Party \(front first; class promotion: no\): Red Mage\nStrengths:/)
   assert.match(rendered, /Physical and magical offense/)
   assert.match(rendered, /Weaknesses:/)
   assert.match(rendered, /no backup action/)
@@ -209,9 +217,15 @@ test("renders console output without exposing rule mechanics", () => {
 
   const output: string[] = []
   runConsole(engine, ["black-mage"], (line) => output.push(line))
-  assert.match(output[0], /^Party \(front first\): Black Mage\nStrengths:/)
+  assert.match(output[0], /^Party \(front first; class promotion: no\): Black Mage\nStrengths:/)
   assert.match(output[0], /Without a conventional healer/)
   assert.match(output[0], /no backup action/)
+
+  const promoted = engine.render(engine.analyze(["warrior", "black-mage"], true))
+  assert.match(
+    promoted,
+    /^Party \(front first; class promotion: yes\): Knight \/ Black Wizard\nStrengths:/,
+  )
 })
 
 test("rejects invalid or unreachable YAML rule definitions", async () => {

@@ -35,7 +35,7 @@ const adviceFor = (
 
 test("loads and validates the complete YAML strategy catalog", () => {
   assert.equal(engine.catalog.jobs.size, 12)
-  assert.equal(engine.catalog.spells.size, 38)
+  assert.equal(engine.catalog.spells.size, 45)
   assert.equal(engine.bosses.length, 18)
   assert.equal(engine.ruleCount, 71)
   assert.deepEqual(

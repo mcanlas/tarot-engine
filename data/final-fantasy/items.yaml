@@ -107,6 +107,24 @@ items:
     criticalRate: 12
     canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
 
+  - key: longsword
+    name: Longsword
+    slot: weapon
+    price: 1200
+    attack: 20
+    accuracy: 10
+    criticalRate: 13
+    canEquip: [warrior, knight, ninja, red-mage, red-wizard]
+
+  - key: falchion
+    name: Falchion
+    slot: weapon
+    price: 360
+    attack: 15
+    accuracy: 10
+    criticalRate: 15
+    canEquip: [warrior, knight, thief, ninja, red-mage, red-wizard]
+
   - key: clothes
     name: Clothes
     slot: body
@@ -185,4 +203,44 @@ items:
     price: 80
     defense: 3
     weight: 3
+    canEquip: [warrior, knight, ninja]
+
+  - key: knights-armor
+    name: Knight's Armor
+    slot: body
+    price: 36000
+    defense: 34
+    weight: 33
+    canEquip: [warrior, knight]
+
+  - key: silver-armlet
+    name: Silver Armlet
+    slot: body
+    price: 4000
+    defense: 15
+    weight: 1
+    canEquip: [warrior, knight, thief, ninja, monk, master, red-mage, red-wizard, white-mage, white-wizard, black-mage, black-wizard]
+
+  - key: great-helm
+    name: Great Helm
+    slot: head
+    price: 360
+    defense: 5
+    weight: 5
+    canEquip: [warrior, knight, ninja]
+
+  - key: bronze-gloves
+    name: Bronze Gloves
+    slot: arms
+    price: 160
+    defense: 2
+    weight: 3
+    canEquip: [warrior, knight, ninja]
+
+  - key: steel-gloves
+    name: Steel Gloves
+    slot: arms
+    price: 600
+    defense: 4
+    weight: 5
     canEquip: [warrior, knight, ninja]

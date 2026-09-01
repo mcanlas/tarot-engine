@@ -90,6 +90,30 @@ test("loads seeded town shops", async () => {
           },
         ],
       },
+      {
+        key: "melmond",
+        name: "Melmond",
+        shops: [
+          {
+            type: "weapons",
+            wares: ["crosier", "saber", "longsword", "falchion"],
+          },
+          {
+            type: "armor",
+            wares: [
+              "knights-armor", "silver-armlet", "great-helm", "bronze-gloves", "steel-gloves",
+            ],
+          },
+          {
+            type: "white-magic",
+            wares: ["curaga", "life", "diaga", "healara"],
+          },
+          {
+            type: "black-magic",
+            wares: ["firaga", "scourge", "teleport", "slowra"],
+          },
+        ],
+      },
     ],
   })
 })
@@ -116,6 +140,8 @@ test("seeds catalog records for every town ware key", async () => {
     "dagger",
     "crosier",
     "saber",
+    "longsword",
+    "falchion",
     "clothes",
     "leather-armor",
     "chain-mail",
@@ -126,6 +152,11 @@ test("seeds catalog records for every town ware key", async () => {
     "iron-shield",
     "leather-cap",
     "helm",
+    "knights-armor",
+    "silver-armlet",
+    "great-helm",
+    "bronze-gloves",
+    "steel-gloves",
   ])
   assert.deepEqual([...magicKeys], [
     "cure",
@@ -142,6 +173,14 @@ test("seeds catalog records for every town ware key", async () => {
     "sleepra",
     "confuse",
     "blizzara",
+    "curaga",
+    "life",
+    "diaga",
+    "healara",
+    "firaga",
+    "scourge",
+    "teleport",
+    "slowra",
     "dia",
     "fire",
     "blizzard",
@@ -164,7 +203,6 @@ test("seeds catalog records for every town ware key", async () => {
     "protera",
     "invisira",
     "flare",
-    "life",
     "saber",
   ])
   for (const town of definitions.towns) {
@@ -251,9 +289,46 @@ test("resolves ordinal town access through the selected town", async () => {
       },
     ],
   })
+  assert.deepEqual(cumulativeTown(definitions, "melmond"), {
+    key: "melmond",
+    name: "Melmond",
+    shops: [
+      {
+        type: "weapons",
+        wares: [
+          "nunchaku", "knife", "staff", "rapier", "hammer", "broadsword", "battle-axe",
+          "scimitar", "iron-nunchaku", "dagger", "crosier", "saber", "longsword", "falchion",
+        ],
+      },
+      {
+        type: "armor",
+        wares: [
+          "clothes", "leather-armor", "chain-mail", "iron-armor", "leather-shield", "gloves",
+          "copper-armlet", "iron-shield", "leather-cap", "helm", "knights-armor",
+          "silver-armlet", "great-helm", "bronze-gloves", "steel-gloves",
+        ],
+      },
+      {
+        type: "white-magic",
+        wares: [
+          "cure", "dia", "protect", "blink", "blindna", "silence", "nulshock", "invis",
+          "cura", "diara", "nulblaze", "heal", "poisona", "fear", "nulfrost", "vox",
+          "curaga", "life", "diaga", "healara",
+        ],
+      },
+      {
+        type: "black-magic",
+        wares: [
+          "fire", "sleep", "focus", "thunder", "blizzard", "dark", "temper", "slow",
+          "fira", "hold", "thundara", "focara", "sleepra", "haste", "confuse", "blizzara",
+          "firaga", "scourge", "teleport", "slowra",
+        ],
+      },
+    ],
+  })
   assert.throws(
-    () => cumulativeTown(definitions, "melmond"),
-    /melmond is missing from the Final Fantasy town catalog/,
+    () => cumulativeTown(definitions, "crescent-lake"),
+    /crescent-lake is missing from the Final Fantasy town catalog/,
   )
 })
 

@@ -15,7 +15,13 @@ export interface PartyObservation {
 
 export interface PartyStrategy {
   party: readonly string[]
+  promoted: boolean
   observations: readonly PartyObservation[]
+}
+
+export interface RandomPartyState {
+  classIds: readonly string[]
+  promoted: boolean
 }
 
 export type PartyStrategyConditionDefinition =
@@ -39,6 +45,7 @@ export interface PartyStrategyRuleDefinition {
 }
 
 interface PartyMemberProfile {
+  baseJob: Job
   job: Job
   capabilities: ReadonlySet<CapabilityId>
 }
@@ -73,31 +80,34 @@ export class PartyStrategyEngine {
     this.ruleCount = this.#rules.length
   }
 
-  analyze(classNames: readonly string[]): PartyStrategy {
+  analyze(classNames: readonly string[], promoted = false): PartyStrategy {
     if (classNames.length < 1 || classNames.length > 4) {
       throw new Error("Expected 1 to 4 character classes.")
     }
 
-    const party = classNames.map((className) => this.#profileFor(className))
+    const party = classNames.map((className) => this.#profileFor(className, promoted))
     const observations = this.#rules
       .filter((rule) => rule.matches(party))
       .map(({ id: ruleId, kind, statement }) => ({ ruleId, kind, statement }))
 
-    return { party: party.map((member) => member.job.id), observations }
+    return { party: party.map((member) => member.baseJob.id), promoted, observations }
   }
 
-  createRandomParty(random: () => number = Math.random): readonly string[] {
+  createRandomParty(random: () => number = Math.random): RandomPartyState {
     const partySize = randomIndex(4, random) + 1
-
-    return Array.from(
+    const classIds = Array.from(
       { length: partySize },
       () => this.classIds[randomIndex(this.classIds.length, random)] ?? "",
     )
+
+    return { classIds, promoted: randomIndex(2, random) === 1 }
   }
 
   render(strategy: PartyStrategy): string {
     const lines = [
-      `Party (front first): ${strategy.party.map((id) => this.#requireStartingJob(id).name).join(" / ")}`,
+      `Party (front first; class promotion: ${strategy.promoted ? "yes" : "no"}): ${strategy.party
+        .map((id) => this.#activeJob(id, strategy.promoted).name)
+        .join(" / ")}`,
     ]
 
     for (const kind of ["strength", "weakness"] as const) {
@@ -111,8 +121,9 @@ export class PartyStrategyEngine {
     return lines.join("\n")
   }
 
-  #profileFor(id: string): PartyMemberProfile {
-    const job = this.#requireStartingJob(id)
+  #profileFor(id: string, promoted: boolean): PartyMemberProfile {
+    const baseJob = this.#requireStartingJob(id)
+    const job = this.#activeJob(id, promoted)
     const capabilities = new Set(job.capabilities)
 
     const spellCapabilities = [
@@ -134,7 +145,25 @@ export class PartyStrategyEngine {
       }
     }
 
-    return { job, capabilities }
+    return { baseJob, job, capabilities }
+  }
+
+  #activeJob(id: string, promoted: boolean): Job {
+    const baseJob = this.#requireStartingJob(id)
+    if (!promoted) {
+
+      return baseJob
+    }
+    const promotion = baseJob.promotion
+    if (promotion === undefined) {
+      throw new Error(`Character class ${baseJob.id} does not have a promotion`)
+    }
+    const activeJob = this.#catalog.jobs.get(promotion)
+    if (activeJob === undefined) {
+      throw new Error(`Unknown promotion for ${baseJob.id}: ${baseJob.promotion}`)
+    }
+
+    return activeJob
   }
 
   #requireStartingJob(id: string): Job {
@@ -186,7 +215,7 @@ function buildCondition(
     }
     const atLeast = requireCount(definition.atLeast)
 
-    return (party) => party.filter((member) => member.job.id === definition.job).length >= atLeast
+    return (party) => party.filter((member) => member.baseJob.id === definition.job).length >= atLeast
   }
   if ("capability" in definition) {
     const capability = requireCapability(definition.capability)
@@ -202,13 +231,13 @@ function buildCondition(
   if ("distinctJobsAtLeast" in definition) {
     const count = requireCount(definition.distinctJobsAtLeast)
 
-    return (party) => new Set(party.map((member) => member.job.id)).size >= count
+    return (party) => new Set(party.map((member) => member.baseJob.id)).size >= count
   }
   if ("repeatedJobAtLeast" in definition) {
     const count = requireCount(definition.repeatedJobAtLeast)
 
     return (party) => party.some((member) =>
-      party.filter((candidate) => candidate.job.id === member.job.id).length >= count,
+      party.filter((candidate) => candidate.baseJob.id === member.baseJob.id).length >= count,
     )
   }
   if ("sameMemberCapabilities" in definition) {

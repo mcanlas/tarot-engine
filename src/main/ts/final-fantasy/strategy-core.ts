@@ -323,13 +323,16 @@ export function createParty(
 export function createFullToolkitParty(
   catalog: StrategyCatalog,
   classIds: readonly string[],
+  promoted = false,
 ): Party {
   const members = classIds.map((classId) => {
+    const baseJob = requireJob(catalog, classId)
+    const jobId = promoted && baseJob.promotion !== undefined ? baseJob.promotion : classId
     const learnedSpells = [...catalog.spells.values()]
-      .filter((spell) => spell.learnableBy.has(classId))
+      .filter((spell) => spell.learnableBy.has(jobId))
       .map((spell) => spell.id)
 
-    return createPartyMember(catalog, classId, learnedSpells)
+    return createPartyMember(catalog, jobId, learnedSpells)
   })
 
   return createParty(members, ["potion"])
