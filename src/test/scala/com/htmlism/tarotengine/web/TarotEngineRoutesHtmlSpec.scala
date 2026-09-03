@@ -6,8 +6,10 @@ import weaver.*
 
 import com.htmlism.tarotengine.chronotrigger.Chapter
 import com.htmlism.tarotengine.chronotrigger.ChapterState
+import com.htmlism.tarotengine.chronotrigger.Character
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
 import com.htmlism.tarotengine.chronotrigger.FlagCondition
+import com.htmlism.tarotengine.chronotrigger.RockColor
 import com.htmlism.tarotengine.chronotrigger.Roster
 import com.htmlism.tarotengine.chronotrigger.RosterChange
 import com.htmlism.tarotengine.chronotrigger.SecretTripleTech
@@ -15,6 +17,8 @@ import com.htmlism.tarotengine.finalfantasy.FinalFantasyDynamicStrategyPage
 import com.htmlism.tarotengine.finalfantasy.FinalFantasyVIPage
 
 object TarotEngineRoutesHtmlSpec extends FunSuite:
+  import Character.*
+
   test("index renders one linked tile for each game series"):
     val html = TarotEngineRoutesHtml.index.render
 
@@ -124,14 +128,14 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
   )
 
   private def render(
-      selectedParty: List[String],
+      selectedParty: List[Character],
       secretTripleTechs: List[SecretTripleTech]
   ): String =
     render(chapter, selectedParty, secretTripleTechs, Map.empty)
 
   private def render(
       renderedChapter: Chapter,
-      selectedParty: List[String],
+      selectedParty: List[Character],
       secretTripleTechs: List[SecretTripleTech],
       flags: Map[String, Boolean]
   ): String =
@@ -142,8 +146,8 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     TarotEngineRoutesHtml.chronoTrigger(data).render
 
   test("secret triple tech parties render a compact rock line with the tech name as hover text"):
-    val tech        = SecretTripleTech("Omega Flare", ("Lucca", "Robo", "Magus"), "Blue")
-    val html        = render(List("Magus", "Lucca", "Robo"), List(tech))
+    val tech        = SecretTripleTech("Omega Flare", (Lucca, Robo, Magus), RockColor.Blue)
+    val html        = render(List(Magus, Lucca, Robo), List(tech))
     val sectionHtml = html.drop(html.indexOf("<section"))
 
     expect(html.contains("rock-designation rock-blue")) &&
@@ -156,7 +160,7 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     expect(html.contains("secret-triple-tech-party"))
 
   test("base triple tech parties render a non-rock designation"):
-    val html = render(List("Chrono", "Marle", "Lucca"), List.empty)
+    val html = render(List(Crono, Marle, Lucca), List.empty)
 
     expect(html.contains("triple-tech-base")) &&
     expect(html.contains("Triple Tech")) &&
@@ -166,12 +170,12 @@ object TarotEngineRoutesHtmlSpec extends FunSuite:
     val condition       = FlagCondition(NonEmptyMap.one("save-chrono", true))
     val chapterWithFlag = chapter.copy(
       completionChanges = Some(
-        NonEmptyList.one(RosterChange.Add("Chrono", Some(condition)))
+        NonEmptyList.one(RosterChange.Add(Crono, Some(condition)))
       )
     )
     val html = render(
       chapterWithFlag,
-      List("Chrono", "Marle", "Lucca"),
+      List(Crono, Marle, Lucca),
       List.empty,
       Map("save-chrono" -> true)
     )

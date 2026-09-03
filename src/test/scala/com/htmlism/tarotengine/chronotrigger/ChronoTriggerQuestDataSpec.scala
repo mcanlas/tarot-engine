@@ -6,6 +6,8 @@ import cats.data.NonEmptyList
 import cats.data.NonEmptyMap
 import weaver.*
 
+import com.htmlism.tarotengine.chronotrigger.Character.*
+
 object ChronoTriggerQuestDataSpec extends FunSuite:
   private def when(flag: String, value: Boolean): Option[FlagCondition] =
     Some(FlagCondition(NonEmptyMap.one(flag, value)))
@@ -27,11 +29,11 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
     val chapters = List(
       chapter(
         "The Millennial Fair",
-        RosterChange.Pin("Crono"),
-        RosterChange.Add("Marle"),
-        RosterChange.Add("Lucca"),
-        RosterChange.Add("Frog"),
-        RosterChange.Add("Robo")
+        RosterChange.Pin(Crono),
+        RosterChange.Add(Marle),
+        RosterChange.Add(Lucca),
+        RosterChange.Add(Frog),
+        RosterChange.Add(Robo)
       ),
       chapter("The Queen Returns")
     )
@@ -47,17 +49,17 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
   test("simulate shuffles side quests and selects a party for each one"):
     val sideQuests = NonEmptyList.of(
       SideQuest("The Sunstone", None),
-      SideQuest("The End of Ozzie", Some("Robo")),
+      SideQuest("The End of Ozzie", Some(Robo)),
       SideQuest("Robo's Origins", None)
     )
     val chapters = List(
       chapter(
         "The Millennial Fair",
-        RosterChange.Pin("Crono"),
-        RosterChange.Add("Marle"),
-        RosterChange.Add("Lucca"),
-        RosterChange.Add("Frog"),
-        RosterChange.Add("Robo")
+        RosterChange.Pin(Crono),
+        RosterChange.Add(Marle),
+        RosterChange.Add(Lucca),
+        RosterChange.Add(Frog),
+        RosterChange.Add(Robo)
       ),
       Chapter(
         "The Fated Hour",
@@ -75,17 +77,17 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
     val validParties    = forEach(sideQuestStates): sideQuestState =>
       expect(sideQuestState.selectedParty.size <= 3) &&
         exists(sideQuestState.selectedParty): selected =>
-          expect.same("Crono", selected)
+          expect.same(Crono, selected)
     val roboRequired = exists(sideQuestStates): sideQuestState =>
       val roboPinned = exists(sideQuestState.roster.pinned): pinned =>
-        expect.same("Robo", pinned)
+        expect.same(Robo, pinned)
       val roboSelected = exists(sideQuestState.selectedParty): selected =>
-        expect.same("Robo", selected)
+        expect.same(Robo, selected)
 
       expect.same("The End of Ozzie", sideQuestState.title) && roboPinned && roboSelected
     val roboNotRequiredElsewhere = forEach(otherSideQuests): sideQuestState =>
       forEach(sideQuestState.roster.pinned): pinned =>
-        expect(pinned != "Robo")
+        expect(pinned != Robo)
 
     expect.same(sideQuests.toList.map(_.title).sorted, sideQuestStates.map(_.title).sorted) &&
     expect(sideQuests.toList.map(_.title) != sideQuestStates.map(_.title)) &&
@@ -95,15 +97,15 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
   test("simulate applies chapter completion changes whose flag conditions match"):
     val chapters = List(
-      chapter("The Millennial Fair", RosterChange.Pin("Chrono")),
+      chapter("The Millennial Fair", RosterChange.Pin(Crono)),
       Chapter(
         "The New King",
         bosses            = None,
         partyRestrictions = None,
         sideQuests        = None,
-        rosterChanges     = Some(NonEmptyList.one(RosterChange.Remove("Chrono"))),
+        rosterChanges     = Some(NonEmptyList.one(RosterChange.Remove(Crono))),
         completionChanges = Some(
-          NonEmptyList.one(RosterChange.Add("Magus", when("fight-magus", false)))
+          NonEmptyList.one(RosterChange.Add(Magus, when("fight-magus", false)))
         )
       ),
       Chapter(
@@ -113,7 +115,7 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
         sideQuests        = None,
         rosterChanges     = None,
         completionChanges = Some(
-          NonEmptyList.one(RosterChange.Add("Chrono", when("save-chrono", true)))
+          NonEmptyList.one(RosterChange.Add(Crono, when("save-chrono", true)))
         )
       ),
       chapter("The Fated Hour")
@@ -123,10 +125,10 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
     expect.same(flags, result.flags) &&
     expect.same(List.empty, result.chapterStates(1).roster.available) &&
-    expect.same(List("Magus"), result.chapterStates(1).rosterAfterCompletion.available) &&
-    expect.same(List("Magus"), result.chapterStates(2).roster.available) &&
-    expect.same(List("Magus", "Chrono"), result.chapterStates(2).rosterAfterCompletion.available) &&
-    expect.same(List("Magus", "Chrono"), result.chapterStates(3).roster.available)
+    expect.same(List(Magus), result.chapterStates(1).rosterAfterCompletion.available) &&
+    expect.same(List(Magus), result.chapterStates(2).roster.available) &&
+    expect.same(List(Magus, Crono), result.chapterStates(2).rosterAfterCompletion.available) &&
+    expect.same(List(Magus, Crono), result.chapterStates(3).roster.available)
 
   test("simulate skips chapter completion changes whose flag conditions do not match"):
     val chapters = List(
@@ -137,7 +139,7 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
         sideQuests        = None,
         rosterChanges     = None,
         completionChanges = Some(
-          NonEmptyList.one(RosterChange.Add("Magus", when("fight-magus", false)))
+          NonEmptyList.one(RosterChange.Add(Magus, when("fight-magus", false)))
         )
       ),
       Chapter(
@@ -147,7 +149,7 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
         sideQuests        = None,
         rosterChanges     = None,
         completionChanges = Some(
-          NonEmptyList.one(RosterChange.Add("Chrono", when("save-chrono", true)))
+          NonEmptyList.one(RosterChange.Add(Crono, when("save-chrono", true)))
         )
       )
     )
@@ -158,16 +160,16 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
       expect(chapterState.roster.available.isEmpty)
 
   test("a matching secret party receives its rock designation regardless of order"):
-    val tech = SecretTripleTech("Omega Flare", ("Lucca", "Robo", "Magus"), "Blue")
+    val tech = SecretTripleTech("Omega Flare", (Lucca, Robo, Magus), RockColor.Blue)
 
     expect.same(
       Some(TripleTechDesignation.Secret(tech)),
-      TripleTechDesignation.forParty(List("Magus", "Lucca", "Robo"), List(tech))
+      TripleTechDesignation.forParty(List(Magus, Lucca, Robo), List(tech))
     )
 
-  test("a party with Chrono and without Magus receives the base triple tech designation"):
+  test("a party with Crono and without Magus receives the base triple tech designation"):
     val designation = TripleTechDesignation.forParty(
-      List("Chrono", "Marle", "Lucca"),
+      List(Crono, Marle, Lucca),
       List.empty
     )
 
@@ -175,7 +177,7 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
   test("parties smaller than three do not receive a triple tech designation"):
     val designation = TripleTechDesignation.forParty(
-      List("Chrono", "Marle"),
+      List(Crono, Marle),
       List.empty
     )
 
@@ -183,7 +185,7 @@ object ChronoTriggerQuestDataSpec extends FunSuite:
 
   test("a non-secret party containing both Chrono and Magus has no triple tech"):
     val designation = TripleTechDesignation.forParty(
-      List("Chrono", "Magus", "Marle"),
+      List(Crono, Magus, Marle),
       List.empty
     )
 

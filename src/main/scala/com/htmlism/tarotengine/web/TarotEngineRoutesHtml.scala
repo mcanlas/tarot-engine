@@ -4,7 +4,9 @@ import scalatags.Text
 import scalatags.Text.all.*
 
 import com.htmlism.tarotengine.chronotrigger.ChapterState
+import com.htmlism.tarotengine.chronotrigger.Character
 import com.htmlism.tarotengine.chronotrigger.ChronoTriggerQuestData
+import com.htmlism.tarotengine.chronotrigger.RockColor
 import com.htmlism.tarotengine.chronotrigger.Roster
 import com.htmlism.tarotengine.chronotrigger.SecretTripleTech
 import com.htmlism.tarotengine.chronotrigger.SideQuestState
@@ -205,33 +207,33 @@ object TarotEngineRoutesHtml:
           tiles
         )
 
-  private def characterTheme(character: String): String =
+  private def characterTheme(character: Character): String =
     character match
-      case "Chrono" => "chrono-lightning"
-      case "Marle"  => "marle-ice"
-      case "Lucca"  => "lucca-fire"
-      case "Frog"   => "frog-forest"
-      case "Robo"   => "robo-tech"
-      case "Ayla"   => "ayla-physical"
-      case "Magus"  => "magus-shadow"
+      case Character.Crono => "chrono-lightning"
+      case Character.Marle => "marle-ice"
+      case Character.Lucca => "lucca-fire"
+      case Character.Frog  => "frog-forest"
+      case Character.Robo  => "robo-tech"
+      case Character.Ayla  => "ayla-physical"
+      case Character.Magus => "magus-shadow"
 
-  private def characterPill(character: String): Text.TypedTag[String] =
-    span(cls := s"character-pill ${characterTheme(character)}")(character)
+  private def characterPill(character: Character): Text.TypedTag[String] =
+    span(cls := s"character-pill ${characterTheme(character)}")(character.toString)
 
-  private def characterList(characters: List[String]): Text.TypedTag[String] =
+  private def characterList(characters: List[Character]): Text.TypedTag[String] =
     if characters.isEmpty then span(cls := "empty-roster")("none")
     else
       span(cls := "character-list")(
         characters.map(characterPill)
       )
 
-  private def rockTheme(color: String): String =
+  private def rockTheme(color: RockColor): String =
     color match
-      case "Black"  => "rock-black"
-      case "Gold"   => "rock-gold"
-      case "Blue"   => "rock-blue"
-      case "White"  => "rock-white"
-      case "Silver" => "rock-silver"
+      case RockColor.Black  => "rock-black"
+      case RockColor.Gold   => "rock-gold"
+      case RockColor.Blue   => "rock-blue"
+      case RockColor.White  => "rock-white"
+      case RockColor.Silver => "rock-silver"
 
   private def secretTripleTechRock(tech: SecretTripleTech): Text.TypedTag[String] =
     span(
@@ -239,11 +241,11 @@ object TarotEngineRoutesHtml:
       attr("title") := tech.name
     )(
       span(cls := "rock-facet", attr("aria-hidden") := "true")("◆"),
-      span(cls := "rock-name")(s"${tech.rockColor} Rock")
+      span(cls := "rock-name")(s"${tech.rockColor.toString} Rock")
     )
 
   private def tripleTechDesignation(
-      selectedParty: List[String],
+      selectedParty: List[Character],
       secretTripleTechs: List[SecretTripleTech]
   ): Option[Text.TypedTag[String]] =
     val designation =
@@ -277,7 +279,7 @@ object TarotEngineRoutesHtml:
 
   private def partyProgression(
       roster: Roster,
-      selectedParty: List[String]
+      selectedParty: List[Character]
   ): Text.TypedTag[String] =
     val pinned       = roster.pinned
     val selected     = selectedParty.filterNot(pinned.contains)
@@ -295,7 +297,7 @@ object TarotEngineRoutesHtml:
 
   private def partyTable(
       roster: Roster,
-      selectedParty: List[String]
+      selectedParty: List[Character]
   ): Text.TypedTag[String] =
     val partyHeading =
       if selectedParty.size > roster.pinned.size then "Selected Party"

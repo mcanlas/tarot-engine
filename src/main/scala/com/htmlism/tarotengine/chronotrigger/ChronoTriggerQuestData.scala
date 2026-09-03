@@ -33,7 +33,7 @@ object ChronoTriggerQuestData:
           .forall:
             case (name, expected) => flags.get(name).contains(expected)
 
-  private def pin(roster: Roster, char: String): Roster =
+  private def pin(roster: Roster, char: Character): Roster =
     roster.copy(
       pinned    = (roster.pinned :+ char).distinct,
       available = roster.available.filterNot(_ == char)
@@ -81,7 +81,7 @@ object ChronoTriggerQuestData:
       ._2
       .reverse
 
-  private def selectParty(roster: Roster): Rng[List[String]] =
+  private def selectParty(roster: Roster): Rng[List[Character]] =
     val openSlots = (3 - roster.pinned.size).max(0)
 
     Rng

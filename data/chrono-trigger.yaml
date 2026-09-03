@@ -37,7 +37,7 @@ secretTripleTechs:
 chapters:
 - title: The Millennial Fair
   rosterChanges:
-    - pin: Chrono
+    - pin: Crono
     - pin: Marle
 - title: The Queen Returns
   rosterChanges:
@@ -80,14 +80,14 @@ chapters:
 - title: Lavos Beckons
 - title: The New King
   rosterChanges:
-    - remove: Chrono
+    - remove: Crono
   completionChanges:
     - add: Magus
       when:
         fight-magus: false
 - title: The Time Egg
   completionChanges:
-    - add: Chrono
+    - add: Crono
       when:
         save-chrono: true
 - title: The Fated Hour

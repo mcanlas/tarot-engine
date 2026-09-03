@@ -8,7 +8,7 @@ object TripleTechDesignation:
   case object Base extends TripleTechDesignation
 
   def forParty(
-      selectedParty: List[String],
+      selectedParty: List[Character],
       secretTripleTechs: List[SecretTripleTech]
   ): Option[TripleTechDesignation] =
     Option
@@ -18,5 +18,5 @@ object TripleTechDesignation:
             tech.characters.toList.toSet == selectedParty.toSet
           .map(Secret.apply)
           .orElse:
-            Option.when(selectedParty.contains("Chrono") && !selectedParty.contains("Magus"))(Base)
+            Option.when(selectedParty.contains(Character.Crono) && !selectedParty.contains(Character.Magus))(Base)
       .flatten

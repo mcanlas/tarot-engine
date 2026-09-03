@@ -6,28 +6,28 @@ sealed trait RosterChange:
   def when: Option[FlagCondition]
 
 object RosterChange:
-  final case class Pin(char: String, when: Option[FlagCondition]) extends RosterChange
+  final case class Pin(char: Character, when: Option[FlagCondition]) extends RosterChange
 
   object Pin:
-    def apply(char: String): Pin =
+    def apply(char: Character): Pin =
       Pin(char, None)
 
-  final case class Unpin(char: String, when: Option[FlagCondition]) extends RosterChange
+  final case class Unpin(char: Character, when: Option[FlagCondition]) extends RosterChange
 
   object Unpin:
-    def apply(char: String): Unpin =
+    def apply(char: Character): Unpin =
       Unpin(char, None)
 
-  final case class Remove(char: String, when: Option[FlagCondition]) extends RosterChange
+  final case class Remove(char: Character, when: Option[FlagCondition]) extends RosterChange
 
   object Remove:
-    def apply(char: String): Remove =
+    def apply(char: Character): Remove =
       Remove(char, None)
 
-  final case class Add(char: String, when: Option[FlagCondition]) extends RosterChange
+  final case class Add(char: Character, when: Option[FlagCondition]) extends RosterChange
 
   object Add:
-    def apply(char: String): Add =
+    def apply(char: Character): Add =
       Add(char, None)
 
   given Decoder[RosterChange] = Decoder.instance: cursor =>
@@ -35,8 +35,8 @@ object RosterChange:
       .get[Option[FlagCondition]]("when")
       .flatMap: when =>
         cursor
-          .get[String]("pin")
+          .get[Character]("pin")
           .map(Pin(_, when))
-          .orElse(cursor.get[String]("unpin").map(Unpin(_, when)))
-          .orElse(cursor.get[String]("remove").map(Remove(_, when)))
-          .orElse(cursor.get[String]("add").map(Add(_, when)))
+          .orElse(cursor.get[Character]("unpin").map(Unpin(_, when)))
+          .orElse(cursor.get[Character]("remove").map(Remove(_, when)))
+          .orElse(cursor.get[Character]("add").map(Add(_, when)))
