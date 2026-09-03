@@ -6,7 +6,7 @@ object Scala3Plugin extends AutoPlugin {
     AllRequirements
 
   override val buildSettings: Seq[Setting[?]] = Seq(
-    scalaVersion := "3.8.4"
+    scalaVersion := "3.9.0"
   )
 
   override val projectSettings: Seq[Setting[?]] = Seq(
