@@ -399,7 +399,40 @@ test("loads explicit seeded magic mechanics", async () => {
         target: "single-enemy",
         effect: { kind: "damage", potency: 60, accuracy: 24 },
       },
-      { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 20 } }
+      { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 20 } },
+      { key: "curaja", target: "single-ally", effect: { kind: "restore-hp", potency: 100 } },
+      {
+        key: "diaja",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 80, accuracy: 48, targetFamily: "undead" },
+      },
+      { key: "healaga", target: "all-allies", effect: { kind: "restore-hp", potency: 48 } },
+      {
+        key: "blizzaga",
+        target: "all-enemies",
+        effect: { kind: "damage", potency: 70, accuracy: 24, element: "ice" },
+      },
+      {
+        key: "break",
+        target: "single-enemy",
+        effect: { kind: "inflict-status", status: "petrification", accuracy: 64 },
+      },
+      {
+        key: "blind",
+        target: "single-enemy",
+        effect: { kind: "inflict-status", status: "darkness", maximumTargetHp: 300 },
+      },
+      { key: "full-life", target: "single-ally", effect: { kind: "revive", potency: 100 } },
+      { key: "nulall", target: "single-ally", effect: { kind: "raise-magic-resistance", potency: 50 } },
+      { key: "holy", target: "all-enemies", effect: { kind: "damage", potency: 100, accuracy: 107 } },
+      { key: "dispel", target: "single-enemy", effect: { kind: "remove-resistance" } },
+      { key: "warp", target: "all-enemies", effect: { kind: "banish-enemy" } },
+      {
+        key: "stop",
+        target: "all-enemies",
+        effect: { kind: "inflict-status", status: "paralysis", accuracy: 48 },
+      },
+      { key: "kill", target: "single-enemy", effect: { kind: "inflict-status", status: "death", accuracy: 0 } },
     ],
   )
 })

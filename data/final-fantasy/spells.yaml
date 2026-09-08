@@ -2,6 +2,7 @@
   name: Cure
   school: white
   level: 1
+  sortOrder: 1
   price: 50
   target: single-ally
   effect: { kind: restore-hp, potency: 16 }
@@ -18,6 +19,7 @@
   name: Heal
   school: white
   level: 3
+  sortOrder: 4
   price: 1000
   target: all-allies
   effect: { kind: restore-hp, potency: 12 }
@@ -31,6 +33,7 @@
   name: Cura
   school: white
   level: 3
+  sortOrder: 1
   price: 1000
   target: single-ally
   effect: { kind: restore-hp, potency: 33 }
@@ -47,6 +50,7 @@
   name: Diara
   school: white
   level: 3
+  sortOrder: 2
   price: 1000
   target: all-enemies
   effect: { kind: damage, potency: 40, accuracy: 24, targetFamily: undead }
@@ -60,6 +64,7 @@
   name: Fira
   school: black
   level: 3
+  sortOrder: 1
   price: 1000
   target: all-enemies
   effect: { kind: damage, potency: 30, accuracy: 24, element: fire }
@@ -77,6 +82,7 @@
   name: Hold
   school: black
   level: 3
+  sortOrder: 2
   price: 1000
   target: single-enemy
   effect: { kind: inflict-status, status: paralysis, accuracy: 64 }
@@ -93,6 +99,7 @@
   name: Thundara
   school: black
   level: 3
+  sortOrder: 3
   price: 1000
   target: all-enemies
   effect: { kind: damage, potency: 30, accuracy: 24, element: lightning }
@@ -110,6 +117,7 @@
   name: Focara
   school: black
   level: 3
+  sortOrder: 4
   price: 1000
   target: all-enemies
   effect: { kind: lower-evasion, potency: 20, accuracy: 64 }
@@ -126,6 +134,7 @@
   name: Poisona
   school: white
   level: 4
+  sortOrder: 1
   price: 2500
   target: single-ally
   effect: { kind: cure-status, status: poison }
@@ -141,6 +150,7 @@
   name: Fear
   school: white
   level: 4
+  sortOrder: 2
   price: 2500
   target: all-enemies
   effect: { kind: increase-flee }
@@ -154,6 +164,7 @@
   name: Vox
   school: white
   level: 4
+  sortOrder: 4
   price: 2500
   target: single-ally
   effect: { kind: cure-status, status: silence }
@@ -168,6 +179,7 @@
   name: Sleepra
   school: black
   level: 4
+  sortOrder: 1
   price: 2500
   target: single-enemy
   effect: { kind: inflict-status, status: sleep, accuracy: 64 }
@@ -184,6 +196,7 @@
   name: Confuse
   school: black
   level: 4
+  sortOrder: 3
   price: 2500
   target: all-enemies
   effect: { kind: inflict-status, status: confusion, accuracy: 64 }
@@ -200,6 +213,7 @@
   name: Blizzara
   school: black
   level: 4
+  sortOrder: 4
   price: 2500
   target: all-enemies
   effect: { kind: damage, potency: 40, accuracy: 24, element: ice }
@@ -217,6 +231,7 @@
   name: Curaga
   school: white
   level: 5
+  sortOrder: 1
   price: 4000
   target: single-ally
   effect: { kind: restore-hp, potency: 66 }
@@ -232,6 +247,7 @@
   name: Life
   school: white
   level: 5
+  sortOrder: 2
   price: 4000
   target: single-ally
   effect: { kind: revive, potency: 1 }
@@ -246,6 +262,7 @@
   name: Diaga
   school: white
   level: 5
+  sortOrder: 3
   price: 4000
   target: all-enemies
   effect: { kind: damage, potency: 60, accuracy: 24, targetFamily: undead }
@@ -259,6 +276,7 @@
   name: Healara
   school: white
   level: 5
+  sortOrder: 4
   price: 4000
   target: all-allies
   effect: { kind: restore-hp, potency: 48 }
@@ -272,6 +290,7 @@
   name: Firaga
   school: black
   level: 5
+  sortOrder: 1
   price: 4000
   target: all-enemies
   effect: { kind: damage, potency: 50, accuracy: 24, element: fire }
@@ -288,6 +307,7 @@
   name: Scourge
   school: black
   level: 5
+  sortOrder: 2
   price: 4000
   target: all-enemies
   effect: { kind: inflict-status, status: death, accuracy: 40 }
@@ -302,6 +322,7 @@
   name: Teleport
   school: black
   level: 5
+  sortOrder: 3
   price: 4000
   target: all-allies
   effect: { kind: teleport-floor }
@@ -314,6 +335,7 @@
   name: Slowra
   school: black
   level: 5
+  sortOrder: 4
   price: 4000
   target: single-enemy
   effect: { kind: lower-attack-count, accuracy: 64 }
@@ -329,6 +351,7 @@
   name: Stona
   school: white
   level: 6
+  sortOrder: 1
   price: 13000
   target: single-ally
   effect: { kind: cure-status, status: petrification }
@@ -342,6 +365,7 @@
   name: Exit
   school: white
   level: 6
+  sortOrder: 2
   price: 13000
   target: all-allies
   effect: { kind: exit-dungeon }
@@ -354,6 +378,7 @@
   name: Thundaga
   school: black
   level: 6
+  sortOrder: 1
   price: 13000
   target: all-enemies
   effect: { kind: damage, potency: 60, accuracy: 24, element: lightning }
@@ -369,6 +394,7 @@
   name: Death
   school: black
   level: 6
+  sortOrder: 2
   price: 13000
   target: single-enemy
   effect: { kind: inflict-status, status: death, accuracy: 24 }
@@ -382,6 +408,7 @@
   name: Quake
   school: black
   level: 6
+  sortOrder: 3
   price: 13000
   target: all-enemies
   effect: { kind: inflict-status, status: death, accuracy: 40, element: earth }
@@ -395,6 +422,7 @@
   name: Stun
   school: black
   level: 6
+  sortOrder: 4
   price: 13000
   target: single-enemy
   effect: { kind: inflict-status, status: paralysis, maximumTargetHp: 300 }
@@ -408,6 +436,7 @@
   name: Dia
   school: white
   level: 1
+  sortOrder: 2
   price: 50
   target: all-enemies
   effect: { kind: damage, potency: 20, accuracy: 24, targetFamily: undead }
@@ -421,6 +450,7 @@
   name: Fire
   school: black
   level: 1
+  sortOrder: 1
   price: 50
   target: single-enemy
   effect: { kind: damage, potency: 10, accuracy: 24, element: fire }
@@ -438,6 +468,7 @@
   name: Blizzard
   school: black
   level: 2
+  sortOrder: 1
   price: 250
   target: single-enemy
   effect: { kind: damage, potency: 20, accuracy: 24, element: ice }
@@ -455,6 +486,7 @@
   name: Thunder
   school: black
   level: 1
+  sortOrder: 4
   price: 50
   target: single-enemy
   effect: { kind: damage, potency: 10, accuracy: 24, element: lightning }
@@ -472,6 +504,7 @@
   name: Blindna
   school: white
   level: 2
+  sortOrder: 1
   price: 250
   target: single-ally
   effect: { kind: cure-status, status: darkness }
@@ -488,6 +521,7 @@
   name: Sleep
   school: black
   level: 1
+  sortOrder: 2
   price: 50
   target: all-enemies
   effect: { kind: inflict-status, status: sleep, accuracy: 24 }
@@ -504,6 +538,7 @@
   name: Focus
   school: black
   level: 1
+  sortOrder: 3
   price: 50
   target: single-enemy
   effect: { kind: lower-evasion, potency: 20, accuracy: 64 }
@@ -520,6 +555,7 @@
   name: Protect
   school: white
   level: 1
+  sortOrder: 3
   price: 50
   target: single-ally
   effect: { kind: raise-defense, potency: 8 }
@@ -536,6 +572,7 @@
   name: Blink
   school: white
   level: 1
+  sortOrder: 4
   price: 50
   target: self
   effect: { kind: raise-evasion, potency: 80 }
@@ -551,6 +588,7 @@
   name: Silence
   school: white
   level: 2
+  sortOrder: 2
   price: 250
   target: all-enemies
   effect: { kind: inflict-status, status: silence, accuracy: 24 }
@@ -567,6 +605,7 @@
   name: Invis
   school: white
   level: 2
+  sortOrder: 4
   price: 250
   target: single-ally
   effect: { kind: raise-evasion, potency: 40 }
@@ -583,6 +622,7 @@
   name: Dark
   school: black
   level: 2
+  sortOrder: 2
   price: 250
   target: all-enemies
   effect: { kind: inflict-status, status: darkness, accuracy: 24 }
@@ -599,6 +639,7 @@
   name: Temper
   school: black
   level: 2
+  sortOrder: 3
   price: 250
   target: single-ally
   effect: { kind: raise-attack, potency: 14 }
@@ -615,6 +656,7 @@
   name: Haste
   school: black
   level: 4
+  sortOrder: 2
   price: 2500
   target: single-ally
   effect: { kind: multiply-attack-count, factor: 2 }
@@ -631,6 +673,7 @@
   name: Slow
   school: black
   level: 2
+  sortOrder: 4
   price: 250
   target: all-enemies
   effect: { kind: lower-attack-count, accuracy: 64 }
@@ -647,6 +690,7 @@
   name: NulShock
   school: white
   level: 2
+  sortOrder: 3
   price: 250
   target: all-allies
   effect: { kind: raise-resistance, element: lightning }
@@ -663,6 +707,7 @@
   name: NulBlaze
   school: white
   level: 3
+  sortOrder: 3
   price: 1000
   target: all-allies
   effect: { kind: raise-resistance, element: fire }
@@ -679,6 +724,7 @@
   name: NulFrost
   school: white
   level: 4
+  sortOrder: 3
   price: 2500
   target: all-allies
   effect: { kind: raise-resistance, element: ice }
@@ -694,6 +740,7 @@
   name: NulDeath
   school: white
   level: 7
+  sortOrder: 3
   price: 20000
   target: all-allies
   effect: { kind: raise-evasion, potency: 30 }
@@ -708,6 +755,7 @@
   name: Protera
   school: white
   level: 6
+  sortOrder: 3
   price: 13000
   target: all-allies
   effect: { kind: raise-defense, potency: 12 }
@@ -722,6 +770,7 @@
   name: Invisira
   school: white
   level: 6
+  sortOrder: 4
   price: 13000
   target: all-allies
   effect: { kind: raise-evasion, potency: 40 }
@@ -736,6 +785,7 @@
   name: Flare
   school: black
   level: 8
+  sortOrder: 1
   price: 40000
   target: single-enemy
   effect: { kind: damage, potency: 60, accuracy: 24 }
@@ -748,9 +798,182 @@
   name: Saber
   school: black
   level: 7
+  sortOrder: 3
   price: 20000
   target: self
   effect: { kind: raise-attack, potency: 20 }
   learnableBy:
     - black-wizard
   attributes: []
+
+- key: curaja
+  name: Curaja
+  school: white
+  level: 7
+  sortOrder: 1
+  price: 20000
+  target: single-ally
+  effect: { kind: restore-hp, potency: 100 }
+  learnableBy:
+    - white-wizard
+  attributes:
+    - hp-recovery
+
+- key: diaja
+  name: Diaja
+  school: white
+  level: 7
+  sortOrder: 2
+  price: 20000
+  target: all-enemies
+  effect: { kind: damage, potency: 80, accuracy: 48, targetFamily: undead }
+  learnableBy:
+    - white-wizard
+  attributes:
+    - anti-undead
+
+- key: healaga
+  name: Healaga
+  school: white
+  level: 7
+  sortOrder: 4
+  price: 20000
+  target: all-allies
+  effect: { kind: restore-hp, potency: 48 }
+  learnableBy:
+    - white-mage
+    - white-wizard
+  attributes:
+    - hp-recovery
+
+- key: blizzaga
+  name: Blizzaga
+  school: black
+  level: 7
+  sortOrder: 1
+  price: 20000
+  target: all-enemies
+  effect: { kind: damage, potency: 70, accuracy: 24, element: ice }
+  learnableBy:
+    - black-mage
+    - red-wizard
+    - black-wizard
+  attributes:
+    - offensive-magic
+    - elemental
+
+- key: break
+  name: Break
+  school: black
+  level: 7
+  sortOrder: 2
+  price: 20000
+  target: single-enemy
+  effect: { kind: inflict-status, status: petrification, accuracy: 64 }
+  learnableBy:
+    - black-wizard
+  attributes:
+    - control-magic
+
+- key: blind
+  name: Blind
+  school: black
+  level: 7
+  sortOrder: 4
+  price: 20000
+  target: single-enemy
+  effect: { kind: inflict-status, status: darkness, maximumTargetHp: 300 }
+  learnableBy:
+    - black-mage
+    - black-wizard
+  attributes:
+    - control-magic
+
+- key: full-life
+  name: Full-Life
+  school: white
+  level: 8
+  sortOrder: 1
+  price: 40000
+  target: single-ally
+  effect: { kind: revive, potency: 100 }
+  learnableBy:
+    - white-wizard
+  attributes:
+    - revival
+
+- key: nulall
+  name: NulAll
+  school: white
+  level: 8
+  sortOrder: 3
+  price: 40000
+  target: single-ally
+  effect: { kind: raise-magic-resistance, potency: 50 }
+  learnableBy:
+    - white-wizard
+  attributes:
+    - defensive-magic
+
+- key: holy
+  name: Holy
+  school: white
+  level: 8
+  sortOrder: 2
+  price: 40000
+  target: all-enemies
+  effect: { kind: damage, potency: 100, accuracy: 107 }
+  learnableBy:
+    - white-wizard
+  attributes:
+    - offensive-magic
+
+- key: dispel
+  name: Dispel
+  school: white
+  level: 8
+  sortOrder: 4
+  price: 40000
+  target: single-enemy
+  effect: { kind: remove-resistance }
+  learnableBy:
+    - white-wizard
+  attributes: []
+
+- key: warp
+  name: Warp
+  school: black
+  level: 8
+  sortOrder: 2
+  price: 40000
+  target: all-enemies
+  effect: { kind: banish-enemy }
+  learnableBy:
+    - black-mage
+  attributes: []
+
+- key: stop
+  name: Stop
+  school: black
+  level: 8
+  sortOrder: 3
+  price: 40000
+  target: all-enemies
+  effect: { kind: inflict-status, status: paralysis, accuracy: 48 }
+  learnableBy:
+    - black-wizard
+  attributes:
+    - control-magic
+
+- key: kill
+  name: Kill
+  school: black
+  level: 8
+  sortOrder: 4
+  price: 40000
+  target: single-enemy
+  effect: { kind: inflict-status, status: death, accuracy: 0 }
+  learnableBy:
+    - black-wizard
+  attributes:
+    - control-magic

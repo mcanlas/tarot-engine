@@ -61,6 +61,7 @@ function decodeSpell(value: unknown, index: number): SpellDefinition {
     key: requireString(record.key, `spells[${index}].key`),
     name: requireString(record.name, `spells[${index}].name`),
     level: requireNumber(record.level, `spells[${index}].level`),
+    sortOrder: requireSpellSortOrder(record.sortOrder, `spells[${index}].sortOrder`),
     learnableBy: requireStringArray(record.learnableBy, `spells[${index}].learnableBy`),
     attributes: requireStringArray(record.attributes, `spells[${index}].attributes`),
     ...((effect.kind !== "damage" && effect.kind !== "inflict-status") || effect.element === undefined
@@ -70,6 +71,16 @@ function decodeSpell(value: unknown, index: number): SpellDefinition {
       ? {}
       : { targetFamily: requireString(effect.targetFamily, `spells[${index}].effect.targetFamily`) }),
   }
+}
+
+function requireSpellSortOrder(value: unknown, path: string): number {
+  const sortOrder = requireNumber(value, path)
+
+  if (!Number.isInteger(sortOrder) || sortOrder < 1 || sortOrder > 4) {
+    throw new Error(`Final Fantasy spell sort order must be an integer from 1 to 4: ${sortOrder}`)
+  }
+
+  return sortOrder
 }
 
 function decodeBoss(value: unknown, index: number): BossDefinition {

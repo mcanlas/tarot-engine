@@ -243,6 +243,19 @@ test("seeds catalog records for every town ware key", async () => {
     "invisira",
     "flare",
     "saber",
+    "curaja",
+    "diaja",
+    "healaga",
+    "blizzaga",
+    "break",
+    "blind",
+    "full-life",
+    "nulall",
+    "holy",
+    "dispel",
+    "warp",
+    "stop",
+    "kill",
   ])
   for (const town of definitions.towns) {
     for (const shop of town.shops) {

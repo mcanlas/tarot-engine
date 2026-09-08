@@ -70,6 +70,7 @@ export interface SpellDefinition {
   key: string
   name: string
   level: number
+  sortOrder: number
   learnableBy: string[]
   attributes: string[]
   element?: string

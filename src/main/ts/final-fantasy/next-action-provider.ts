@@ -57,6 +57,7 @@ export type MagicEffect =
   | { readonly kind: "raise-defense"; readonly potency: number }
   | { readonly kind: "raise-evasion"; readonly potency: number }
   | { readonly kind: "raise-resistance"; readonly element: MagicElement }
+  | { readonly kind: "raise-magic-resistance"; readonly potency: number }
   | { readonly kind: "raise-attack"; readonly potency: number }
   | { readonly kind: "multiply-attack-count"; readonly factor: number }
   | {
@@ -71,6 +72,8 @@ export type MagicEffect =
   | { readonly kind: "increase-flee" }
   | { readonly kind: "exit-dungeon" }
   | { readonly kind: "teleport-floor" }
+  | { readonly kind: "remove-resistance" }
+  | { readonly kind: "banish-enemy" }
 
 export interface MagicDefinition {
   readonly key: string
@@ -337,9 +340,14 @@ function validateMagicMechanics(magic: MagicDefinition): void {
       return
     case "cure-status":
     case "raise-resistance":
+    case "remove-resistance":
+    case "banish-enemy":
     case "increase-flee":
     case "exit-dungeon":
     case "teleport-floor":
+      return
+    case "raise-magic-resistance":
+      requireNonNegativeInteger(magic.effect.potency, `magic ${magic.key} potency`)
       return
     case "multiply-attack-count":
       if (!Number.isFinite(magic.effect.factor) || magic.effect.factor < 1) {
