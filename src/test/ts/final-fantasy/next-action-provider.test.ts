@@ -250,7 +250,7 @@ test("loads explicit seeded magic mechanics", async () => {
         target: "all-enemies",
         effect: { kind: "damage", potency: 60, accuracy: 24, targetFamily: "undead" },
       },
-      { key: "healara", target: "all-allies", effect: { kind: "restore-hp", potency: 48 } },
+      { key: "healara", target: "all-allies", effect: { kind: "restore-hp", potency: 24 } },
       {
         key: "firaga",
         target: "all-enemies",
@@ -382,7 +382,7 @@ test("loads explicit seeded magic mechanics", async () => {
       {
         key: "nuldeath",
         target: "all-allies",
-        effect: { kind: "raise-evasion", potency: 30 },
+        effect: { kind: "raise-resistances", resistances: ["earth", "status", "poison", "time", "death"] },
       },
       {
         key: "protera",
@@ -397,10 +397,10 @@ test("loads explicit seeded magic mechanics", async () => {
       {
         key: "flare",
         target: "single-enemy",
-        effect: { kind: "damage", potency: 60, accuracy: 24 },
+        effect: { kind: "damage", potency: 100, accuracy: 107 },
       },
-      { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 20 } },
-      { key: "curaja", target: "single-ally", effect: { kind: "restore-hp", potency: 100 } },
+      { key: "saber", target: "self", effect: { kind: "raise-attack", potency: 16 } },
+      { key: "curaja", target: "single-ally", effect: { kind: "restore-hp", potency: 999, fullRecovery: true } },
       {
         key: "diaja",
         target: "all-enemies",
@@ -422,17 +422,17 @@ test("loads explicit seeded magic mechanics", async () => {
         target: "single-enemy",
         effect: { kind: "inflict-status", status: "darkness", maximumTargetHp: 300 },
       },
-      { key: "full-life", target: "single-ally", effect: { kind: "revive", potency: 100 } },
-      { key: "nulall", target: "single-ally", effect: { kind: "raise-magic-resistance", potency: 50 } },
-      { key: "holy", target: "all-enemies", effect: { kind: "damage", potency: 100, accuracy: 107 } },
-      { key: "dispel", target: "single-enemy", effect: { kind: "remove-resistance" } },
-      { key: "warp", target: "all-enemies", effect: { kind: "banish-enemy" } },
+      { key: "full-life", target: "single-ally", effect: { kind: "revive", potency: 999, fullRecovery: true } },
+      { key: "nulall", target: "single-ally", effect: { kind: "raise-resistances", resistances: ["earth", "fire", "ice", "lightning", "status", "poison", "time", "death"] } },
+      { key: "holy", target: "all-enemies", effect: { kind: "damage", potency: 80, accuracy: 107 } },
+      { key: "dispel", target: "single-enemy", effect: { kind: "remove-resistance", accuracy: 107 } },
+      { key: "warp", target: "all-enemies", effect: { kind: "banish-enemy", accuracy: 32, element: "time" } },
       {
         key: "stop",
         target: "all-enemies",
         effect: { kind: "inflict-status", status: "paralysis", accuracy: 48 },
       },
-      { key: "kill", target: "single-enemy", effect: { kind: "inflict-status", status: "death", accuracy: 0 } },
+      { key: "kill", target: "single-enemy", effect: { kind: "inflict-status", status: "death", maximumTargetHp: 300 } },
     ],
   )
 })

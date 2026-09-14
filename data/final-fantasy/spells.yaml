@@ -279,7 +279,7 @@
   sortOrder: 4
   price: 4000
   target: all-allies
-  effect: { kind: restore-hp, potency: 48 }
+  effect: { kind: restore-hp, potency: 24 }
   learnableBy:
     - white-mage
     - white-wizard
@@ -741,9 +741,9 @@
   school: white
   level: 7
   sortOrder: 3
-  price: 20000
+  price: 30000
   target: all-allies
-  effect: { kind: raise-evasion, potency: 30 }
+  effect: { kind: raise-resistances, resistances: [earth, status, poison, time, death] }
   learnableBy:
     - white-mage
     - white-wizard
@@ -788,7 +788,7 @@
   sortOrder: 1
   price: 40000
   target: single-enemy
-  effect: { kind: damage, potency: 60, accuracy: 24 }
+  effect: { kind: damage, potency: 100, accuracy: 107 }
   learnableBy:
     - black-wizard
   attributes:
@@ -799,9 +799,9 @@
   school: black
   level: 7
   sortOrder: 3
-  price: 20000
+  price: 30000
   target: self
-  effect: { kind: raise-attack, potency: 20 }
+  effect: { kind: raise-attack, potency: 16 }
   learnableBy:
     - black-wizard
   attributes: []
@@ -811,9 +811,9 @@
   school: white
   level: 7
   sortOrder: 1
-  price: 20000
+  price: 30000
   target: single-ally
-  effect: { kind: restore-hp, potency: 100 }
+  effect: { kind: restore-hp, potency: 999, fullRecovery: true }
   learnableBy:
     - white-wizard
   attributes:
@@ -824,7 +824,7 @@
   school: white
   level: 7
   sortOrder: 2
-  price: 20000
+  price: 30000
   target: all-enemies
   effect: { kind: damage, potency: 80, accuracy: 48, targetFamily: undead }
   learnableBy:
@@ -837,7 +837,7 @@
   school: white
   level: 7
   sortOrder: 4
-  price: 20000
+  price: 30000
   target: all-allies
   effect: { kind: restore-hp, potency: 48 }
   learnableBy:
@@ -851,7 +851,7 @@
   school: black
   level: 7
   sortOrder: 1
-  price: 20000
+  price: 30000
   target: all-enemies
   effect: { kind: damage, potency: 70, accuracy: 24, element: ice }
   learnableBy:
@@ -867,7 +867,7 @@
   school: black
   level: 7
   sortOrder: 2
-  price: 20000
+  price: 30000
   target: single-enemy
   effect: { kind: inflict-status, status: petrification, accuracy: 64 }
   learnableBy:
@@ -880,7 +880,7 @@
   school: black
   level: 7
   sortOrder: 4
-  price: 20000
+  price: 30000
   target: single-enemy
   effect: { kind: inflict-status, status: darkness, maximumTargetHp: 300 }
   learnableBy:
@@ -896,7 +896,7 @@
   sortOrder: 1
   price: 40000
   target: single-ally
-  effect: { kind: revive, potency: 100 }
+  effect: { kind: revive, potency: 999, fullRecovery: true }
   learnableBy:
     - white-wizard
   attributes:
@@ -909,7 +909,7 @@
   sortOrder: 3
   price: 40000
   target: single-ally
-  effect: { kind: raise-magic-resistance, potency: 50 }
+  effect: { kind: raise-resistances, resistances: [earth, fire, ice, lightning, status, poison, time, death] }
   learnableBy:
     - white-wizard
   attributes:
@@ -922,7 +922,7 @@
   sortOrder: 2
   price: 40000
   target: all-enemies
-  effect: { kind: damage, potency: 100, accuracy: 107 }
+  effect: { kind: damage, potency: 80, accuracy: 107 }
   learnableBy:
     - white-wizard
   attributes:
@@ -935,7 +935,7 @@
   sortOrder: 4
   price: 40000
   target: single-enemy
-  effect: { kind: remove-resistance }
+  effect: { kind: remove-resistance, accuracy: 107 }
   learnableBy:
     - white-wizard
   attributes: []
@@ -947,9 +947,9 @@
   sortOrder: 2
   price: 40000
   target: all-enemies
-  effect: { kind: banish-enemy }
+  effect: { kind: banish-enemy, accuracy: 32, element: time }
   learnableBy:
-    - black-mage
+    - black-wizard
   attributes: []
 
 - key: stop
@@ -972,7 +972,7 @@
   sortOrder: 4
   price: 40000
   target: single-enemy
-  effect: { kind: inflict-status, status: death, accuracy: 0 }
+  effect: { kind: inflict-status, status: death, maximumTargetHp: 300 }
   learnableBy:
     - black-wizard
   attributes:

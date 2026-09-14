@@ -56,6 +56,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "raise-defense": 25,
     "raise-evasion": 20,
     "raise-resistance": 30,
+    "raise-resistances": 30,
     "raise-magic-resistance": 30,
     "raise-attack": 35,
     "multiply-attack-count": 60,
@@ -66,7 +67,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "exit-dungeon": 0,
     "teleport-floor": 0,
     "remove-resistance": 0,
-    "banish-enemy": 0,
+    "banish-enemy": 25,
   }),
   spellPotency: Object.freeze({
     "restore-hp": 1,
@@ -76,6 +77,7 @@ export const defaultPartyUtilityPolicy: PartyUtilityPolicy = Object.freeze({
     "raise-defense": 2,
     "raise-evasion": 0.125,
     "raise-resistance": 0,
+    "raise-resistances": 0,
     "raise-magic-resistance": 0,
     "raise-attack": 2,
     "multiply-attack-count": 0,
@@ -294,7 +296,7 @@ function scoreMagic(
     reasons.push(`${targetFit.label} multiplier ${targetFit.multiplier}`)
   }
 
-  if (effect.kind === "inflict-status" && effect.status === "death") {
+  if ((effect.kind === "inflict-status" && effect.status === "death") || effect.kind === "banish-enemy") {
     value *= policy.instantDeathMultiplier
     reasons.push(`instant-death reliability multiplier ${policy.instantDeathMultiplier}`)
   }
@@ -514,6 +516,7 @@ function magicCapabilityKey(magic: MagicDefinition): string {
   if (effect.kind === "raise-resistance") {
     discriminators.push(effect.element)
   }
+  if (effect.kind === "raise-resistances") discriminators.push(...effect.resistances)
   if (effect.kind === "restore-hp" || effect.kind === "revive") {
     discriminators.push(magic.target)
   }

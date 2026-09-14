@@ -129,7 +129,7 @@ test("Melmond recommendations preserve revival and reject dungeon-only magic", a
   const byId = new Map(finalParty.characters.map((member) => [member.id, member]))
 
   assert.deepEqual(spellsAtLevel(byId.get("white")!, 5, scenario.catalog.magic), [
-    "curaga", "healara", "life",
+    "curaga", "diaga", "life",
   ])
   assert(!byId.get("black")!.learnedSpells.has("teleport"))
   assertThreeSpellsPerLevel(finalParty, scenario.catalog.magic)

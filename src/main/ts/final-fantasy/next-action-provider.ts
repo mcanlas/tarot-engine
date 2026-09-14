@@ -33,6 +33,7 @@ export type MagicTarget =
   | "all-allies"
 
 export type MagicElement = "earth" | "fire" | "ice" | "lightning"
+export type MagicResistance = MagicElement | "status" | "poison" | "time" | "death"
 export type MagicStatus =
   | "confusion"
   | "darkness"
@@ -44,8 +45,8 @@ export type MagicStatus =
   | "death"
 
 export type MagicEffect =
-  | { readonly kind: "restore-hp"; readonly potency: number }
-  | { readonly kind: "revive"; readonly potency: number }
+  | { readonly kind: "restore-hp"; readonly potency: number; readonly fullRecovery?: true }
+  | { readonly kind: "revive"; readonly potency: number; readonly fullRecovery?: true }
   | { readonly kind: "cure-status"; readonly status: MagicStatus }
   | {
       readonly kind: "damage"
@@ -57,6 +58,7 @@ export type MagicEffect =
   | { readonly kind: "raise-defense"; readonly potency: number }
   | { readonly kind: "raise-evasion"; readonly potency: number }
   | { readonly kind: "raise-resistance"; readonly element: MagicElement }
+  | { readonly kind: "raise-resistances"; readonly resistances: readonly MagicResistance[] }
   | { readonly kind: "raise-magic-resistance"; readonly potency: number }
   | { readonly kind: "raise-attack"; readonly potency: number }
   | { readonly kind: "multiply-attack-count"; readonly factor: number }
@@ -72,8 +74,8 @@ export type MagicEffect =
   | { readonly kind: "increase-flee" }
   | { readonly kind: "exit-dungeon" }
   | { readonly kind: "teleport-floor" }
-  | { readonly kind: "remove-resistance" }
-  | { readonly kind: "banish-enemy" }
+  | { readonly kind: "remove-resistance"; readonly accuracy: number }
+  | { readonly kind: "banish-enemy"; readonly accuracy: number; readonly element: "time" }
 
 export interface MagicDefinition {
   readonly key: string
@@ -340,11 +342,16 @@ function validateMagicMechanics(magic: MagicDefinition): void {
       return
     case "cure-status":
     case "raise-resistance":
-    case "remove-resistance":
-    case "banish-enemy":
     case "increase-flee":
     case "exit-dungeon":
     case "teleport-floor":
+      return
+    case "raise-resistances":
+      if (magic.effect.resistances.length === 0) throw new Error(`Final Fantasy magic ${magic.key} must grant a resistance`)
+      return
+    case "remove-resistance":
+    case "banish-enemy":
+      requireNonNegativeInteger(magic.effect.accuracy, `magic ${magic.key} accuracy`)
       return
     case "raise-magic-resistance":
       requireNonNegativeInteger(magic.effect.potency, `magic ${magic.key} potency`)
