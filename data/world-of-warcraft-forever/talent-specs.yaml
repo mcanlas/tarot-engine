@@ -1,0 +1,89 @@
+- class: Druid
+  features: { rage: 0, energy: 0, mana: 1, pet: 0, pet-specialist: 0, ranged: 0, melee: 0, periodic-damage: 0, burst-damage: 0, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Balance
+      features: { ranged: 1, periodic-damage: 1 }
+    - name: Feral Combat
+      features: { rage: 1, energy: 1, melee: 1, periodic-damage: 1, burst-damage: 1, tank: 1, damage-prevention: 1 }
+    - name: Restoration
+      features: { ranged: 1, healer: 1, periodic-healing: 1 }
+
+- class: Hunter
+  features: { rage: 0, energy: 0, mana: 1, pet: 1, pet-specialist: 0, ranged: 0, melee: 0, periodic-damage: 0, burst-damage: 0, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Beast Mastery
+      features: { pet-specialist: 1, ranged: 1, burst-damage: 1 }
+    - name: Marksmanship
+      features: { ranged: 1, burst-damage: 1 }
+    - name: Survival
+      features: { melee: 1, crowd-control: 1 }
+
+- class: Mage
+  features: { rage: 0, energy: 0, mana: 1, pet: 0, pet-specialist: 0, ranged: 1, melee: 0, periodic-damage: 0, burst-damage: 1, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Arcane
+      features: {}
+    - name: Fire
+      features: { periodic-damage: 1 }
+    - name: Frost
+      features: { crowd-control: 1 }
+
+- class: Paladin
+  features: { rage: 0, energy: 0, mana: 1, pet: 0, pet-specialist: 0, ranged: 0, melee: 0, periodic-damage: 0, burst-damage: 0, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Holy
+      features: {  ranged: 1, healer: 1 }
+    - name: Protection
+      features: { melee: 1, tank: 1, damage-prevention: 1 }
+    - name: Retribution
+      features: { melee: 1, burst-damage: 1 }
+
+- class: Priest
+  features: { rage: 0, energy: 0, mana: 1, pet: 0, pet-specialist: 0, ranged: 1, melee: 0, periodic-damage: 0, burst-damage: 0, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Discipline
+      features: { damage-prevention: 1, healer: 1 }
+    - name: Holy
+      features: { healer: 1 }
+    - name: Shadow
+      features: { periodic-damage: 1 }
+
+- class: Rogue
+  features: { rage: 0, energy: 1, mana: 0, pet: 0, pet-specialist: 0, ranged: 0, melee: 1, periodic-damage: 0, burst-damage: 1, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Assassination
+      features: { periodic-damage: 1 }
+    - name: Combat
+      features: {}
+    - name: Subtlety
+      features: { periodic-damage: 1, crowd-control: 1 }
+
+- class: Shaman
+  features: { rage: 0, energy: 0, mana: 1, pet: 0, pet-specialist: 0, ranged: 0, melee: 0, periodic-damage: 0, burst-damage: 0, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Elemental
+      features: { ranged: 1, periodic-damage: 1, burst-damage: 1 }
+    - name: Enhancement
+      features: { melee: 1, burst-damage: 1 }
+    - name: Restoration
+      features: { ranged: 1, healer: 1, periodic-healing: 1 }
+
+- class: Warlock
+  features: { rage: 0, energy: 0, mana: 1, pet: 1, pet-specialist: 0, ranged: 1, melee: 0, periodic-damage: 0, burst-damage: 0, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Affliction
+      features: { periodic-damage: 1 }
+    - name: Demonology
+      features: { pet-specialist: 1 }
+    - name: Destruction
+      features: { periodic-damage: 1, burst-damage: 1 }
+
+- class: Warrior
+  features: { rage: 1, energy: 0, mana: 0, pet: 0, pet-specialist: 0, ranged: 0, melee: 1, periodic-damage: 0, burst-damage: 0, crowd-control: 0, tank: 0, damage-prevention: 0, healer: 0, periodic-healing: 0 }
+  specs:
+    - name: Arms
+      features: { periodic-damage: 1, burst-damage: 1 }
+    - name: Fury
+      features: { burst-damage: 1 }
+    - name: Protection
+      features: { tank: 1, damage-prevention: 1 }

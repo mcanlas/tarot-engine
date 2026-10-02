@@ -1,0 +1,131 @@
+- race: Dwarf
+  class: Hunter
+- race: Dwarf
+  class: Paladin
+- race: Dwarf
+  class: Priest
+- race: Dwarf
+  class: Rogue
+- race: Dwarf
+  class: Shaman
+- race: Dwarf
+  class: Warrior
+
+- race: Gnome
+  class: Mage
+- race: Gnome
+  class: Priest
+- race: Gnome
+  class: Rogue
+- race: Gnome
+  class: Warlock
+- race: Gnome
+  class: Warrior
+
+- race: Human
+  class: Hunter
+- race: Human
+  class: Mage
+- race: Human
+  class: Paladin
+- race: Human
+  class: Priest
+- race: Human
+  class: Rogue
+- race: Human
+  class: Warlock
+- race: Human
+  class: Warrior
+
+- race: Night Elf
+  class: Druid
+- race: Night Elf
+  class: Hunter
+- race: Night Elf
+  class: Priest
+- race: Night Elf
+  class: Rogue
+- race: Night Elf
+  class: Warrior
+
+- race: Orc
+  class: Hunter
+- race: Orc
+  class: Mage
+- race: Orc
+  class: Rogue
+- race: Orc
+  class: Shaman
+- race: Orc
+  class: Warlock
+- race: Orc
+  class: Warrior
+
+- race: Tauren
+  class: Druid
+- race: Tauren
+  class: Hunter
+- race: Tauren
+  class: Shaman
+- race: Tauren
+  class: Warrior
+
+- race: Troll
+  class: Hunter
+- race: Troll
+  class: Mage
+- race: Troll
+  class: Priest
+- race: Troll
+  class: Rogue
+- race: Troll
+  class: Shaman
+- race: Troll
+  class: Warlock
+- race: Troll
+  class: Warrior
+
+- race: Undead
+  class: Mage
+- race: Undead
+  class: Paladin
+- race: Undead
+  class: Priest
+- race: Undead
+  class: Rogue
+- race: Undead
+  class: Warlock
+- race: Undead
+  class: Warrior
+
+- race: Skyborne
+  class: Druid
+  faction: Alliance
+- race: Skyborne
+  class: Hunter
+  faction: Alliance
+- race: Skyborne
+  class: Mage
+  faction: Alliance
+- race: Skyborne
+  class: Rogue
+  faction: Alliance
+- race: Skyborne
+  class: Warrior
+  faction: Alliance
+
+- race: Skyborne
+  class: Druid
+  faction: Horde
+- race: Skyborne
+  class: Hunter
+  faction: Horde
+- race: Skyborne
+  class: Rogue
+  faction: Horde
+- race: Skyborne
+  class: Shaman
+  faction: Horde
+- race: Skyborne
+  class: Warrior
+  faction: Horde
