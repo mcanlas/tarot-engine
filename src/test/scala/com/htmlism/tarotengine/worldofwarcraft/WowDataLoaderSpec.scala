@@ -17,12 +17,17 @@ object WowDataLoaderSpec extends SimpleIOSuite:
       )
       .evalTap(path => IO.blocking(Files.writeString(path, contents, StandardCharsets.UTF_8)).void)
 
-  test("load both classpath catalogs with typed names and sparse feature maps"):
+  test("load classpath catalogs with typed names, starting areas, and sparse feature maps"):
     for
+      races <- WowDataLoader.loadRaces
+
       combinations <- WowDataLoader.loadRaceClassCombinations
 
       classes <- WowDataLoader.loadClassTalentSpecs
-    yield expect.same(56, combinations.size) &&
+    yield expect.same(Race.values.toSet, races.map(_.race).toSet) &&
+      expect.same(Race.values.length, races.size) &&
+      expect.same(Some("Zephras Isle"), races.find(_.race == Race.Skyborne).map(_.startingArea)) &&
+      expect.same(56, combinations.size) &&
       expect.same(CharacterClass.values.toSet, classes.map(_.className).toSet) &&
       expect.same(27, classes.flatMap(_.specs).size) &&
       expect(classes.flatMap(_.specs).exists(_.features.isEmpty)) &&

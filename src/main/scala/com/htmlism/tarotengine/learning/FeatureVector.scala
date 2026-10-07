@@ -7,5 +7,4 @@ object FeatureVector:
   private[tarotengine] def fromValues(values: Vector[Double]): FeatureVector =
     values
 
-  extension (features: FeatureVector)
-    def values: Vector[Double] = features
+  extension (features: FeatureVector) def values: Vector[Double] = features

@@ -35,6 +35,8 @@ object AltRecommendationApp extends IOApp:
           .errorln("Usage: AltRecommendationApp <alt-journal.yaml>")
           .as(ExitCode.Error)
 
-  /** suspends path parsing and captures invalid paths as effect failures */
+  /**
+    * Suspends path parsing and captures invalid paths as effect failures
+    */
   private def parseJournalPath(value: String) =
     IO(Path.of(value))

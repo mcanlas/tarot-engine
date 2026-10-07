@@ -2,7 +2,9 @@ package com.htmlism.tarotengine.worldofwarcraft
 
 import io.circe.Decoder
 
-/** A talent tree name; use the owning class to resolve names shared by multiple classes. */
+/**
+  * A talent tree name; use the owning class to resolve names shared by multiple classes
+  */
 enum Spec(val yamlName: String):
   case Balance       extends Spec("Balance")
   case FeralCombat   extends Spec("Feral Combat")

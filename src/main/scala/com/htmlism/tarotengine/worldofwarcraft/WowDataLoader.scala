@@ -11,6 +11,9 @@ import io.circe.Decoder
 import io.circe.yaml.parser
 
 object WowDataLoader:
+  def loadRaces: IO[List[RaceDefinition]] =
+    loadResource[List[RaceDefinition]]("world-of-warcraft-forever/races.yaml")
+
   def loadRaceClassCombinations: IO[List[RaceClassCombination]] =
     loadResource[List[RaceClassCombination]]("world-of-warcraft-forever/class-race-combinations.yaml")
 

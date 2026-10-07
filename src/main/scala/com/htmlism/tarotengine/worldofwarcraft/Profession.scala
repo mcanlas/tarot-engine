@@ -2,7 +2,9 @@ package com.htmlism.tarotengine.worldofwarcraft
 
 import io.circe.Decoder
 
-/** Primary professions occupying the journal's two profession slots. */
+/**
+  * Primary professions occupying the journal's two profession slots
+  */
 enum Profession:
   case Alchemy
   case Blacksmithing
