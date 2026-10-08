@@ -8,15 +8,17 @@ final case class AltJournalEntry(
     className: CharacterClass,
     primarySpec: Spec,
     secondarySpec: Spec,
-    professions: Set[Profession]
+    professions: Set[Profession],
+    checkpoints: List[AltCheckpoint]
 )
 
 object AltJournalEntry:
-  given Decoder[AltJournalEntry] = Decoder.forProduct6(
+  given Decoder[AltJournalEntry] = Decoder.forProduct7(
     "faction",
     "race",
     "class",
     "primarySpec",
     "secondarySpec",
-    "professions"
+    "professions",
+    "checkpoints"
   )(AltJournalEntry.apply)

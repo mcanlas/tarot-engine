@@ -1,6 +1,8 @@
 package com.htmlism.tarotengine.learning
 
-/** numeric coordinates under an encoder's feature layout */
+/**
+  * numeric coordinates under an encoder's feature layout
+  */
 opaque type FeatureVector = Vector[Double]
 
 object FeatureVector:

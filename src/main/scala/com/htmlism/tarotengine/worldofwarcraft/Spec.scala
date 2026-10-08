@@ -6,6 +6,7 @@ import io.circe.Decoder
   * A talent tree name; use the owning class to resolve names shared by multiple classes
   */
 enum Spec(val yamlName: String):
+  case Undecided     extends Spec("UNDECIDED")
   case Balance       extends Spec("Balance")
   case FeralCombat   extends Spec("Feral Combat")
   case Restoration   extends Spec("Restoration")

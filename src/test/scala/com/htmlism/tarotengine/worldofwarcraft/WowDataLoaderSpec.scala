@@ -40,6 +40,7 @@ object WowDataLoaderSpec extends SimpleIOSuite:
                  |  primarySpec: Affliction
                  |  secondarySpec: Demonology
                  |  professions: [Tailoring, Engineering]
+                 |  checkpoints: []
                  |""".stripMargin
 
     yamlFile(yaml).use: path =>
@@ -54,7 +55,8 @@ object WowDataLoaderSpec extends SimpleIOSuite:
                 CharacterClass.Warlock,
                 Spec.Affliction,
                 Spec.Demonology,
-                Set(Profession.Tailoring, Profession.Engineering)
+                Set(Profession.Tailoring, Profession.Engineering),
+                Nil
               )
             ),
             journal

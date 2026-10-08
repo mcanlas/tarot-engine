@@ -13,7 +13,8 @@ object WowFeatureEncoderSpec extends SimpleIOSuite:
       CharacterClass.Warrior,
       Spec.Arms,
       Spec.Fury,
-      Set(Profession.Mining, Profession.Blacksmithing)
+      Set(Profession.Mining, Profession.Blacksmithing),
+      Nil
     )
 
   test("shared starting areas reduce distance while preserving distinct race identities"):

@@ -10,6 +10,7 @@ object SpecDecodersSpec extends FunSuite:
                             |  primarySpec: Affliction
                             |  secondarySpec: Demonology
                             |  professions: [Tailoring, Engineering]
+                            |  checkpoints: []
                             |""".stripMargin
 
   test("journal uses primarySpec and secondarySpec with typed spec values"):
@@ -20,7 +21,8 @@ object SpecDecodersSpec extends FunSuite:
         CharacterClass.Warlock,
         Spec.Affliction,
         Spec.Demonology,
-        Set(Profession.Tailoring, Profession.Engineering)
+        Set(Profession.Tailoring, Profession.Engineering),
+        Nil
       )
     )
 
