@@ -9,8 +9,7 @@ package com.htmlism.tarotengine.learning
   * The result is called covariance: the model's assumed relationship between those preference scores. Identical vectors
   * produce `variance`; as the vectors move farther apart, the result approaches zero.
   *
-  * Each coordinate difference is divided by `lengthScale`, squared, and added to the other squared differences. The
-  * result is `variance * exp(-0.5 * squaredDistance)`.
+  * The selected distance is divided by `lengthScale`. The result is `variance * exp(-0.5 * scaledDistance squared)`.
   *
   * For example, with variance 1 and length scale 1, the vectors [0] and [1] have covariance about 0.607. Increasing the
   * length scale to 2 raises it to about 0.882: the same difference creates a stronger connection.
@@ -20,22 +19,16 @@ package com.htmlism.tarotengine.learning
   * @param variance
   *   the scale of variation in the model's preference scores; also the covariance of an input with itself
   */
-final case class RbfKernel(lengthScale: Double, variance: Double) extends Kernel:
+final case class RbfKernel(lengthScale: Double, variance: Double, distance: Distance) extends Kernel:
   require(lengthScale.isFinite && lengthScale > 0.0, "RBF length scale must be positive and finite")
   require(variance.isFinite && variance > 0.0, "RBF variance must be positive and finite")
 
   def covariance(left: FeatureVector, right: FeatureVector): Double =
-    require(left.values.size == right.values.size, "Feature vectors must have equal dimensions")
-    require(left.values.forall(_.isFinite) && right.values.forall(_.isFinite), "Feature values must be finite")
+    val scaledDistance =
+      distance.between(left, right) / lengthScale
 
-    val squaredDistance = left
-      .values
-      .zip(right.values)
-      .map:
-        case (a, b) =>
-          val distance = (a - b) / lengthScale
+    variance * math.exp(-0.5 * scaledDistance * scaledDistance)
 
-          distance * distance
-      .sum
-
-    variance * math.exp(-0.5 * squaredDistance)
+object RbfKernel:
+  def apply(lengthScale: Double, variance: Double): RbfKernel =
+    new RbfKernel(lengthScale, variance, Distance.euclidean)
