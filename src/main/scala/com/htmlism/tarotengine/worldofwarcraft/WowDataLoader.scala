@@ -11,6 +11,9 @@ import io.circe.Decoder
 import io.circe.yaml.parser
 
 object WowDataLoader:
+  def loadProfessionPairs: IO[List[ProfessionPair]] =
+    loadResource[List[ProfessionPair]]("world-of-warcraft-forever/profession-pairs.yaml")
+
   def loadRaces: IO[List[RaceDefinition]] =
     loadResource[List[RaceDefinition]]("world-of-warcraft-forever/races.yaml")
 
